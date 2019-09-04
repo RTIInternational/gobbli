@@ -8,7 +8,7 @@ from gobbli.model.fasttext import FastText
 from gobbli.model.random import RandomEmbedder
 from gobbli.model.transformer import Transformer
 from gobbli.model.use import USE
-from gobbli.test.util import model_test_dir, validate_checkpoint
+from gobbli.test.util import model_test_dir, skip_if_low_resource, validate_checkpoint
 
 
 def check_embed_output(
