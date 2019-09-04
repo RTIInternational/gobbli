@@ -14,6 +14,7 @@ import json
 #
 import os
 import sys
+from pathlib import Path
 
 import gobbli
 
@@ -63,7 +64,7 @@ autosummary_generate = True
 intersphinx_mapping = {
     "docker": ("https://docker-py.readthedocs.io/en/stable/", None),
     "ray": ("https://ray.readthedocs.io/en/stable/", None),
-    "sklearn": ("http://scikit-learn.org/stable", None),
+    "sklearn": ("https://scikit-learn.org/stable", None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -91,3 +92,28 @@ html_static_path = ["_static"]
 html_sidebars = {
     "**": ["about.html", "navigation.html", "relations.html", "searchbox.html"]
 }
+
+# Autogenerate API docs
+def run_apidoc(_):
+    from sphinx.ext.apidoc import main
+
+    # Repository root
+    base_dir = Path(__file__).parent.parent.resolve()
+
+    output_path = base_dir / "docs" / "auto"
+    print(base_dir)
+    print(output_path)
+    main(
+        [
+            "--no-toc",
+            "--separate",
+            "-o",
+            str(output_path),
+            str(base_dir / project),
+            str(base_dir / project / "model" / "*" / "src"),
+        ]
+    )
+
+
+def setup(app):
+    app.connect("builder-inited", run_apidoc)
