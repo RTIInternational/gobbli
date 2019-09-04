@@ -8,13 +8,15 @@ gobbli is currently **experimental**.  We have used gobbli for project work in i
 
 ## Usage
 
-See [the docs](https://gobbli.readthedocs.io/en/latest/) for prerequisites, a quickstart, and the API reference.
+See [the docs](https://gobbli.readthedocs.io/en/latest/) for prerequisites, a quickstart, and the API reference.  In brief, you need [Docker](https://www.docker.com/) installed with appropriate permissions for your user account to run Docker commands, Python 3.7.  Then run the following:
+
+    pip install gobbli
 
 You may also want to check out the [benchmarks](./benchmark) to see some comparisons of gobbli's implementation of various models in different situations.
 
 ## Development
 
-Install the package and all required + optional dependencies in development mode:
+Assuming you have all prerequisites noted above, you need to install the package and all required + optional dependencies in development mode:
 
     pip install -e ".[augment,tokenize]"
     
