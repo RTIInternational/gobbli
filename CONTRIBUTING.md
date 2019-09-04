@@ -4,7 +4,7 @@ Thanks for your contribution!  We're starting out with a few simple guidelines:
 
 ## Contributor License Agreement
 
-You must [sign a Contributor License Agreement](TODO) (CLA) to contribute to this project.
+You must [sign a Contributor License Agreement](https://www.clahub.com/agreements/RTIInternational/gobbli) (CLA) to contribute to this project.
 
 ## Code Style
 
