@@ -8,7 +8,7 @@ gobbli is currently **experimental**.  We have used gobbli for project work in i
 
 ## Usage
 
-See [the docs](https://gobbli.readthedocs.io/en/latest/) for prerequisites, a quickstart, and the API reference.  In brief, you need [Docker](https://www.docker.com/) installed with appropriate permissions for your user account to run Docker commands, Python 3.7.  Then run the following:
+See [the docs](https://gobbli.readthedocs.io/en/latest/) for prerequisites, a quickstart, and the API reference.  In brief, you need [Docker](https://www.docker.com/) installed with appropriate permissions for your user account to run Docker commands and Python 3.7.  Then run the following:
 
     pip install gobbli
 
