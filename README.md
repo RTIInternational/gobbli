@@ -27,8 +27,10 @@ Run linting, autoformatting, and tests:
     ./run_ci.sh
     
 To avoid manually fixing some of these errors, consider enabling [isort](https://github.com/timothycrosley/isort) and [black](https://github.com/python/black) support in your favorite editor.
+
+If you're running tests in an environment with less than 12GB of memory, you'll want to pass the `--low-resource` argument when running tests to avoid out of memory errors.
     
-**NOTE:** If running on a Mac, you may encounter Out of Memory errors (exit status 137) when running the tests.  This is due to not enough memory being allocated to your Docker daemon.  Try going to Docker for Mac -> Preferences -> Advanced and raising "Memory" to 12GiB or more.
+**NOTE:** If running on a Mac, even with adequate memory available, you may encounter Out of Memory errors (exit status 137) when running the tests.  This is due to not enough memory being allocated to your Docker daemon.  Try going to Docker for Mac -> Preferences -> Advanced and raising "Memory" to 12GiB or more.
 
 If you want to run the tests GPU(s) enabled, see the `--use-gpu` and `--nvidia-visible-devices` arguments under `py.test --help`.  If your local machine doesn't have an NVIDIA GPU, but you have access to one that does via SSH, you can use the `test_remote_gpu.sh` script to run the tests with GPU enabled over SSH.
 

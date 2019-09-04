@@ -122,6 +122,10 @@ def test_embeddings(
     if model_cls in (USE, FastText) and pooling == gobbli.io.EmbedPooling.NONE:
         pytest.xfail("pooling is required for USE and FastText models")
 
+    # These combinations of model and dataset require a lot of memory
+    if model_cls in (BERT, Transformer) and dataset_cls in (NewsgroupsDataset,):
+        skip_if_low_resource(request.config)
+
     model = model_cls(
         data_dir=model_test_dir(model_cls),
         load_existing=True,

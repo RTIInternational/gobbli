@@ -44,6 +44,12 @@ def pytest_addoption(parser):
         help="Log level for containers run in worker processes as part of tests. "
         "Combine with --log-cli-level to see logs from workers.",
     )
+    parser.addoption(
+        "--low-resource",
+        action="store_true",
+        help="Skip tests that require a lot of CPU and/or memory. Useful for "
+        "running tests in a resource-limited environment.",
+    )
 
 
 def make_temp_dir() -> Path:

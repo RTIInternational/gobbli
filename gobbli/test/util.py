@@ -18,6 +18,16 @@ def skip_if_no_gpu(config):
         pytest.skip("needs --use-gpu option to run")
 
 
+def skip_if_low_resource(config):
+    """
+    Used when a test involves a large amount of CPU, memory, etc,
+    and the user has indicated we're running in a resource-limited
+    environment.
+    """
+    if config.option.low_resource:
+        pytest.skip("skipping large test due to --low-resource option")
+
+
 # TODO can we write a type declaration to indicate that args
 # should be classes derived from BaseModel?
 def model_test_dir(model_cls: Any) -> Path:

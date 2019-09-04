@@ -7,7 +7,7 @@ from gobbli.model.fasttext import FastText
 from gobbli.model.majority import MajorityClassifier
 from gobbli.model.mtdnn import MTDNN
 from gobbli.model.transformer import Transformer
-from gobbli.test.util import model_test_dir, validate_checkpoint
+from gobbli.test.util import model_test_dir, skip_if_low_resource, validate_checkpoint
 
 
 def check_predict_output(train_output, predict_input, predict_output):
@@ -93,10 +93,15 @@ def test_classifier(
     predict_kwargs,
     model_gpu_config,
     gobbli_dir,
+    request,
 ):
     """
     Ensure classifiers train and predict appropriately across a few example datasets.
     """
+    # These combinations of model and dataset require a lot of memory
+    if model_cls in (BERT, MTDNN, Transformer) and dataset_cls in (NewsgroupsDataset,):
+        skip_if_low_resource(request.config)
+
     model = model_cls(
         data_dir=model_test_dir(model_cls),
         load_existing=True,
