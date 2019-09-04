@@ -1,0 +1,33 @@
+stages:
+  - build
+  - test
+  - deploy
+
+build_docker:
+  stage: build
+  tags:
+    - docker-shell
+  script:
+    - cd ci
+    - docker-compose build gobbli-ci
+
+run_tests:
+  stage: test
+  tags:
+    - docker-shell
+  script:
+    - cd ci
+    - docker-compose run --rm gobbli-ci
+
+deploy_docs:
+  stage: deploy
+  tags:
+    - docker-shell
+  only:
+    - master
+  script:
+    - cd ci
+    # Generate docs using the CI container so we don't rely on host Python version
+    - docker-compose run --rm gobbli-ci ./generate_docs.sh
+    - docker-compose build gobbli-docs
+    - docker-compose up -d gobbli-docs

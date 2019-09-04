@@ -1,0 +1,11 @@
+flake8==3.7.7
+mypy==0.720
+pytest==4.5.0
+ray[debug]==0.7.3
+aiohttp==3.5.4
+importmagic==0.1.7
+epc==0.0.5
+isort==4.3.20
+isort[requirements]==4.3.20
+black==19.3b0
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.1.0/en_core_web_sm-2.1.0.tar.gz

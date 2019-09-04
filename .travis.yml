@@ -1,0 +1,11 @@
+language: minimal
+
+services:
+  - docker
+
+install:
+  - ci cd
+  - docker-compose build gobbli-ci
+
+script:
+  - docker-compose run --rm gobbli-ci

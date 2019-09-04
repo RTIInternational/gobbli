@@ -1,0 +1,21 @@
+[tool.black]
+line-length = 88
+target-version = ['py37']
+exclude = '''
+(
+  /(
+      \.eggs
+    | \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+  | gobbli/model/bert/src
+  | gobbli/model/mtdnn/src
+)
+'''

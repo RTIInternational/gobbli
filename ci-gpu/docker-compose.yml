@@ -1,0 +1,18 @@
+version: "2.3"
+
+services:
+  gobbli-ci-gpu:
+    runtime: nvidia
+    ipc: host
+    build: ../
+    image: gobbli-ci:latest
+    environment:
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+    # Change permissions after running to allow temp file cleanup by non-root user
+    command: bash -c 'py.test -x --use-gpu --nvidia-visible-devices $NVIDIA_VISIBLE_DEVICES; chmod -R a+w ./'
+    working_dir: $PWD/..
+    volumes:
+      # Needed for CI to be able to spawn containers
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Needed for CI to perform bind mounts as we would on the host
+      - $PWD/..:$PWD/..

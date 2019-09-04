@@ -1,0 +1,22 @@
+version: "3.5"
+
+services:
+  gobbli-ci:
+    build: ../
+    image: gobbli-ci:latest
+    command: ./run_ci.sh
+    working_dir: $PWD/..
+    volumes:
+      # Needed for CI to be able to spawn containers
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Needed for CI to perform bind mounts as we would on the host
+      - $PWD/..:$PWD/..
+
+  gobbli-docs:
+    build:
+      context: ../
+      dockerfile: ./ci/docs/Dockerfile
+    image: gobbli-docs:latest
+    restart: always
+    ports:
+      - "5555:80"
