@@ -1,5 +1,7 @@
 # gobbli
 
+[![Build Status](https://travis-ci.com/RTIInternational/gobbli.svg?branch=master)](https://travis-ci.com/RTIInternational/gobbli)
+
 This is a library designed to provide a uniform interface to various deep learning models via programmatically created Docker containers.
 
 ## Current Status
