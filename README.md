@@ -1,6 +1,8 @@
 # gobbli
 
-[![Build Status](https://travis-ci.com/RTIInternational/gobbli.svg?branch=master)](https://travis-ci.com/RTIInternational/gobbli) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gobbli) [![PyPI version](https://badge.fury.io/py/gobbli.svg)](https://badge.fury.io/py/gobbli)
+[![Build Status](https://travis-ci.com/RTIInternational/gobbli.svg?branch=master)](https://travis-ci.com/RTIInternational/gobbli) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gobbli) [![PyPI version](https://badge.fury.io/py/gobbli.svg)](https://badge.fury.io/py/gobbli) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3387610.svg)](https://doi.org/10.5281/zenodo.3387610)
+
+
 
 This is a library designed to provide a uniform interface to various deep learning models via programmatically created Docker containers.
 
