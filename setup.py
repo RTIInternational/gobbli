@@ -8,7 +8,9 @@ containing_dir = os.path.split(__file__)[0]
 with open(os.path.join(containing_dir, "meta.json"), "r") as f:
     meta = json.load(f)
 
-with open(os.path.join(containing_dir, "README.md"), "r") as f:
+readme_path = os.path.join(containing_dir, "README.md")
+
+with open(readme_path, "r") as f:
     long_description = f.read()
 
 setup(
