@@ -9,6 +9,6 @@ isort==4.3.20
 isort[requirements]==4.3.20
 black==19.3b0
 setuptools==41.0.1
-wheel==0.33.2
+wheel==0.33.6
 twine==1.13.0
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.1.0/en_core_web_sm-2.1.0.tar.gz

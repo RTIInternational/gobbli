@@ -1,8 +1,6 @@
 FROM python:3.7
 
-COPY ./setup.py /code/setup.py
-COPY ./meta.json /code/meta.json
-COPY ./requirements.txt /code/requirements.txt
+COPY ./setup.py ./meta.json ./requirements.txt ./README.md /code/
 COPY ./docs/requirements.txt /code/docs/requirements.txt
 
 WORKDIR /code

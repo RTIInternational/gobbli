@@ -1,9 +1,7 @@
 FROM python:3.7
 
 # Copy essentials in to install requirements
-COPY ./setup.py /code/setup.py
-COPY ./meta.json /code/meta.json
-COPY ./requirements.txt /code/requirements.txt
+COPY ./setup.py ./meta.json ./requirements.txt ./README.md /code/
 COPY ./benchmark/requirements.txt /code/benchmark/requirements.txt
 
 # Install dependencies

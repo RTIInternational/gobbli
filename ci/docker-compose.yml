@@ -13,12 +13,3 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       # Needed for CI to perform bind mounts as we would on the host
       - $PWD/..:$PWD/..
-
-  gobbli-docs:
-    build:
-      context: ../
-      dockerfile: ./ci/docs/Dockerfile
-    image: gobbli-docs:latest
-    restart: always
-    ports:
-      - "5555:80"
