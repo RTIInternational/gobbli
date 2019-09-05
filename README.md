@@ -52,7 +52,7 @@ Then, run the following from the repository root:
     
 Then browse the generated documentation in `docs/_build/html`.
 
-
+    
 ## Attribution
 
 gobbli wouldn't exist without the public release of several state-of-the-art models.  The library incorporates:

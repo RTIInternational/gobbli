@@ -8,6 +8,9 @@ containing_dir = os.path.split(__file__)[0]
 with open(os.path.join(containing_dir, "meta.json"), "r") as f:
     meta = json.load(f)
 
+with open(os.path.join(containing_dir, "README.md"), "r") as f:
+    long_description = f.read()
+
 setup(
     name=meta["name"],
     author=meta["author"],
@@ -16,6 +19,9 @@ setup(
     packages=find_packages(exclude=["test"]),
     license="LICENSE.txt",
     description=meta["description"],
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url=meta["url"],
     install_requires=[
         "docker >= 3.7.0",
         "numpy >= 1.16.0",
@@ -30,4 +36,14 @@ setup(
     },
     python_requires=">=3.7",
     entry_points={"console_scripts": []},
+    classifiers=[
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: MacOS :: MacOS X",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Topic :: Scientific/Engineering",
+    ],
 )
