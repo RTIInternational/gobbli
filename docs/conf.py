@@ -82,7 +82,15 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # a list of builtin themes.
 #
 html_theme = "alabaster"
-html_theme_options = {"description": "Deep learning doesn't have to be scary"}
+html_theme_options = {
+    "description": "Deep learning doesn't have to be scary",
+    "logo": "gobbli_lg.svg",
+    "touch_icon": "gobbli_app.svg",
+    "github_banner": "true",
+    "github_button": "true",
+    "github_repo": "gobbli",
+    "github_user": "RTIInternational",
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -93,6 +101,8 @@ html_sidebars = {
     "**": ["about.html", "navigation.html", "relations.html", "searchbox.html"]
 }
 
+html_favicon = os.path.join("_static", "gobbli_app.svg")
+
 # Autogenerate API docs
 def run_apidoc(_):
     from sphinx.ext.apidoc import main
@@ -101,8 +111,6 @@ def run_apidoc(_):
     base_dir = Path(__file__).parent.parent.resolve()
 
     output_path = base_dir / "docs" / "auto"
-    print(base_dir)
-    print(output_path)
     main(
         [
             "--no-toc",

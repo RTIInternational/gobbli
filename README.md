@@ -1,5 +1,6 @@
-# gobbli
-
+<div align="center">
+  <img src="https://raw.githubusercontent.com/RTIInternational/gobbli/master/img/gobbli_lg.svg" alt="gobbli logo" width="200" />
+</div>
 [![Build Status](https://travis-ci.com/RTIInternational/gobbli.svg?branch=master)](https://travis-ci.com/RTIInternational/gobbli) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gobbli) [![PyPI version](https://badge.fury.io/py/gobbli.svg)](https://badge.fury.io/py/gobbli) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3387610.svg)](https://doi.org/10.5281/zenodo.3387610)
 
 
