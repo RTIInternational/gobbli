@@ -1,9 +1,14 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/RTIInternational/gobbli/master/img/gobbli_lg.svg" alt="gobbli logo" width="200" />
+  <div>
+    <img src="https://raw.githubusercontent.com/RTIInternational/gobbli/master/img/gobbli_lg.svg?sanitize=true" alt="gobbli logo" width="200" />
+  </div>
+  <div>
+    <a href="https://travis-ci.com/RTIInternational/gobbli"><img src="https://travis-ci.com/RTIInternational/gobbli.svg?branch=master" alt="PyPI version"></a>
+    <a href="https://badge.fury.io/py/gobbli"><img src="https://badge.fury.io/py/gobbli.svg" alt="PyPI version"></a>
+    <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/gobbli" />
+    <a href="https://doi.org/10.5281/zenodo.3387610"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3387610.svg" alt="DOI"></a>
+  </div>
 </div>
-[![Build Status](https://travis-ci.com/RTIInternational/gobbli.svg?branch=master)](https://travis-ci.com/RTIInternational/gobbli) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gobbli) [![PyPI version](https://badge.fury.io/py/gobbli.svg)](https://badge.fury.io/py/gobbli) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3387610.svg)](https://doi.org/10.5281/zenodo.3387610)
-
-
 
 This is a library designed to provide a uniform interface to various deep learning models via programmatically created Docker containers.
 

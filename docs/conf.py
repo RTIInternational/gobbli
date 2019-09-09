@@ -90,6 +90,7 @@ html_theme_options = {
     "github_button": "true",
     "github_repo": "gobbli",
     "github_user": "RTIInternational",
+    "page_width": "1040px",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -102,6 +103,7 @@ html_sidebars = {
 }
 
 html_favicon = os.path.join("_static", "gobbli_app.svg")
+html_title = f"gobbli {version} documentation"
 
 # Autogenerate API docs
 def run_apidoc(_):
