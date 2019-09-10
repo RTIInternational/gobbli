@@ -102,7 +102,7 @@ html_sidebars = {
     "**": ["about.html", "navigation.html", "relations.html", "searchbox.html"]
 }
 
-html_favicon = os.path.join("_static", "gobbli_app.svg")
+html_favicon = os.path.join("_static", "gobbli_favicon.ico")
 html_title = f"gobbli {version} documentation"
 
 # Autogenerate API docs
