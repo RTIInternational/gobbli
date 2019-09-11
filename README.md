@@ -12,10 +12,6 @@
 
 This is a library designed to provide a uniform interface to various deep learning models via programmatically created Docker containers.
 
-## Current Status
-
-gobbli is currently **experimental**.  We have used gobbli for project work in its current state, but not all model weights/variations or complex edge cases (such as distributed experiments) have been thoroughly tested.  We appreciate your patience and help improving the library!
-
 ## Usage
 
 See [the docs](https://gobbli.readthedocs.io/en/latest/) for prerequisites, a quickstart, and the API reference.  In brief, you need [Docker](https://www.docker.com/) installed with appropriate permissions for your user account to run Docker commands and Python 3.7.  Then run the following:
