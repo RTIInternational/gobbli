@@ -83,7 +83,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 #
 html_theme = "alabaster"
 html_theme_options = {
-    "description": "Deep learning doesn't have to be scary",
+    "description": "Deep learning with text doesn't have to be scary",
     "logo": "gobbli_lg.svg",
     "touch_icon": "gobbli_app.svg",
     "github_banner": "true",
