@@ -10,7 +10,7 @@
   </div>
 </div>
 
-This is a library designed to provide a uniform interface to various deep learning models via programmatically created Docker containers.
+This is a library designed to provide a uniform interface to various deep learning models for text via programmatically created Docker containers.
 
 ## Usage
 
