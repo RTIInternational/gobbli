@@ -16,6 +16,8 @@ if [[ "$mode" != "test" && "$mode" != "live" ]]; then
     exit 1
 fi
 
+rm -r ./dist/
+
 python setup.py sdist bdist_wheel
 
 if [[ "$mode" == "test" ]]; then
