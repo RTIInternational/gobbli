@@ -4,6 +4,6 @@
   "download_url": "",
   "author": "RTI International",
   "maintainer": "Jason Nance",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Uniform interface to deep learning approaches via Docker containers."
 }
