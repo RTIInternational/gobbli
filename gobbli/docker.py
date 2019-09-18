@@ -75,9 +75,15 @@ def run_container(
     logger.debug(f"Container volumes: {run_kwargs['volumes']}")
 
     # Run as current UID to avoid files created by root
-    container = client.containers.run(
-        image_tag, cmd, user=os.geteuid(), group_add=[os.getegid()], **run_kwargs
-    )
+    try:
+        container = client.containers.run(
+            image_tag, cmd, user=os.geteuid(), group_add=[os.getegid()], **run_kwargs
+        )
+    except docker.errors.ImageNotFound:
+        raise RuntimeError(
+            "gobbli couldn't find the Docker image for the container it was asked to run. "
+            "This probably means you didn't call .build() on a model before using it."
+        )
 
     try:
         for line in container.logs(stream=True):
