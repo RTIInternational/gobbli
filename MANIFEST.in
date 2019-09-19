@@ -1,1 +1,4 @@
+include LICENSE
+include README.md
+include meta.json
 recursive-include gobbli Dockerfile

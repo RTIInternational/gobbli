@@ -23,6 +23,8 @@ setup(
     description=meta["description"],
     long_description=long_description,
     long_description_content_type="text/markdown",
+    # Needed to ensure Dockerfiles, etc are copied with the package
+    include_package_data=True,
     url=meta["url"],
     install_requires=[
         "docker >= 3.7.0",
