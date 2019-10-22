@@ -4,3 +4,4 @@ include meta.json
 # We have some .py files that are needed but aren't part of the package, so make sure they're included
 recursive-include gobbli *.py
 recursive-include gobbli Dockerfile
+recursive-include gobbli requirements.txt
