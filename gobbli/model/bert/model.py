@@ -110,6 +110,10 @@ BERT_MODEL_ARCHIVES = {
     "biobert-cased": "https://github.com/naver/biobert-pretrained/releases/download/v1.1-pubmed/biobert_v1.1_pubmed.tar.gz",
     "scibert-uncased": "https://s3-us-west-2.amazonaws.com/ai2-s2-research/scibert/tensorflow_models/scibert_scivocab_uncased.tar.gz",
     "scibert-cased": "https://s3-us-west-2.amazonaws.com/ai2-s2-research/scibert/tensorflow_models/scibert_scivocab_cased.tar.gz",
+    "ncbi-bert-base-pubmed-uncased": "https://ftp.ncbi.nlm.nih.gov/pub/lu/Suppl/NCBI-BERT/NCBI_BERT_pubmed_uncased_L-12_H-768_A-12.zip",
+    "ncbi-bert-base-pubmed-mimic-uncased": "https://ftp.ncbi.nlm.nih.gov/pub/lu/Suppl/NCBI-BERT/NCBI_BERT_pubmed_mimic_uncased_L-12_H-768_A-12.zip",
+    "ncbi-bert-large-pubmed-uncased": "https://ftp.ncbi.nlm.nih.gov/pub/lu/Suppl/NCBI-BERT/NCBI_BERT_pubmed_uncased_L-24_H-1024_A-16.zip",
+    "ncbi-bert-large-pubmed-mimic-uncased": "https://ftp.ncbi.nlm.nih.gov/pub/lu/Suppl/NCBI-BERT/NCBI_BERT_pubmed_mimic_uncased_L-24_H-1024_A-16.zip",
 }  # type: Dict[str, str]
 """
 A mapping from model names to archives.
