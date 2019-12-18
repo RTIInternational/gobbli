@@ -33,13 +33,15 @@ setup(
         "scikit-learn >= 0.21.0",
         "ray >= 0.7.3",
         "seaborn >= 0.9.0",
+        "click >= 7.0",
     ],
     extras_require={
         "augment": ["nltk>=3.4.4", "gensim>=3.8.0", "spacy>=2.1.4"],
         "tokenize": ["sentencepiece >= v0.1.83"],
+        "interactive": ["streamlit >= 0.51.0", "altair >= 3.2.0"],
     },
     python_requires=">=3.7",
-    entry_points={"console_scripts": []},
+    entry_points={"console_scripts": ["gobbli = gobbli.cli:main"]},
     classifiers=[
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: Apache Software License",
