@@ -38,7 +38,7 @@ setup(
     extras_require={
         "augment": ["nltk>=3.4.4", "gensim>=3.8.0", "spacy>=2.1.4"],
         "tokenize": ["sentencepiece >= v0.1.83"],
-        "interactive": ["streamlit >= 0.51.0", "altair >= 3.2.0"],
+        "interactive": ["streamlit >= 0.51.0", "altair >= 3.2.0", "gensim >= 3.8.0"],
     },
     python_requires=">=3.7",
     entry_points={"console_scripts": ["gobbli = gobbli.cli:main"]},
