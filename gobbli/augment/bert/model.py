@@ -28,7 +28,7 @@ class BERTMaskedLM(BaseModel, BaseAugment):
         BERTMaskedLM parameters:
 
         - ``bert_model`` (:obj:`str`): Name of a pretrained BERT model to use.
-          See the `pytorch-transformers <https://huggingface.co/pytorch-transformers/pretrained_models.html>`__
+          See the `transformers <https://huggingface.co/transformers/pretrained_models.html>`__
           docs for supported values.
         - ``diversity``: 0 < diversity <= 1; determines the likelihood of selecting replacement words
           based on their predicted probability.
@@ -96,7 +96,7 @@ class BERTMaskedLM(BaseModel, BaseAugment):
     @property
     def host_cache_dir(self):
         """
-        Directory to be used for downloaded pytorch-transformers files.
+        Directory to be used for downloaded transformers files.
         Should be the same across all instances of the class, since these are
         generally static model weights/config files that can be reused.
         """

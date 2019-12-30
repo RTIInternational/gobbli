@@ -2,7 +2,7 @@ import argparse
 
 import torch
 import torch.nn.functional as F
-from pytorch_transformers import BertConfig, BertForMaskedLM, BertTokenizer
+from transformers import BertConfig, BertForMaskedLM, BertTokenizer
 
 
 def batch_list(l, batch_size):
@@ -37,9 +37,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--bert-model",
         help="BERT model to use. "
-        "Can be one of the pretrained names supported by pytorch_transformers, in which case "
+        "Can be one of the pretrained names supported by transformers, in which case "
         "the pretrained weights will be downloaded. "
-        "Anything else supported by pytorch_transformers should work as well. ",
+        "Anything else supported by transformers should work as well. ",
         default="bert-base-uncased",
     )
     parser.add_argument(
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--cache-dir",
-        help="Directory to use as the cache for pytorch_transformer downloads.",
+        help="Directory to use as the cache for transformers downloads.",
         default=None,
     )
     parser.add_argument(

@@ -5,13 +5,14 @@ import io
 import json
 import logging
 import os
+import random
 import shutil
 import tarfile
 import tempfile
 import uuid
 import zipfile
 from pathlib import Path
-from typing import Any, Container, Dict, Iterator, List, Optional
+from typing import Any, Container, Dict, Iterator, List, Optional, TypeVar
 
 import pandas as pd
 import requests
@@ -432,6 +433,35 @@ def blob_to_dir(blob: bytes, dir_path: Path):
     """
     with tarfile.open(fileobj=io.BytesIO(blob), mode="r:gz") as archive:
         archive.extractall(dir_path)
+
+
+T1 = TypeVar("T1")
+T2 = TypeVar("T2")
+
+
+def shuffle_together(l1: List[T1], l2: List[T2], seed: Optional[int] = None):
+    """
+    Shuffle two lists together, so their order is random but the individual
+    elements still correspond.  Ex. shuffle a list of texts and a list of labels
+    so the labels still correspond correctly to the texts.  The lists are shuffled in-place.
+
+    The lists must be the same length for this to make sense.
+
+    Args:
+      l1: The first list to be shuffled.
+      l2: The second list to be shuffled.
+      seed: Seed for the random number generator, if any
+    """
+    if not len(l1) == len(l2):
+        raise ValueError("Lists have unequal length.")
+    if len(l1) == 0:
+        return
+
+    zipped = list(zip(l1, l2))
+    if seed is not None:
+        random.seed(seed)
+    random.shuffle(zipped)
+    l1[:], l2[:] = zip(*zipped)
 
 
 @enum.unique

@@ -6,9 +6,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-import pytorch_transformers
 import torch
-from pytorch_transformers import AdamW, WarmupLinearSchedule
+import transformers
+from transformers import AdamW, get_linear_schedule_with_warmup
 
 
 def read_unique_labels(labels_path):
@@ -135,19 +135,21 @@ def train(
     labels,
     lr,
     adam_eps,
+    gradient_accumulation_steps,
 ):
     """
     Train the passed model on the given data.  Return training/validation metrics
     and save the model to the specified output directory.
     """
     # Prepare optimizer and scheduler
-    # Adapted from https://github.com/huggingface/pytorch-transformers/blob/master/examples/run_squad.py
+    # Adapted from https://github.com/huggingface/transformers/blob/master/examples/run_squad.py
     optimizer = AdamW(model.parameters(), lr=lr, eps=adam_eps)
-    scheduler = WarmupLinearSchedule(
+    scheduler = get_linear_schedule_with_warmup(
         optimizer,
-        warmup_steps=0,
-        t_total=num_train_epochs
-        * num_batches(input_dir / "train.tsv", train_batch_size),
+        num_warmup_steps=0,
+        num_training_steps=num_train_epochs
+        * num_batches(input_dir / "train.tsv", train_batch_size)
+        // gradient_accumulation_steps,
     )
 
     model.zero_grad()
@@ -158,13 +160,21 @@ def train(
         train_loss = 0.0
         train_count = 0
 
-        for X, y in tsv_to_encoded_batches(
-            input_dir / "train.tsv", tokenizer, labels, train_batch_size, max_seq_length
+        for i, (X, y) in enumerate(
+            tsv_to_encoded_batches(
+                input_dir / "train.tsv",
+                tokenizer,
+                labels,
+                train_batch_size,
+                max_seq_length,
+            )
         ):
             X = X.to(device)
             y = y.to(device)
             outputs = model(input_ids=X, labels=y)
             loss = outputs[0]
+            if gradient_accumulation_steps > 1:
+                loss /= gradient_accumulation_steps
 
             if n_gpu > 1:
                 loss = loss.mean()  # average loss on parallel training
@@ -175,9 +185,10 @@ def train(
             train_loss += loss.detach().item()
             train_count += X.size(0)
 
-            scheduler.step()
-            optimizer.step()
-            model.zero_grad()
+            if (i + 1) % gradient_accumulation_steps == 0:
+                optimizer.step()
+                scheduler.step()
+                model.zero_grad()
 
         print(f"Epoch {epoch} train loss: {train_loss / train_count}")
 
@@ -216,7 +227,7 @@ def train(
         # DataParallel object -- unpack the module before saving
         model.module.save_pretrained(checkpoint_dir)
     else:
-        # Plain pytorch_transformers model
+        # Plain transformers model
         model.save_pretrained(checkpoint_dir)
 
     tokenizer.save_pretrained(checkpoint_dir)
@@ -329,7 +340,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--cache-dir",
         required=True,
-        help="Directory to use for caching pytorch_transformers downloads.",
+        help="Directory to use for caching transformers downloads.",
     )
     parser.add_argument(
         "--config-overrides",
@@ -338,9 +349,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model",
         required=True,
-        help="Name of the pytorch_transformers model to use.  If `mode` is 'train' or 'predict', "
-        "this value should ensure `from pytorch_transformers import <model>ModelForSequenceClassification` "
-        "is a valid import. For example, model = 'Bert' -> from pytorch_transformers import "
+        help="Name of the transformers model to use.  If `mode` is 'train' or 'predict', "
+        "this value should ensure `from transformers import <model>ModelForSequenceClassification` "
+        "is a valid import. For example, model = 'Bert' -> from transformers import "
         "BertForSequenceClassification.  If `mode` is 'embed', the import will be `<model>Model`.",
     )
     parser.add_argument(
@@ -397,6 +408,12 @@ if __name__ == "__main__":
         help="Epsilon value for the AdamW optimizer.",
     )
     parser.add_argument(
+        "--gradient-accumulation-steps",
+        type=int,
+        default=1,
+        help="Number of training steps to accumulate gradients before updating model weights.",
+    )
+    parser.add_argument(
         "--embed-pooling",
         choices=["mean", "none"],
         default="mean",
@@ -411,6 +428,11 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    if args.gradient_accumulation_steps <= 0:
+        raise ValueError(
+            f"Gradient accumulation steps must be >0, got '{args.gradient_accumulation_steps}'"
+        )
 
     input_dir = Path(args.input_dir)
     output_dir = Path(args.output_dir)
@@ -436,9 +458,9 @@ if __name__ == "__main__":
     print(f"  Tokenizer: {tokenizer_name}")
     print(f"  Config: {config_name}")
 
-    model_cls = getattr(pytorch_transformers, model_name)
-    tokenizer_cls = getattr(pytorch_transformers, tokenizer_name)
-    config_cls = getattr(pytorch_transformers, config_name)
+    model_cls = getattr(transformers, model_name)
+    tokenizer_cls = getattr(transformers, tokenizer_name)
+    config_cls = getattr(transformers, config_name)
 
     tokenizer = tokenizer_cls.from_pretrained(args.weights, cache_dir=args.cache_dir)
     if tokenizer is None:
@@ -469,7 +491,7 @@ if __name__ == "__main__":
         config.num_labels = len(labels)
         if config.num_labels == 1:
             raise ValueError(
-                "pytorch_transformers calculates regression loss when only one "
+                "transformers calculates regression loss when only one "
                 "label is given, so it doesn't support classification when only "
                 "a single label is available."
             )
@@ -517,6 +539,7 @@ if __name__ == "__main__":
             labels=labels,
             lr=args.lr,
             adam_eps=args.adam_eps,
+            gradient_accumulation_steps=args.gradient_accumulation_steps,
         )
         with open(output_dir / "valid_results.json", "w") as f:
             json.dump(metrics, f)

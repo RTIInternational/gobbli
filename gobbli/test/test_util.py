@@ -14,6 +14,7 @@ from gobbli.util import (
     dir_to_blob,
     extract_archive,
     is_archive,
+    shuffle_together,
     tokenize,
 )
 
@@ -148,6 +149,31 @@ def test_blob_to_dir(tmpdir):
     extracted_file = extract_path / test_file_name
     assert extracted_file.exists()
     assert extracted_file.read_text() == file_contents
+
+
+@pytest.mark.parametrize(
+    "l1,l2,err",
+    [
+        ([], [], None),
+        (["a"], [1], None),
+        (["a", "b"], [1], ValueError),
+        (["a", "b"], [1, 2], None),
+        (["a", "b", "c"], [1, 2, 3], None),
+        (["a", "b", "c", "d"], [1, 2, 3, 4], None),
+    ],
+)
+def test_shuffle_together(l1, l2, err):
+    seed = 1
+
+    if err is not None:
+        with pytest.raises(err):
+            shuffle_together(l1, l2, seed=seed)
+    else:
+        original_rows = set(zip(l1, l2))
+
+        shuffle_together(l1, l2, seed=seed)
+        for row in zip(l1, l2):
+            assert tuple(row) in original_rows
 
 
 @pytest.mark.parametrize(

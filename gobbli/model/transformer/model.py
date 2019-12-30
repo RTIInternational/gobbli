@@ -16,7 +16,7 @@ from gobbli.util import assert_type, escape_line_delimited_texts
 class Transformer(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
     """
     Classifier/embedding wrapper for any of the Transformers from
-    `pytorch-transformers <https://github.com/huggingface/pytorch-transformers>`__.
+    `transformers <https://github.com/huggingface/transformers>`__.
     """
 
     _BUILD_PATH = Path(__file__).parent
@@ -44,15 +44,15 @@ class Transformer(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
 
         - ``transformer_model`` (:obj:`str`): Name of a transformer model architecture to use.
           For training/prediction, the value should be one such that
-          ``from pytorch_transformers import <value>ForSequenceClassification`` is
+          ``from transformers import <value>ForSequenceClassification`` is
           a valid import.  ex value = "Bert" ->
-          ``from pytorch_transformers import BertForSequenceClassification``.  Note this means
-          only a subset of the pytorch_transformers models are supported for these tasks -- search
-          `the docs <https://huggingface.co/pytorch-transformers/search.html?q=forsequenceclassification&check_keywords=yes&area=default>`__ to see which ones you can use.
-          For embedding generation, the import is ``<value>Model``, so any pytorch_transformer
+          ``from transformers import BertForSequenceClassification``.  Note this means
+          only a subset of the transformers models are supported for these tasks -- search
+          `the docs <https://huggingface.co/transformers/search.html?q=forsequenceclassification&check_keywords=yes&area=default>`__ to see which ones you can use.
+          For embedding generation, the import is ``<value>Model``, so any transformer
           model is supported.
         - ``transformer_weights`` (:obj:`str`): Name of the pretrained weights to use.
-          See the `pytorch-transformers docs <https://huggingface.co/pytorch-transformers/pretrained_models.html>`__
+          See the `transformers docs <https://huggingface.co/transformers/pretrained_models.html>`__
           for supported values.  These depend on the ``transformer_model`` chosen.
         - ``config_overrides`` (:obj:`dict`): Dictionary of keys and values that will
           override config for the model.
@@ -60,8 +60,11 @@ class Transformer(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
           Used to save memory.
         - ``lr``: Learning rate for the AdamW optimizer.
         - ``adam_eps``: Epsilon value for the AdamW optimizer.
+        - ``gradient_accumulation_steps``: Number of iterations to accumulate gradients before
+          updating the model.  Used to allow larger effective batch sizes for models too big to
+          fit a large batch on the GPU.
 
-        Note that gobbli relies on pytorch-transformers to perform validation on these parameters,
+        Note that gobbli relies on transformers to perform validation on these parameters,
         so initialization errors may not be caught until model runtime.
         """
         self.transformer_model = "Bert"
@@ -70,6 +73,7 @@ class Transformer(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         self.max_seq_length = 128
         self.lr = 5e-5
         self.adam_eps = 1e-8
+        self.gradient_accumulation_steps = 1
 
         for name, value in params.items():
             if name == "transformer_model":
@@ -88,6 +92,9 @@ class Transformer(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             elif name == "adam_eps":
                 assert_type(name, value, float)
                 self.adam_eps = value
+            elif name == "gradient_accumulation_steps":
+                assert_type(name, value, int)
+                self.gradient_accumulation_steps = value
             else:
                 raise ValueError(f"Unknown param '{name}'")
 
@@ -148,7 +155,7 @@ class Transformer(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
     @property
     def host_cache_dir(self):
         """
-        Directory to be used for downloaded pytorch-transformers files.
+        Directory to be used for downloaded transformers files.
         Should be the same across all instances of the class, since these are
         generally static model weights/config files that can be reused.
         """
@@ -222,6 +229,7 @@ class Transformer(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             f" --num-train-epochs {train_input.num_train_epochs}"
             f" --lr {self.lr}"
             f" --adam-eps {self.adam_eps}"
+            f" --gradient-accumulation-steps {self.gradient_accumulation_steps}"
         )
 
         run_kwargs = self._base_docker_run_kwargs(context)

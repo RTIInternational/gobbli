@@ -65,7 +65,7 @@ gobbli wouldn't exist without the public release of several state-of-the-art mod
 - [MT-DNN](https://github.com/namisan/mt-dnn), released by Microsoft
 - [Universal Sentence Encoder](https://tfhub.dev/google/universal-sentence-encoder/2), released by Google
 - [fastText](https://github.com/facebookresearch/fastText), released by Facebook
-- [pytorch_transformers](https://github.com/huggingface/pytorch-transformers), released by Hugging Face
+- [transformers](https://github.com/huggingface/transformers), released by Hugging Face
 
 Original work on the library was funded by [RTI International](https://www.rti.org/).
 
