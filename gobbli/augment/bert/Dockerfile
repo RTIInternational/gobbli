@@ -1,6 +1,6 @@
-FROM pytorch/pytorch:1.1.0-cuda10.0-cudnn7.5-runtime
+FROM pytorch/pytorch:1.3-cuda10.1-cudnn7-runtime
 
-RUN pip install pytorch-transformers==1.0.0
+RUN pip install transformers==2.3.0
 
 COPY ./src /code/bert
 WORKDIR /code/bert

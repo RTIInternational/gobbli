@@ -24,6 +24,10 @@ from gobbli.model.transformer import Transformer
         ({"adam_eps": 1}, TypeError),
         # OK type (adam_eps)
         ({"adam_eps": 1e-5}, None),
+        # Bad type (gradient_accumulation_steps)
+        ({"gradient_accumulation_steps": 1.0}, TypeError),
+        # OK type (gradient_accumulation_steps)
+        ({"gradient_accumulation_steps": 2}, None),
         # OK values (all params),
         (
             {
@@ -31,6 +35,7 @@ from gobbli.model.transformer import Transformer
                 "config_overrides": {},
                 "lr": 1e-3,
                 "adam_eps": 1e-5,
+                "gradient_accumulation_steps": 2,
             },
             None,
         ),

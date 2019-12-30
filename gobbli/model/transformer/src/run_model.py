@@ -6,9 +6,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-import pytorch_transformers
 import torch
-from pytorch_transformers import AdamW, WarmupLinearSchedule
+import transformers
+from transformers import AdamW, get_linear_schedule_with_warmup
 
 
 def read_unique_labels(labels_path):
@@ -142,12 +142,12 @@ def train(
     and save the model to the specified output directory.
     """
     # Prepare optimizer and scheduler
-    # Adapted from https://github.com/huggingface/pytorch-transformers/blob/master/examples/run_squad.py
+    # Adapted from https://github.com/huggingface/transformers/blob/master/examples/run_squad.py
     optimizer = AdamW(model.parameters(), lr=lr, eps=adam_eps)
-    scheduler = WarmupLinearSchedule(
+    scheduler = get_linear_schedule_with_warmup(
         optimizer,
-        warmup_steps=0,
-        t_total=num_train_epochs
+        num_warmup_steps=0,
+        num_training_steps=num_train_epochs
         * num_batches(input_dir / "train.tsv", train_batch_size)
         // gradient_accumulation_steps,
     )
@@ -186,8 +186,8 @@ def train(
             train_count += X.size(0)
 
             if (i + 1) % gradient_accumulation_steps == 0:
-                scheduler.step()
                 optimizer.step()
+                scheduler.step()
                 model.zero_grad()
 
         print(f"Epoch {epoch} train loss: {train_loss / train_count}")
@@ -227,7 +227,7 @@ def train(
         # DataParallel object -- unpack the module before saving
         model.module.save_pretrained(checkpoint_dir)
     else:
-        # Plain pytorch_transformers model
+        # Plain transformers model
         model.save_pretrained(checkpoint_dir)
 
     tokenizer.save_pretrained(checkpoint_dir)
@@ -340,7 +340,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--cache-dir",
         required=True,
-        help="Directory to use for caching pytorch_transformers downloads.",
+        help="Directory to use for caching transformers downloads.",
     )
     parser.add_argument(
         "--config-overrides",
@@ -349,9 +349,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model",
         required=True,
-        help="Name of the pytorch_transformers model to use.  If `mode` is 'train' or 'predict', "
-        "this value should ensure `from pytorch_transformers import <model>ModelForSequenceClassification` "
-        "is a valid import. For example, model = 'Bert' -> from pytorch_transformers import "
+        help="Name of the transformers model to use.  If `mode` is 'train' or 'predict', "
+        "this value should ensure `from transformers import <model>ModelForSequenceClassification` "
+        "is a valid import. For example, model = 'Bert' -> from transformers import "
         "BertForSequenceClassification.  If `mode` is 'embed', the import will be `<model>Model`.",
     )
     parser.add_argument(
@@ -359,7 +359,7 @@ if __name__ == "__main__":
         required=True,
         help="Name of the pretrained weights to use or path to a file containing "
         "pretrained weights.  If a name, must correspond to a valid weights name "
-        "for the chosen model.",
+        "for the chosen model.  This is passed directly to ",
     )
     parser.add_argument(
         "--train-batch-size",
@@ -407,7 +407,7 @@ if __name__ == "__main__":
         default=1e-8,
         help="Epsilon value for the AdamW optimizer.",
     )
-    parsre.add_argument(
+    parser.add_argument(
         "--gradient-accumulation-steps",
         type=int,
         default=1,
@@ -458,9 +458,9 @@ if __name__ == "__main__":
     print(f"  Tokenizer: {tokenizer_name}")
     print(f"  Config: {config_name}")
 
-    model_cls = getattr(pytorch_transformers, model_name)
-    tokenizer_cls = getattr(pytorch_transformers, tokenizer_name)
-    config_cls = getattr(pytorch_transformers, config_name)
+    model_cls = getattr(transformers, model_name)
+    tokenizer_cls = getattr(transformers, tokenizer_name)
+    config_cls = getattr(transformers, config_name)
 
     tokenizer = tokenizer_cls.from_pretrained(args.weights, cache_dir=args.cache_dir)
     if tokenizer is None:
@@ -491,7 +491,7 @@ if __name__ == "__main__":
         config.num_labels = len(labels)
         if config.num_labels == 1:
             raise ValueError(
-                "pytorch_transformers calculates regression loss when only one "
+                "transformers calculates regression loss when only one "
                 "label is given, so it doesn't support classification when only "
                 "a single label is available."
             )
