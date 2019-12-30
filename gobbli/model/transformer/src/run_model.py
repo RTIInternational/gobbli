@@ -359,7 +359,7 @@ if __name__ == "__main__":
         required=True,
         help="Name of the pretrained weights to use or path to a file containing "
         "pretrained weights.  If a name, must correspond to a valid weights name "
-        "for the chosen model.  This is passed directly to ",
+        "for the chosen model.",
     )
     parser.add_argument(
         "--train-batch-size",
