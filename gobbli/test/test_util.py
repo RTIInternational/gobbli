@@ -173,8 +173,6 @@ def test_shuffle_together(l1, l2, err):
 
         shuffle_together(l1, l2, seed=seed)
         for row in zip(l1, l2):
-            print(original_rows)
-            print(tuple(row))
             assert tuple(row) in original_rows
 
 
