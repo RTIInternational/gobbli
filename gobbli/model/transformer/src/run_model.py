@@ -135,6 +135,7 @@ def train(
     labels,
     lr,
     adam_eps,
+    gradient_accumulation_steps,
 ):
     """
     Train the passed model on the given data.  Return training/validation metrics
@@ -147,7 +148,8 @@ def train(
         optimizer,
         warmup_steps=0,
         t_total=num_train_epochs
-        * num_batches(input_dir / "train.tsv", train_batch_size),
+        * num_batches(input_dir / "train.tsv", train_batch_size)
+        // gradient_accumulation_steps,
     )
 
     model.zero_grad()
@@ -158,13 +160,21 @@ def train(
         train_loss = 0.0
         train_count = 0
 
-        for X, y in tsv_to_encoded_batches(
-            input_dir / "train.tsv", tokenizer, labels, train_batch_size, max_seq_length
+        for i, (X, y) in enumerate(
+            tsv_to_encoded_batches(
+                input_dir / "train.tsv",
+                tokenizer,
+                labels,
+                train_batch_size,
+                max_seq_length,
+            )
         ):
             X = X.to(device)
             y = y.to(device)
             outputs = model(input_ids=X, labels=y)
             loss = outputs[0]
+            if gradient_accumulation_steps > 1:
+                loss /= gradient_accumulation_steps
 
             if n_gpu > 1:
                 loss = loss.mean()  # average loss on parallel training
@@ -175,9 +185,10 @@ def train(
             train_loss += loss.detach().item()
             train_count += X.size(0)
 
-            scheduler.step()
-            optimizer.step()
-            model.zero_grad()
+            if (i + 1) % gradient_accumulation_steps == 0:
+                scheduler.step()
+                optimizer.step()
+                model.zero_grad()
 
         print(f"Epoch {epoch} train loss: {train_loss / train_count}")
 
@@ -396,6 +407,12 @@ if __name__ == "__main__":
         default=1e-8,
         help="Epsilon value for the AdamW optimizer.",
     )
+    parsre.add_argument(
+        "--gradient-accumulation-steps",
+        type=int,
+        default=1,
+        help="Number of training steps to accumulate gradients before updating model weights.",
+    )
     parser.add_argument(
         "--embed-pooling",
         choices=["mean", "none"],
@@ -411,6 +428,11 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    if args.gradient_accumulation_steps <= 0:
+        raise ValueError(
+            f"Gradient accumulation steps must be >0, got '{args.gradient_accumulation_steps}'"
+        )
 
     input_dir = Path(args.input_dir)
     output_dir = Path(args.output_dir)
@@ -517,6 +539,7 @@ if __name__ == "__main__":
             labels=labels,
             lr=args.lr,
             adam_eps=args.adam_eps,
+            gradient_accumulation_steps=args.gradient_accumulation_steps,
         )
         with open(output_dir / "valid_results.json", "w") as f:
             json.dump(metrics, f)
