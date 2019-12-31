@@ -90,10 +90,13 @@ def train(
     num_train_epochs,
     labels,
     dropout,
+    disabled,
 ):
     """
     Train the TextCategorizer component of the passed pipeline on the given data.
     Return training/validation metrics and save the model to the specified output directory.
+    Make sure to restore any disabled pipeline components before saving so we can reuse the
+    saved checkpoint however we need to.
     """
     textcat = nlp.create_pipe(
         "textcat", config={"exclusive_classes": True, "architecture": architecture}
@@ -131,6 +134,8 @@ def train(
 
     checkpoint_dir = output_dir / "checkpoint"
     checkpoint_dir.mkdir(exist_ok=True, parents=True)
+
+    disabled.restore()
 
     with nlp.use_params(optimizer.averages):
         nlp.to_disk(checkpoint_dir)
@@ -293,7 +298,8 @@ if __name__ == "__main__":
             pass
         else:
             # If vectors are available, disable everything, since we just want the vectors
-            disabled_components.update(set(["tagger", "parser", "ner"]))
+            for component in ("tagger", "parser", "ner"):
+                disabled_components.add(component)
 
     elif args.mode in ("train", "predict"):
         if args.full_pipeline:
@@ -302,9 +308,10 @@ if __name__ == "__main__":
             pass
         else:
             # Otherwise, disable everything that isn't part of the text categorizer model
-            disabled_components.update(set(["tagger", "parser", "ner"]))
+            for component in ("tagger", "parser", "ner"):
+                disabled_components.add(component)
 
-    nlp.disable_pipes(*disabled_components)
+    disabled = nlp.disable_pipes(*disabled_components)
 
     # We need a list of labels for training or prediction so we know what the
     # output shape of the model should be
@@ -325,6 +332,7 @@ if __name__ == "__main__":
             train_batch_size=args.train_batch_size,
             num_train_epochs=args.num_train_epochs,
             dropout=args.dropout,
+            disabled=disabled,
         )
 
     elif args.mode == "predict":
