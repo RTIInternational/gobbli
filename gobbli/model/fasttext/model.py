@@ -94,6 +94,8 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
     consider performing some preprocessing on your own beforehand.
     """
 
+    _BUILD_PATH = Path(__file__).parent
+
     _TRAIN_INPUT_FILE = "train.txt"
     _VALID_INPUT_FILE = "valid.txt"
     _TEST_INPUT_FILE = "test.txt"
@@ -108,13 +110,10 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
     @property
     def image_tag(self) -> str:
         """
-        Using a prebuilt image directly:
-        https://github.com/xeb/fastText-docker
-
         Returns:
           The tag to use for the fastText image.
         """
-        return "xebxeb/fasttext-docker:binary"
+        return "gobbli-fasttext"
 
     def init(self, params: Dict[str, Any]):
         """
@@ -190,7 +189,12 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
                     shutil.rmtree(self.weights_dir)
                 raise
 
-        # Using a prebuilt Docker image, so no build step required
+        # Build the custom docker image
+        self.docker_client.images.build(
+            path=str(FastText._BUILD_PATH),
+            tag=self.image_tag,
+            **self._base_docker_build_kwargs,
+        )
 
     @staticmethod
     def _locate_checkpoint(weights_dir: Path) -> FastTextCheckpoint:
@@ -336,7 +340,7 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         )
 
         # Parse the training loss out of the console output
-        last_loss_ndx = container_logs.rfind("loss:")
+        last_loss_ndx = container_logs.rfind("avg.loss:")
         failed_parse_msg = (
             "Failed to parse loss information from fastText container logs."
             " Run with debug logging to"
@@ -345,9 +349,9 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         if last_loss_ndx == -1:
             raise ValueError(failed_parse_msg)
 
-        # Skip over the word "loss:" - next field in the output is "eta:"
-        loss_start_ndx = last_loss_ndx + 5
-        loss_end_ndx = container_logs.find("eta:", loss_start_ndx)
+        # Skip over the word "avg.loss:" - next field in the output is "ETA:"
+        loss_start_ndx = last_loss_ndx + len("avg.loss:")
+        loss_end_ndx = container_logs.find("ETA:", loss_start_ndx)
         loss = float(container_logs[loss_start_ndx:loss_end_ndx].strip())
         return container_logs, loss
 
