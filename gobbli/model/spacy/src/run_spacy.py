@@ -159,11 +159,29 @@ def predict(*, input_dir, output_dir, nlp, labels):
     df.to_csv(output_dir / "test_results.tsv", index=False, sep="\t")
 
 
-def embed(*, input_dir, output_dir, nlp, embed_batch_size):
+def embed(*, input_dir, output_dir, nlp, embed_pooling):
     """
     Generate embeddings for the given dataset using the vectors from the
     passed pipeline.
     """
+    embeddings = []
+    X_embed, _ = read_data(input_dir / "input.tsv", False)
+
+    with open(output_dir / "embeddings.jsonl", "w") as f:
+        for doc in nlp.pipe(X_embed):
+            if embed_pooling == "mean":
+                row_json = {"embedding": doc.vector.tolist()}
+            elif embed_pooling == "none":
+                embeddings = []
+                tokens = []
+                for tok in doc:
+                    embeddings.append(tok.vector.tolist())
+                    tokens.append(tok.text)
+                row_json = {"embedding": embeddings, "tokens": tokens}
+            else:
+                raise ValueError(f"Unsupported pooling type: {embed_pooling}")
+
+            f.write(f"{json.dumps(row_json)}\n")
 
 
 if __name__ == "__main__":
@@ -227,6 +245,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dropout", type=float, default=0.2, help="Dropout proportion for training."
     )
+    parser.add_argument(
+        "--embed-pooling",
+        choices=["mean", "none"],
+        default="mean",
+        help="Pooling strategy to use for combining embeddings.  If None, embeddings for "
+        "each token will be returned along with the token.  Ignored if method != 'embed'.",
+    )
 
     args = parser.parse_args()
 
@@ -241,7 +266,33 @@ if __name__ == "__main__":
     print(f"  Language Model: {args.model}")
     print(f"  TextCategorizer Architecture: {args.architecture}")
 
-    nlp = spacy.load(args.model, disable=["tagger", "parser", "ner"])
+    nlp = spacy.load(args.model)
+    model_name = nlp.meta.get("name", "")
+
+    print(f"Model '{model_name}' loaded.")
+
+    disabled_components = set()
+
+    if args.mode == "embed":
+        # Don't need the text categorizer (if present) for embeddings
+        if nlp.has_pipe("textcat"):
+            disabled_components.add("textcat")
+
+        if model_name.endswith("sm"):
+            # No vectors available for small models -- we need to enable the
+            # other pipeline components to provide tensors, which aren't as good as vectors
+            # but will suffice in a pinch
+            pass
+        else:
+            # If vectors are available, disable everything, since we just want the vectors
+            disabled_components.update(set(["tagger", "parser", "ner"]))
+
+    elif args.mode in ("train", "predict"):
+        # Enable all parsing components to provide maximum information to the
+        # text categorization model
+        pass
+
+    nlp.disable_pipes(*disabled_components)
 
     # We need a list of labels for training or prediction so we know what the
     # output shape of the model should be
@@ -272,7 +323,7 @@ if __name__ == "__main__":
             input_dir=input_dir,
             output_dir=output_dir,
             nlp=nlp,
-            embed_batch_size=args.embed_batch_size,
+            embed_pooling=args.embed_pooling,
         )
 
     else:

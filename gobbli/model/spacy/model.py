@@ -323,7 +323,16 @@ class SpaCyModel(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
                 "checkpoints are ignored when generating embeddings."
             )
 
-        cmd = "python3 run_model.py" " embed"
+        cmd = (
+            "python3 run_spacy.py"
+            " embed"
+            f" --input-dir {context.container_input_dir}"
+            f" --output-dir {context.container_output_dir}"
+            f" --model {self.model}"
+            f" --architecture {self.architecture}"
+            f" --cache-dir {SpaCyModel._CONTAINER_CACHE_DIR}"
+            f" --embed-pooling {embed_input.pooling.value}"
+        )
 
         run_kwargs = self._base_docker_run_kwargs(context)
 
