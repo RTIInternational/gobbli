@@ -1,0 +1,4 @@
+# These are additional requirements needed on top of the pytorch image
+pandas==0.25.0
+spacy==2.2.3
+spacy-transformers[cuda100]==0.5.1
