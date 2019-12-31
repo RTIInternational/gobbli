@@ -90,7 +90,7 @@ def train(
     num_train_epochs,
     labels,
     dropout,
-    disabled,
+    disabled_components,
 ):
     """
     Train the TextCategorizer component of the passed pipeline on the given data.
@@ -115,27 +115,28 @@ def train(
     train_data = list(zip(X_train, [{"cats": cats} for cats in train_labels]))
     valid_data = list(zip(X_valid, [{"cats": cats} for cats in valid_labels]))
 
-    optimizer = nlp.begin_training()
-    for i in range(num_train_epochs):
-        losses = {}
-        random.shuffle(train_data)
-        batches = minibatch(train_data, train_batch_size)
-        for batch in batches:
-            texts, annotations = zip(*batch)
-            nlp.update(texts, annotations, sgd=optimizer, drop=dropout, losses=losses)
+    with nlp.disable_pipes(*disabled_components):
+        optimizer = nlp.begin_training()
+        for i in range(num_train_epochs):
+            losses = {}
+            random.shuffle(train_data)
+            batches = minibatch(train_data, train_batch_size)
+            for batch in batches:
+                texts, annotations = zip(*batch)
+                nlp.update(
+                    texts, annotations, sgd=optimizer, drop=dropout, losses=losses
+                )
 
-        with textcat.model.use_params(optimizer.averages):
-            accuracy, precision, recall, f_score, valid_loss = evaluate(
-                nlp.tokenizer, nlp, valid_data, labels
-            )
-            print(
-                f"Iter {i}\tTrain Loss: {losses['textcat']:.3f}\tValid Loss: {valid_loss:.3f}\tAccuracy: {accuracy:.3f}\tPrecision: {precision:.3f}\tRecall: {recall:.3f}\tF: {f_score:.3f}"
-            )
+            with textcat.model.use_params(optimizer.averages):
+                accuracy, precision, recall, f_score, valid_loss = evaluate(
+                    nlp.tokenizer, nlp, valid_data, labels
+                )
+                print(
+                    f"Iter {i}\tTrain Loss: {losses['textcat']:.3f}\tValid Loss: {valid_loss:.3f}\tAccuracy: {accuracy:.3f}\tPrecision: {precision:.3f}\tRecall: {recall:.3f}\tF: {f_score:.3f}"
+                )
 
     checkpoint_dir = output_dir / "checkpoint"
     checkpoint_dir.mkdir(exist_ok=True, parents=True)
-
-    disabled.restore()
 
     with nlp.use_params(optimizer.averages):
         nlp.to_disk(checkpoint_dir)
@@ -150,7 +151,7 @@ def train(
         json.dump(metrics, f)
 
 
-def predict(*, input_dir, output_dir, nlp, labels):
+def predict(*, input_dir, output_dir, nlp, labels, disabled_components):
     """
     Generate predictions for the given dataset using the TextCategorizer component
     of the passed pipeline.
@@ -158,13 +159,14 @@ def predict(*, input_dir, output_dir, nlp, labels):
     X_test, _ = read_data(input_dir / "test.tsv", False)
 
     pred_probas = []
-    for doc in nlp.pipe(X_test):
-        pred_probas.append({label: doc.cats.get(label, 0.0) for label in labels})
+    with nlp.disable_pipes(*disabled_components):
+        for doc in nlp.pipe(X_test):
+            pred_probas.append({label: doc.cats.get(label, 0.0) for label in labels})
     df = pd.DataFrame(pred_probas)
     df.to_csv(output_dir / "test_results.tsv", index=False, sep="\t")
 
 
-def embed(*, input_dir, output_dir, nlp, embed_pooling):
+def embed(*, input_dir, output_dir, nlp, embed_pooling, disabled_components):
     """
     Generate embeddings for the given dataset using the vectors from the
     passed pipeline.
@@ -172,21 +174,22 @@ def embed(*, input_dir, output_dir, nlp, embed_pooling):
     embeddings = []
     X_embed, _ = read_data(input_dir / "input.tsv", False)
 
-    with open(output_dir / "embeddings.jsonl", "w") as f:
-        for doc in nlp.pipe(X_embed):
-            if embed_pooling == "mean":
-                row_json = {"embedding": doc.vector.tolist()}
-            elif embed_pooling == "none":
-                embeddings = []
-                tokens = []
-                for tok in doc:
-                    embeddings.append(tok.vector.tolist())
-                    tokens.append(tok.text)
-                row_json = {"embedding": embeddings, "tokens": tokens}
-            else:
-                raise ValueError(f"Unsupported pooling type: {embed_pooling}")
+    with nlp.disable_pipes(*disabled_components):
+        with open(output_dir / "embeddings.jsonl", "w") as f:
+            for doc in nlp.pipe(X_embed):
+                if embed_pooling == "mean":
+                    row_json = {"embedding": doc.vector.tolist()}
+                elif embed_pooling == "none":
+                    embeddings = []
+                    tokens = []
+                    for tok in doc:
+                        embeddings.append(tok.vector.tolist())
+                        tokens.append(tok.text)
+                    row_json = {"embedding": embeddings, "tokens": tokens}
+                else:
+                    raise ValueError(f"Unsupported pooling type: {embed_pooling}")
 
-            f.write(f"{json.dumps(row_json)}\n")
+                f.write(f"{json.dumps(row_json)}\n")
 
 
 if __name__ == "__main__":
@@ -273,7 +276,8 @@ if __name__ == "__main__":
 
     using_gpu = spacy.prefer_gpu()
 
-    print(f"Using GPU: {using_gpu}")
+    device = "gpu" if using_gpu else "cpu"
+    print(f"Using device: {device}")
 
     print("Initializing spaCy model...")
     print(f"  Language Model: {args.model}")
@@ -311,8 +315,6 @@ if __name__ == "__main__":
             for component in ("tagger", "parser", "ner"):
                 disabled_components.add(component)
 
-    disabled = nlp.disable_pipes(*disabled_components)
-
     # We need a list of labels for training or prediction so we know what the
     # output shape of the model should be
     labels = None
@@ -332,11 +334,17 @@ if __name__ == "__main__":
             train_batch_size=args.train_batch_size,
             num_train_epochs=args.num_train_epochs,
             dropout=args.dropout,
-            disabled=disabled,
+            disabled_components=disabled_components,
         )
 
     elif args.mode == "predict":
-        predict(input_dir=input_dir, output_dir=output_dir, nlp=nlp, labels=labels)
+        predict(
+            input_dir=input_dir,
+            output_dir=output_dir,
+            nlp=nlp,
+            labels=labels,
+            disabled_components=disabled_components,
+        )
 
     elif args.mode == "embed":
         embed(
@@ -344,6 +352,7 @@ if __name__ == "__main__":
             output_dir=output_dir,
             nlp=nlp,
             embed_pooling=args.embed_pooling,
+            disabled_components=disabled_components,
         )
 
     else:
