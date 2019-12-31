@@ -130,19 +130,25 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         - ``lr`` (:obj:`float`): Learning rate.
         - ``dim`` (:obj:`int`): Dimension of learned vectors.
         - ``ws`` (:obj:`int`): Context window size.
+        - ``autotune_duration`` (:obj:`int`): Duration in seconds to spend autotuning parameters.
+          Any of the above parameters will not be autotuned if they are manually specified.
+        - ``autotune_modelsize`` (:obj:`str`): Maximum size of autotuned model (ex "2M" for 2
+          megabytes).  Any of the above parameters will not be autotuned if they are manually
+          specified.
         - ``fasttext_model`` (:obj:`str`): Name of a pretrained fastText model to use.
           See :obj:`FASTTEXT_VECTOR_ARCHIVES` for a listing of available pretrained models.
         """
-        self.word_ngrams = 1
-        self.lr = 0.1
-        self.ws = 5
+        self.word_ngrams = None
+        self.lr = None
+        self.ws = None
         self.fasttext_model = None
-        # Default to dimensionality of the passed model, if any;
-        # otherwise, default to 100
+        # Default to dimensionality of the passed model, if any
         if "fasttext_model" in params:
-            self.dim = _parse_dim(params["fasttext_model"])
+            self.dim: Optional[int] = _parse_dim(params["fasttext_model"])
         else:
-            self.dim = 100
+            self.dim = None
+        self.autotune_duration = None
+        self.autotune_modelsize = None
 
         for name, value in params.items():
             if name == "word_ngrams":
@@ -160,6 +166,12 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             elif name == "fasttext_model":
                 assert_in(name, value, set(FASTTEXT_VECTOR_ARCHIVES.keys()))
                 self.fasttext_model = value
+            elif name == "autotune_duration":
+                assert_type(name, value, int)
+                self.autotune_duration = value
+            elif name == "autotune_modelsize":
+                assert_type(name, value, str)
+                self.autotune_modelsize = value
             else:
                 raise ValueError(f"Unknown param '{name}'")
 
@@ -289,6 +301,7 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         container_output_path: Path,
         context: ContainerTaskContext,
         num_epochs: int,
+        autotune_validation_file_path: Optional[Path] = None,
         freeze_vectors: bool = False,
     ) -> Tuple[str, float]:
         """
@@ -300,6 +313,7 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
           container_input_path: Path to the input file in the container
           container_output_path: Path to the output checkpoint in the container
           context: Container task context.
+        validation_file_path: Optional file to use for autotune validation when training.
           freeze_vectors: If true, use 0 learning rate; train solely for
             the purpose of calculating loss.
 
@@ -310,20 +324,32 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             user_checkpoint, context
         )
 
-        lr = self.lr
-        if freeze_vectors:
-            lr = 0.0
-
         cmd = (
             "supervised"
             f" -input {container_input_path}"
             f" -output {container_output_path}"
-            f" -wordNgrams {self.word_ngrams}"
-            f" -lr {lr}"
-            f" -dim {self.dim}"
             f" -epoch {num_epochs}"
-            f" -ws {self.ws}"
         )
+
+        if autotune_validation_file_path is not None:
+            cmd += f" -autotune-validation {autotune_validation_file_path}"
+
+        lr = self.lr
+        if freeze_vectors:
+            lr = 0.0
+        if lr is not None:
+            cmd += f" -lr {lr}"
+
+        for arg_name, attr in (
+            ("wordNgrams", "word_ngrams"),
+            ("dim", "dim"),
+            ("ws", "ws"),
+            ("autotune-duration", "autotune_duration"),
+            ("autotune-modelsize", "autotune_modelsize"),
+        ):
+            attr_val = getattr(self, attr)
+            if attr_val is not None:
+                cmd += f" -{arg_name} {attr_val}"
 
         run_kwargs = self._base_docker_run_kwargs(context)
 
@@ -434,21 +460,24 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             context.host_input_dir / FastText._VALID_INPUT_FILE,
         )
 
+        container_validation_input_path = (
+            context.container_input_dir / FastText._VALID_INPUT_FILE
+        )
         train_logs, train_loss = self._run_supervised(
             train_input.checkpoint,
             context.container_input_dir / FastText._TRAIN_INPUT_FILE,
             context.container_output_dir / FastText._CHECKPOINT_BASE,
             context,
             train_input.num_train_epochs,
+            autotune_validation_file_path=container_validation_input_path,
         )
 
         host_checkpoint_path = context.host_output_dir / f"{FastText._CHECKPOINT_BASE}"
 
         # Calculate validation accuracy on our own, since the CLI only provides
         # precision/recall
-        container_input_path = context.container_input_dir / FastText._VALID_INPUT_FILE
         predict_logs, pred_prob_df = self._run_predict_prob(
-            host_checkpoint_path, labels, container_input_path, context
+            host_checkpoint_path, labels, container_validation_input_path, context
         )
         pred_labels = pred_prob_to_pred_label(pred_prob_df)
 
