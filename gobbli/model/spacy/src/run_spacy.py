@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import spacy
+from spacy.gold import GoldParse
 from spacy.util import minibatch
 
 
@@ -45,23 +46,26 @@ def evaluate(tokenizer, nlp, valid_data, labels):
     texts, cats = zip(*valid_data)
     scores = np.zeros((len(cats), len(labels)), dtype="f")
     docs = []
+    golds = []
     for i, doc in enumerate(nlp.pipe(texts)):
-        gold = cats[i]["cats"]
+        gold_cats = cats[i]["cats"]
         for j, (label, score) in enumerate(doc.cats.items()):
-            if label not in gold:
+            if label not in gold_cats:
                 raise ValueError(f"Prediction for unexpected label: {label}")
+            gold_score = gold_cats[label]
 
-            if score >= 0.5 and gold[label] >= 0.5:
+            if score >= 0.5 and gold_score >= 0.5:
                 tp += 1.0
-            elif score > +0.5 and gold[label] < 0.5:
+            elif score > +0.5 and gold_score < 0.5:
                 fp += 1.0
-            elif score < 0.5 and gold[label] < 0.5:
+            elif score < 0.5 and gold_score < 0.5:
                 tn += 1
-            elif score < 0.5 and gold[label] >= 0.5:
+            elif score < 0.5 and gold_score >= 0.5:
                 fn += 1
 
             scores[i, j] = score
         docs.append(doc)
+        golds.append(GoldParse(doc, cats=gold_cats))
 
     precision = tp / (tp + fp)
     recall = tp / (tp + fn)
@@ -71,11 +75,7 @@ def evaluate(tokenizer, nlp, valid_data, labels):
     else:
         f_score = 2 * (precision * recall) / (precision + recall)
 
-    # The textcat loss calculation ignores the first parameter (documents)
-    # and wants the second parameter to be gold standard documents, so pass
-    # the texts twice
-    # Reference: https://github.com/explosion/spaCy/blob/db9257559c0642262a46d7acb7855e1e23b50e56/spacy/pipeline/pipes.pyx#L1005
-    loss, _ = nlp.get_pipe("textcat").get_loss(texts, docs, scores)
+    loss, _ = nlp.get_pipe("textcat").get_loss(texts, golds, scores)
 
     return accuracy, precision, recall, f_score, loss
 
