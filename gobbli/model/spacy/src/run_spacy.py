@@ -225,6 +225,14 @@ if __name__ == "__main__":
         help="Architecture for the spaCy TextCategorizer.",
     )
     parser.add_argument(
+        "--full-pipeline",
+        action="store_true",
+        help="If passed, use the full spaCy language pipeline (including tagging, "
+        "parsing, and named entity recognition) for the TextCategorizer model used in "
+        "training and prediction.  This makes training/prediction much slower but theoretically "
+        "provides more information to the model.",
+    )
+    parser.add_argument(
         "--train-batch-size",
         type=int,
         default=32,
@@ -288,9 +296,13 @@ if __name__ == "__main__":
             disabled_components.update(set(["tagger", "parser", "ner"]))
 
     elif args.mode in ("train", "predict"):
-        # Enable all parsing components to provide maximum information to the
-        # text categorization model
-        pass
+        if args.full_pipeline:
+            # Enable all parsing components to provide maximum information to the
+            # text categorization model
+            pass
+        else:
+            # Otherwise, disable everything that isn't part of the text categorizer model
+            disabled_components.update(set(["tagger", "parser", "ner"]))
 
     nlp.disable_pipes(*disabled_components)
 

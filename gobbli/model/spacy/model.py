@@ -50,6 +50,10 @@ class SpaCyModel(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         - ``architecture`` (:obj:`str`): Model architecture to use.
           Available values are in `the spaCy API docs <https://spacy.io/api/textcategorizer#architectures>`__.
         - ``dropout`` (:obj:`float`): Dropout proportion for training.
+        - ``full_pipeline`` (:obj:`bool`): If True, enable the full spaCy language pipeline
+          (including tagging, parsing, and named entity recognition) for the TextCategorizer
+          model used in training and prediction.  This makes training/prediction much slower
+          but theoretically provides more information to the model.
 
         Note that gobbli relies on spaCy to perform validation on these parameters,
         so initialization errors may not be caught until model runtime.
@@ -57,6 +61,7 @@ class SpaCyModel(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         self.model = "en_core_web_lg"
         self.architecture = "ensemble"
         self.dropout = 0.2
+        self.full_pipeline = False
 
         for name, value in params.items():
             if name == "model":
@@ -66,6 +71,9 @@ class SpaCyModel(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             elif name == "dropout":
                 assert_type(name, value, float)
                 self.dropout = value
+            elif name == "full_pipeline":
+                assert_type(name, value, bool)
+                self.full_pipeline = value
             else:
                 raise ValueError(f"Unknown param '{name}'")
 
@@ -197,6 +205,9 @@ class SpaCyModel(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             f" --num-train-epochs {train_input.num_train_epochs}"
             f" --dropout {self.dropout}"
         )
+
+        if self.full_pipeline:
+            cmd += " --full-pipeline"
 
         run_kwargs = self._base_docker_run_kwargs(context)
 
