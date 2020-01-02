@@ -1,3 +1,4 @@
+import warnings
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -212,6 +213,11 @@ class SKLearnClassifier(BaseModel, TrainMixin, PredictMixin):
     def _train(
         self, train_input: gobbli.io.TrainInput, context: ContainerTaskContext
     ) -> gobbli.io.TrainOutput:
+        if train_input.checkpoint is not None:
+            warnings.warn(
+                "SKLearnClassifier does not support training from an existing "
+                "checkpoint, so the passed checkpoint will be ignored."
+            )
         self.estimator.fit(train_input.X_train, train_input.y_train)
 
         y_train_pred = self.estimator.predict(train_input.X_train)
@@ -243,7 +249,9 @@ class SKLearnClassifier(BaseModel, TrainMixin, PredictMixin):
     ) -> gobbli.io.PredictOutput:
 
         if predict_input.checkpoint is not None:
-            self.estimator = self._load_estimator(predict_input.checkpoint)
+            self.estimator = _SafeEstimator(
+                self._load_estimator(predict_input.checkpoint)
+            )
 
         pred_proba_df = pd.DataFrame(self.estimator.predict_proba(predict_input.X))
         if self.estimator.classes_ is None:
