@@ -219,11 +219,13 @@ def test_detokenize_split_spacy(text, tokens, tokenize_method):
     assert detokenize(tokenize_method, [tokens]) == [text]
 
 
-def test_tokenize_detokenize_sentencepiece(tmpdir):
+@pytest.mark.parametrize("model_path", [Path("spm"), None])
+def test_tokenize_detokenize_sentencepiece(tmpdir, model_path):
     texts = ["a b c", "a ab c", "a b ac"]
 
     # Model should be trained
-    model_path = Path(tmpdir) / "spm"
+    if model_path is not None:
+        model_path = Path(tmpdir) / model_path
     tokens = tokenize(
         TokenizeMethod.SENTENCEPIECE, texts, model_path=model_path, vocab_size=7
     )
@@ -237,9 +239,12 @@ def test_tokenize_detokenize_sentencepiece(tmpdir):
     ]
     assert tokens == expected_tokens
 
-    assert detokenize(TokenizeMethod.SENTENCEPIECE, tokens, model_path) == texts
+    # Can't detokenize if we didn't give a persistent model path to the tokenize
+    # function
+    if model_path is not None:
+        assert detokenize(TokenizeMethod.SENTENCEPIECE, tokens, model_path) == texts
 
-    # Previously should be reused with the old vocab size, and a new model
-    # shouldn't be trained
-    tokens = tokenize(TokenizeMethod.SENTENCEPIECE, texts, model_path=model_path)
-    assert tokens == expected_tokens
+        # Previously should be reused with the old vocab size, and a new model
+        # shouldn't be trained
+        tokens = tokenize(TokenizeMethod.SENTENCEPIECE, texts, model_path=model_path)
+        assert tokens == expected_tokens

@@ -464,6 +464,29 @@ def shuffle_together(l1: List[T1], l2: List[T2], seed: Optional[int] = None):
     l1[:], l2[:] = zip(*zipped)
 
 
+def _train_sentencepiece(spm: Any, texts: List[str], model_path: Path, vocab_size: int):
+    """
+    Train a Sentencepiece model on the given data and save it to the given
+    location.
+
+    Args:
+      spm: Imported sentencepiece module
+      texts: Data to train on.
+      model_path: Path to write the trained model to.
+      vocab_size: Size of the vocabulary for the model to train.
+    """
+    with tempfile.NamedTemporaryFile(mode="w") as f:
+        f.write("\n".join(texts))
+        f.flush()
+
+        # log levels:
+        # https://github.com/google/sentencepiece/blob/d4dd947fe71c4fa4ee24ad8297beee32887d8828/src/common.h#L132
+        # Default is waaay too chatty
+        spm.SentencePieceTrainer.train(
+            f"--input={f.name} --model_prefix={model_path} --vocab_size={vocab_size} --minloglevel=2"
+        )
+
+
 @enum.unique
 class TokenizeMethod(enum.Enum):
     """
@@ -529,22 +552,24 @@ def tokenize(
                 "SentencePiece tokenization requires the sentencepiece module "
                 "to be installed."
             )
-
         # Train only if the model file path doesn't already exist
-        model_file_path = Path(f"{model_path}.model")
-        if not model_file_path.exists():
-            with tempfile.NamedTemporaryFile(mode="w") as f:
-                f.write("\n".join(texts))
-                f.flush()
-
-                spm.SentencePieceTrainer.train(
-                    f"--input={f.name} --model_prefix={model_path} --vocab_size={vocab_size}"
-                )
-
+        # If we weren't given a path to save to, just make a temp file which will
+        # be discarded after the run
         sp = spm.SentencePieceProcessor()
-        sp.load(str(model_file_path))
+        if model_path is None:
+            with tempfile.TemporaryDirectory() as temp_model_dir:
+                temp_model_path = Path(temp_model_dir) / "temp"
+                _train_sentencepiece(spm, texts, temp_model_path, vocab_size)
+                # Have to add the extension here for sentencepiece to find the model
+                sp.load(f"{temp_model_path}.model")
+                return [sp.encode_as_pieces(text) for text in texts]
+        else:
+            model_file_path = Path(f"{model_path}.model")
 
-        return [sp.encode_as_pieces(text) for text in texts]
+            if not model_file_path.exists():
+                _train_sentencepiece(spm, texts, model_path, vocab_size)
+            sp.load(str(model_file_path))
+            return [sp.encode_as_pieces(text) for text in texts]
     else:
         raise ValueError(f"Unsupported tokenization method '{method}'.")
 
