@@ -8,6 +8,10 @@ services:
     build:
       context: ./gobbli/model/bert
 
+  fasttext:
+    build:
+      context: ./gobbli/model/fasttext
+
   mt-dnn:
     build:
       context: ./gobbli/model/mtdnn
@@ -23,3 +27,7 @@ services:
   transformer:
     build:
       context: ./gobbli/model/transformer
+
+  spacy:
+    build:
+      context: ./gobbli/model/spacy
