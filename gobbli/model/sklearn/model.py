@@ -85,6 +85,11 @@ def make_cv_tfidf_logistic_regression(
     )
 
 
+_AT_LEAST_TWO_CLASSES_ERR_MSG = (
+    "This solver needs samples of at least 2 classes in the data"
+)
+
+
 class _SafeEstimator(BaseEstimator, ClassifierMixin):
     """
     Wrap an arbitrary classifier estimator to catch errors when fitting
@@ -102,10 +107,7 @@ class _SafeEstimator(BaseEstimator, ClassifierMixin):
         try:
             return self.base_estimator.fit(*args, **kwargs)
         except ValueError as e:
-            if (
-                "This solver needs samples of at least 2 classes in the data"
-                not in str(e)
-            ):
+            if _AT_LEAST_TWO_CLASSES_ERR_MSG not in str(e):
                 raise
         finally:
             self.classes_ = self.base_estimator.classes_
@@ -160,7 +162,7 @@ class SKLearnClassifier(BaseModel, TrainMixin, PredictMixin):
         for name, value in params.items():
             if name == "estimator_path":
                 assert_type(name, value, str)
-                estimator = SKLearnClassifier._load_estimator(value)
+                estimator = SKLearnClassifier._load_estimator(Path(value))
                 SKLearnClassifier._validate_estimator(estimator)
             else:
                 raise ValueError(f"Unknown param '{name}'")
@@ -171,11 +173,11 @@ class SKLearnClassifier(BaseModel, TrainMixin, PredictMixin):
             self.estimator = _SafeEstimator(estimator)
 
     @staticmethod
-    def _load_estimator(estimator_path: str) -> BaseEstimator:
+    def _load_estimator(estimator_path: Path) -> BaseEstimator:
         return joblib.load(estimator_path)
 
     @staticmethod
-    def _dump_estimator(estimator: BaseEstimator, estimator_path: str):
+    def _dump_estimator(estimator: BaseEstimator, estimator_path: Path):
         joblib.dump(estimator, estimator_path)
 
     @staticmethod
@@ -244,6 +246,10 @@ class SKLearnClassifier(BaseModel, TrainMixin, PredictMixin):
             self.estimator = self._load_estimator(predict_input.checkpoint)
 
         pred_proba_df = pd.DataFrame(self.estimator.predict_proba(predict_input.X))
+        if self.estimator.classes_ is None:
+            raise ValueError(
+                "Can't determine column names for predicted probabilities."
+            )
         pred_proba_df.columns = self.estimator.classes_.astype("str")
 
         labels = predict_input.labels
