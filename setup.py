@@ -30,7 +30,7 @@ setup(
         "docker >= 3.7.0",
         "numpy >= 1.16.0",
         "pandas >= 0.24.0",
-        "scikit-learn >= 0.21.0",
+        "scikit-learn >= 0.22.0",
         "ray >= 0.7.3",
         "seaborn >= 0.9.0",
     ],

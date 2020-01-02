@@ -479,6 +479,14 @@ class ClassificationExperiment(BaseExperiment):
             test_size=round(valid_prop / train_valid_prop, 4),
         )
 
+        for param, values in self.param_grid.items():
+            if isinstance(values, str):
+                raise TypeError(
+                    f"String detected in parameter grid values for parameter '{param}'. "
+                    "This will be treated as a list of character parameter values, "
+                    "which probably isn't what you want.  If you're really sure, "
+                    "convert the string to a list of characters and try again."
+                )
         grid = ParameterGrid(self.param_grid)
         if len(grid) == 0:
             raise ValueError("empty parameter grid")

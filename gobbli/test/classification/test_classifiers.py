@@ -6,6 +6,7 @@ from gobbli.model.bert import BERT
 from gobbli.model.fasttext import FastText
 from gobbli.model.majority import MajorityClassifier
 from gobbli.model.mtdnn import MTDNN
+from gobbli.model.sklearn import SKLearnClassifier
 from gobbli.model.spacy import SpaCyModel
 from gobbli.model.transformer import Transformer
 from gobbli.test.util import model_test_dir, skip_if_low_resource, validate_checkpoint
@@ -28,6 +29,8 @@ def check_predict_output(train_output, predict_input, predict_output):
     [
         (MajorityClassifier, TrivialDataset, {}, {}, {}),
         (MajorityClassifier, NewsgroupsDataset, {}, {}, {}),
+        (SKLearnClassifier, TrivialDataset, {}, {}, {}),
+        (SKLearnClassifier, NewsgroupsDataset, {}, {}, {}),
         (
             BERT,
             TrivialDataset,

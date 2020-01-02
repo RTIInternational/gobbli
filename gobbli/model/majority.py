@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
@@ -17,7 +17,7 @@ class MajorityClassifier(BaseModel, TrainMixin, PredictMixin):
     without having to build a time-consuming model.
     """
 
-    def init(self, params):
+    def init(self, params: Dict[str, Any]):
         self.majority_class: Any = None
 
     def _build(self):
