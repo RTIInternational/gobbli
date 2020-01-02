@@ -44,9 +44,16 @@ def evaluate(tokenizer, nlp, valid_data, labels):
     tn = 0.0
 
     texts, cats = zip(*valid_data)
-    scores = np.zeros((len(cats), len(labels)), dtype="f")
+
     docs = []
     golds = []
+    # Use the model's ops module
+    # to make sure this is compatible with GPU (cupy array)
+    # or without (numpy array)
+    scores = np.zeros((len(cats), len(labels)), dtype="f")
+    textcat = nlp.get_pipe("textcat")
+    scores = textcat.model.ops.asarray(scores)
+
     for i, doc in enumerate(nlp.pipe(texts)):
         gold_cats = cats[i]["cats"]
         for j, (label, score) in enumerate(doc.cats.items()):

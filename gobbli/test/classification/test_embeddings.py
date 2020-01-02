@@ -96,8 +96,8 @@ def check_embed_output(
             {"num_train_epochs": 1, "train_batch_size": 16, "valid_batch_size": 8},
             {"embed_batch_size": 32},
         ),
-        (SpaCyModel, TrivialDataset, {"model": "spacy_core_en_sm"}, {}, {}),
-        (SpaCyModel, NewsgroupsDataset, {"model": "spacy_core_en_sm"}, {}, {}),
+        (SpaCyModel, TrivialDataset, {"model": "en_core_web_sm"}, {}, {}),
+        (SpaCyModel, NewsgroupsDataset, {"model": "en_core_web_sm"}, {}, {}),
     ],
 )
 def test_embeddings(
