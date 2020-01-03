@@ -18,7 +18,7 @@ def _check_string_list(obj: Any):
     if not isinstance(obj, list):
         raise TypeError(f"obj must be a list, got '{type(obj)}'")
     if len(obj) > 0 and not isinstance(obj[0], str):
-        raise TypeError(f"obj must contain strings, got '{type(obj)}'")
+        raise TypeError(f"obj must contain strings, got '{type(obj[0])}'")
 
 
 def validate_X(X: List[str]):
