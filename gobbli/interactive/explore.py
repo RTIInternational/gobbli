@@ -11,18 +11,8 @@ import pandas as pd
 import streamlit as st
 
 import gobbli.dataset
-from gobbli.interactive.util import read_data
+from gobbli.interactive.util import load_data
 from gobbli.util import TokenizeMethod, tokenize, truncate_text
-
-
-@st.cache(show_spinner=True)
-def get_data(
-    # Streamlit errors sometimes when hashing Path objects, so use a string.
-    # https://github.com/streamlit/streamlit/issues/857
-    data_file: str,
-    n_rows: Optional[int] = None,
-) -> Tuple[List[str], Optional[List[str]]]:
-    return read_data(Path(data_file), n_rows=n_rows)
 
 
 # For performance, don't let streamlit try to hash the tokens.  It takes forever
@@ -247,22 +237,7 @@ def show_topic_model(
     show_default=True,
 )
 def run(data: str, n_rows: int):
-    if os.path.exists(data):
-        data_path = Path(data)
-        st.title(f"Exploring: {data_path}")
-        texts, labels = get_data(
-            str(data_path), n_rows=None if n_rows == -1 else n_rows
-        )
-    elif data in gobbli.dataset.__all__:
-        dataset = getattr(gobbli.dataset, data).load()
-        texts = dataset.X_train() + dataset.X_test()
-        labels = dataset.y_train() + dataset.y_test()
-    else:
-        raise ValueError(
-            "data argument did not correspond to an existing data file in a "
-            "supported format or a built-in gobbli dataset.  Available datasets: "
-            f"{gobbli.dataset.__all__}"
-        )
+    texts, labels = load_data(data, None if n_rows == -1 else n_rows)
     label_indices = get_label_indices(labels)
 
     #

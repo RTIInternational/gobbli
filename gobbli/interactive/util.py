@@ -1,7 +1,13 @@
 import csv
 import itertools
+import os
 from pathlib import Path
 from typing import List, Optional, Tuple
+
+import streamlit as st
+
+import gobbli
+from gobbli.dataset.base import BaseDataset
 
 
 def _read_delimited(
@@ -56,7 +62,7 @@ def _read_lines(data_file: Path, n_rows: Optional[int] = None) -> List[str]:
         return list(itertools.islice((l.strip() for l in f), n_rows))
 
 
-def read_data(
+def read_data_file(
     data_file: Path, n_rows: Optional[int] = None
 ) -> Tuple[List[str], Optional[List[str]]]:
     """
@@ -79,5 +85,88 @@ def read_data(
         texts = _read_lines(data_file, n_rows=n_rows)
     else:
         raise ValueError(f"Data file extension '{extension}' is unsupported.")
+
+    return texts, labels
+
+
+def sample_dataset(
+    dataset: BaseDataset, n_rows: Optional[int] = None
+) -> Tuple[List[str], List[str]]:
+    """
+    Sample the given number of rows from the given dataset.
+
+    Args:
+      dataset: Loaded dataset to sample from.
+      n_rows: Optional number of rows to sample.  If None, return all rows.
+
+    Returns:
+      2-tuple: a list of texts and a list of labels.  If n_rows was given, these will
+      be no longer than n_rows.
+    """
+    # Apply limit to the dataset, if any
+    if n_rows == -1:
+        texts = dataset.X_train() + dataset.X_test()
+        labels = dataset.y_train() + dataset.y_test()
+    else:
+        # Try to reach the limit from the train split only first
+        train_texts = dataset.X_train()[:n_rows]
+        train_labels = dataset.y_train()[:n_rows]
+
+        if len(train_texts) < n_rows:
+            # If we need more rows to reach the limit, get them
+            # from the test set
+            test_limit = n_rows - len(train_texts)
+            test_texts = dataset.X_test()[:test_limit]
+            test_labels = dataset.y_test()[:test_limit]
+
+            texts = train_texts + test_texts
+            labels = train_labels + test_labels
+        else:
+            # Otherwise, just use the limited train data
+            texts = train_texts
+            labels = train_labels
+
+
+@st.cache(show_spinner=True)
+def read_data_file_cached(
+    # Streamlit errors sometimes when hashing Path objects, so use a string.
+    # https://github.com/streamlit/streamlit/issues/857
+    data_file: str,
+    n_rows: Optional[int] = None,
+) -> Tuple[List[str], Optional[List[str]]]:
+    """
+    Streamlit-cached wrapper around :func:`read_data_file` for performance.
+    """
+    return read_data_file(Path(data_file), n_rows=n_rows)
+
+
+def load_data(data: str, n_rows: Optional[int]) -> Tuple[List[str], List[str]]:
+    """
+    Load data according to the given 'data' string and row limit.
+
+    Args:
+      data: Could be either the name of a gobbli dataset class or a path
+      to a data file in a supported format.
+      n_rows: Optional limit on number of rows read from the data.
+
+    Returns:
+      2-tuple: List of texts and list of labels.
+    """
+    if os.path.exists(data):
+        data_path = Path(data)
+        st.title(f"Exploring: {data_path}")
+        texts, labels = read_data_file_cached(
+            str(data_path), n_rows=None if n_rows == -1 else n_rows
+        )
+    elif data in gobbli.dataset.__all__:
+        st.title(f"Exploring: {data}")
+        dataset = getattr(gobbli.dataset, data).load()
+        texts, labels = sample_dataset(dataset, None if n_rows == -1 else n_rows)
+    else:
+        raise ValueError(
+            "data argument did not correspond to an existing data file in a "
+            "supported format or a built-in gobbli dataset.  Available datasets: "
+            f"{gobbli.dataset.__all__}"
+        )
 
     return texts, labels
