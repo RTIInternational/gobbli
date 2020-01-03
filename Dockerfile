@@ -5,7 +5,7 @@ COPY ./docs/requirements.txt /code/docs/requirements.txt
 
 WORKDIR /code
 RUN pip install --upgrade pip \
-    && pip install -e '.[augment,tokenize]' \
+    && pip install -e '.[augment,tokenize,interactive]' \
     && pip install -r requirements.txt \
     && pip install -r docs/requirements.txt
 
