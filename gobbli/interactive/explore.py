@@ -1,18 +1,14 @@
 import copy
-import itertools
-import logging
 import os
 import random
-import tempfile
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple, TypeVar
+from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
 
 import altair as alt
 import click
 import pandas as pd
 import streamlit as st
-from streamlit.logger import set_log_level
 
 import gobbli.dataset
 from gobbli.interactive.util import read_data
@@ -275,7 +271,6 @@ def run(data: str, n_rows: int):
 
     st.sidebar.header("Sample Parameters")
 
-    filter_label_input = st.sidebar.empty()
     filter_label = None
     if st.sidebar.checkbox("Filter By Label", key="sample_by_label"):
         filter_label = st.sidebar.selectbox("Label", list(sorted(label_indices.keys())))

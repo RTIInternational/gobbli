@@ -53,7 +53,6 @@ def _read_lines(data_file: Path, n_rows: Optional[int] = None) -> List[str]:
       List of read lines.
     """
     with open(data_file, "r") as f:
-        # TODO how to handle whitespace
         return list(itertools.islice((l.strip() for l in f), n_rows))
 
 
