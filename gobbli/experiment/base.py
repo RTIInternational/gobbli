@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import ray
 
 from gobbli.dataset.base import BaseDataset
+from gobbli.model.sklearn import SKLearnClassifier
 from gobbli.util import generate_uuid, gobbli_dir, is_dir_empty, write_metadata
 
 
@@ -194,6 +195,13 @@ class BaseExperiment(ABC):
         self.task_num_gpus = task_num_gpus
         self.worker_log_level = worker_log_level
         self.distributed = distributed
+
+        if self.model_cls is SKLearnClassifier and distributed:
+            raise ValueError(
+                "The scikit-learn classifier is not supported for distributed "
+                "experiments, since it needs to load a pickle from a file path "
+                "which may not be on a given worker node."
+            )
 
         _ray_kwargs = ray_kwargs
         if _ray_kwargs is None:
