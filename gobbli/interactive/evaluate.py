@@ -88,7 +88,7 @@ PRED_PROB_LABEL_RE = re.compile(r"^(.+) \((?:[0-9.]+)\)$")
 
 def _show_example_predictions(
     texts: List[str],
-    labels: List[str],
+    labels: Optional[List[str]],
     y_pred_proba: pd.DataFrame,
     truncate_len: int,
     top_k: int,
@@ -96,10 +96,9 @@ def _show_example_predictions(
     def gather_predictions(row):
         ndx = row.name
         pred_prob_order = row.sort_values(ascending=False)[:top_k]
-        data = {
-            "Document": truncate_text(texts[ndx], truncate_len),
-            "True Label": labels[ndx],
-        }
+        data = {"Document": truncate_text(texts[ndx], truncate_len)}
+        if labels is not None:
+            data["True Label"] = labels[ndx]
 
         for i, (label, pred_prob) in enumerate(pred_prob_order.items()):
             data[f"Predicted Label {i+1}"] = f"{label} ({pred_prob:.3f})"
@@ -108,7 +107,7 @@ def _show_example_predictions(
 
     df = y_pred_proba.apply(gather_predictions, axis=1)
 
-    def style_pred_prob(row):
+    def style_pred_prob(row, labels):
         ndx = row.name
         true_label_style = (
             f"background-color: {TRUE_LABEL_COLOR};color: {TRUE_LABEL_TEXT_COLOR}"
@@ -134,12 +133,15 @@ def _show_example_predictions(
 
         return style
 
-    st.table(df.style.apply(style_pred_prob, axis=1))
+    if labels is not None:
+        df = df.style.apply(style_pred_prob, axis=1, labels=labels)
+
+    st.table(df)
 
 
 def show_example_predictions(
     texts: List[str],
-    labels: List[str],
+    labels: Optional[List[str]],
     y_pred_proba: pd.DataFrame,
     example_truncate_len: int,
     example_num_docs: int,
@@ -150,7 +152,7 @@ def show_example_predictions(
     example_indices = safe_sample(range(len(texts)), example_num_docs)
     _show_example_predictions(
         [texts[i] for i in example_indices],
-        [labels[i] for i in example_indices],
+        None if labels is None else [labels[i] for i in example_indices],
         y_pred_proba.iloc[example_indices, :].reset_index(drop=True),
         example_truncate_len,
         example_top_k,
