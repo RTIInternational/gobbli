@@ -1,5 +1,6 @@
 import datetime as dt
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -20,7 +21,7 @@ from gobbli.io import PredictInput, TaskIO
 from gobbli.model.base import BaseModel
 from gobbli.model.context import ContainerTaskContext
 from gobbli.model.mixin import TrainMixin
-from gobbli.util import truncate_text
+from gobbli.util import pred_prob_to_pred_label, truncate_text
 
 
 def format_task(task_dir: Path) -> str:
@@ -71,6 +72,20 @@ def get_predictions(
     return predict_output.y_pred_proba
 
 
+def show_metrics(metrics: Dict[str, Any]):
+    st.header("Metrics")
+    md = ""
+    for name, value in metrics.items():
+        md += f"- **{name}:** {value:.4f}\n"
+    st.markdown(md)
+
+
+TRUE_LABEL_COLOR = "#1f78b4"
+TRUE_LABEL_TEXT_COLOR = "white"
+
+PRED_PROB_LABEL_RE = re.compile(r"^(.+) \((?:[0-9.]+)\)$")
+
+
 def _show_example_predictions(
     texts: List[str],
     labels: List[str],
@@ -83,7 +98,7 @@ def _show_example_predictions(
         pred_prob_order = row.sort_values(ascending=False)[:top_k]
         data = {
             "Document": truncate_text(texts[ndx], truncate_len),
-            "Label": labels[ndx],
+            "True Label": labels[ndx],
         }
 
         for i, (label, pred_prob) in enumerate(pred_prob_order.items()):
@@ -92,7 +107,34 @@ def _show_example_predictions(
         return pd.Series(data)
 
     df = y_pred_proba.apply(gather_predictions, axis=1)
-    st.table(df)
+
+    def style_pred_prob(row):
+        ndx = row.name
+        true_label_style = (
+            f"background-color: {TRUE_LABEL_COLOR};color: {TRUE_LABEL_TEXT_COLOR}"
+        )
+        style = [
+            # Text
+            "",
+            # True label
+            true_label_style,
+        ]
+
+        pred_probs = row[2:]
+        for p in pred_probs:
+            match = re.match(PRED_PROB_LABEL_RE, p)
+            if match is None:
+                raise ValueError(f"Failed to parse predicted probability cell: {p}")
+            if match.group(1) == labels[ndx]:
+                # The cell corresponds to the true label
+                cell_style = true_label_style
+            else:
+                cell_style = ""
+            style.append(cell_style)
+
+        return style
+
+    st.table(df.style.apply(style_pred_prob, axis=1))
 
 
 def show_example_predictions(
@@ -219,8 +261,9 @@ def run(
         checkpoint_meta["checkpoint"],
     )
 
+    evaluation = None
+
     if labels is not None:
-        st.header("Evaluation")
         evaluation = ClassificationEvaluation(
             labels=checkpoint_labels,
             X=sampled_texts,
@@ -228,8 +271,7 @@ def run(
             y_pred_proba=y_pred_proba,
         )
 
-        metrics_df = pd.DataFrame({"Metric": pd.Series(evaluation.metrics())})
-        st.dataframe(metrics_df)
+        show_metrics(evaluation.metrics())
 
     st.sidebar.header("Example Parameters")
     example_truncate_len = st.sidebar.number_input(
