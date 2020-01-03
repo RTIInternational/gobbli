@@ -4,18 +4,18 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 import matplotlib
 import pandas as pd
 import seaborn as sns
+
+from gobbli.util import (
+    escape_line_delimited_text,
+    pred_prob_to_pred_label,
+    truncate_text,
+)
 from sklearn.metrics import (
     accuracy_score,
     classification_report,
     f1_score,
     precision_score,
     recall_score,
-)
-
-from gobbli.util import (
-    escape_line_delimited_text,
-    pred_prob_to_pred_label,
-    truncate_text,
 )
 
 
@@ -97,6 +97,13 @@ class ClassificationEvaluation:
                 "y_true and y_pred_proba must have the same number of observations"
             )
 
+        self.y_pred_series = pd.Series(self.y_pred)
+        self.y_true_series = pd.Series(self.y_true)
+
+        self.error_pred_prob = self.y_pred_proba[
+            self.y_pred_series != self.y_true_series
+        ]
+
     @property
     def y_pred(self) -> List[str]:
         """
@@ -165,6 +172,55 @@ class ClassificationEvaluation:
         plot_ax.legend(loc="lower right", framealpha=0, fontsize="small")
         return plot_ax
 
+    def errors_for_label(self, label: str, k: int = 10):
+        """
+        Output the biggest mistakes for the given class by the classifier.
+
+        Args:
+          label: The label to return errors for.
+          k: The number of results to return for each of false positives and false negatives.
+
+        Returns:
+          A 2-tuple.  The first element is a list of the top ``k`` false positives, and the
+          second element is a list of the top ``k`` false negatives.
+        """
+        pred_label = self.y_pred_series == label
+        true_label = self.y_true_series == label
+
+        # Order false positives/false negatives by the degree of the error;
+        # i.e. we want the false positives with highest predicted probability first
+        # and false negatives with lowest predicted probability first
+        # Take the top `k` of each
+        false_positives = (
+            self.error_pred_prob.loc[pred_label & ~true_label]
+            .sort_values(by=label, ascending=False)
+            .iloc[:k]
+        )
+        false_negatives = (
+            self.error_pred_prob.loc[~pred_label & true_label]
+            .sort_values(by=label, ascending=True)
+            .iloc[:k]
+        )
+
+        def create_classification_errors(
+            y_pred_proba: pd.DataFrame,
+        ) -> List[ClassificationError]:
+            classification_errors = []
+            for ndx, row in y_pred_proba.iterrows():
+                classification_errors.append(
+                    ClassificationError(
+                        X=self.X[ndx],
+                        y_true=self.y_true[ndx],
+                        y_pred_proba=row.to_dict(),
+                    )
+                )
+            return classification_errors
+
+        return (
+            create_classification_errors(false_positives),
+            create_classification_errors(false_negatives),
+        )
+
     def errors(
         self, k: int = 10
     ) -> Dict[str, Tuple[List[ClassificationError], List[ClassificationError]]]:
@@ -175,52 +231,13 @@ class ClassificationEvaluation:
           k: The number of results to return for each of false positives and false negatives.
 
         Returns:
-          A dictionary whose keys are class names and values are 2-tuples.  The first
+          A dictionary whose keys are label names and values are 2-tuples.  The first
           element is a list of the top ``k`` false positives, and the second element is a list
           of the top ``k`` false negatives.
         """
         errors = {}
-        y_pred_series = pd.Series(self.y_pred)
-        y_true_series = pd.Series(self.y_true)
-
-        error_pred_prob = self.y_pred_proba[y_pred_series != y_true_series]
         for label in self.labels:
-            pred_label = y_pred_series == label
-            true_label = y_true_series == label
-
-            # Order false positives/false negatives by the degree of the error;
-            # i.e. we want the false positives with highest predicted probability first
-            # and false negatives with lowest predicted probability first
-            # Take the top `k` of each
-            false_positives = (
-                error_pred_prob.loc[pred_label & ~true_label]
-                .sort_values(by=label, ascending=False)
-                .iloc[:k]
-            )
-            false_negatives = (
-                error_pred_prob.loc[~pred_label & true_label]
-                .sort_values(by=label, ascending=True)
-                .iloc[:k]
-            )
-
-            def create_classification_errors(
-                y_pred_proba: pd.DataFrame,
-            ) -> List[ClassificationError]:
-                classification_errors = []
-                for ndx, row in y_pred_proba.iterrows():
-                    classification_errors.append(
-                        ClassificationError(
-                            X=self.X[ndx],
-                            y_true=self.y_true[ndx],
-                            y_pred_proba=row.to_dict(),
-                        )
-                    )
-                return classification_errors
-
-            errors[label] = (
-                create_classification_errors(false_positives),
-                create_classification_errors(false_negatives),
-            )
+            errors[label] = self.errors_for_label(label, k=k)
 
         return errors
 

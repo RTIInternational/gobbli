@@ -1,6 +1,7 @@
 import datetime as dt
 import json
 import re
+from collections import OrderedDict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -10,7 +11,7 @@ import pandas as pd
 
 import gobbli
 import streamlit as st
-from gobbli.inspect.evaluate import ClassificationEvaluation
+from gobbli.inspect.evaluate import ClassificationError, ClassificationEvaluation
 from gobbli.interactive.util import (
     get_label_indices,
     load_data,
@@ -159,6 +160,25 @@ def show_example_predictions(
     )
 
 
+def show_errors(errors: List[ClassificationError], truncate_len: int = 500):
+    df_data = []
+    for e in errors:
+        pred_class = max(e.y_pred_proba, key=e.y_pred_proba.get)
+        pred_class_prob = e.y_pred_proba[pred_class]
+        df_data.append(
+            # Use OrderedDict to preserve column order
+            OrderedDict(
+                {
+                    "Document": truncate_text(e.X, truncate_len),
+                    "True Label": e.y_true,
+                    "Predicted Label": f"{pred_class} ({pred_class_prob:.4f})",
+                }
+            )
+        )
+    df = pd.DataFrame(df_data)
+    st.table(df)
+
+
 @click.command()
 @click.argument("model_data_dir", type=str)
 @click.argument("data", type=str)
@@ -276,11 +296,11 @@ def run(
         show_metrics(evaluation.metrics())
 
     st.sidebar.header("Example Parameters")
-    example_truncate_len = st.sidebar.number_input(
-        "Example Truncate Length", min_value=1, max_value=None, value=500
-    )
     example_num_docs = st.sidebar.number_input(
         "Number of Example Documents", min_value=1, max_value=None, value=5
+    )
+    example_truncate_len = st.sidebar.number_input(
+        "Example Truncate Length", min_value=1, max_value=None, value=500
     )
     example_top_k = st.sidebar.number_input(
         "Top K Predictions to Show",
@@ -297,6 +317,36 @@ def run(
         example_num_docs,
         example_top_k,
     )
+
+    if labels is not None and evaluation is not None:
+        num_errors = int(
+            (pd.Series(evaluation.y_pred) != pd.Series(sampled_labels)).sum()
+        )
+
+        st.sidebar.header("Errors Parameters")
+        errors_label = st.sidebar.selectbox(
+            "Label to Show Errors For", options=checkpoint_labels
+        )
+        errors_num_docs = st.sidebar.number_input(
+            "Number of Errors to Show",
+            min_value=1,
+            max_value=num_errors,
+            value=min(5, num_errors),
+        )
+        errors_truncate_len = st.sidebar.number_input(
+            "Error Document Truncate Length", min_value=1, max_value=None, value=500
+        )
+
+        false_positives, false_negatives = evaluation.errors_for_label(
+            errors_label, k=errors_num_docs
+        )
+        st.header("Top Model Errors")
+
+        st.subheader("False Positives")
+        show_errors(false_positives, truncate_len=errors_truncate_len)
+
+        st.subheader("False Negatives")
+        show_errors(false_negatives, truncate_len=errors_truncate_len)
 
     if labels is None:
         st.warning(
