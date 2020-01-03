@@ -17,13 +17,22 @@ def main():
     pass
 
 
-@main.command("explore", context_settings=dict(ignore_unknown_options=True))
+@main.command(
+    # Forward the --help argument to the streamlit apps
+    "explore",
+    context_settings=dict(ignore_unknown_options=True),
+    add_help_option=False,
+)
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 def main_explore(args):
     _streamlit_run("explore", *args)
 
 
-@main.command("evaluate")
+@main.command(
+    "evaluate",
+    context_settings=dict(ignore_unknown_options=True),
+    add_help_option=False,
+)
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 def main_evaluate(args):
     _streamlit_run("evaluate", *args)

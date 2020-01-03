@@ -4,16 +4,23 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import click
+import numpy as np
 import pandas as pd
-import streamlit as st
 
 import gobbli
+import streamlit as st
 from gobbli.inspect.evaluate import ClassificationEvaluation
-from gobbli.interactive.util import get_label_indices, load_data, st_sample_data
+from gobbli.interactive.util import (
+    get_label_indices,
+    load_data,
+    safe_sample,
+    st_sample_data,
+)
 from gobbli.io import PredictInput, TaskIO
 from gobbli.model.base import BaseModel
 from gobbli.model.context import ContainerTaskContext
 from gobbli.model.mixin import TrainMixin
+from gobbli.util import truncate_text
 
 
 def format_task(task_dir: Path) -> str:
@@ -62,6 +69,50 @@ def get_predictions(
     model = model_cls(**model_kwargs)
     predict_output = model.predict(predict_input)
     return predict_output.y_pred_proba
+
+
+def _show_example_predictions(
+    texts: List[str],
+    labels: List[str],
+    y_pred_proba: pd.DataFrame,
+    truncate_len: int,
+    top_k: int,
+):
+    def gather_predictions(row):
+        ndx = row.name
+        pred_prob_order = row.sort_values(ascending=False)[:top_k]
+        data = {
+            "Document": truncate_text(texts[ndx], truncate_len),
+            "Label": labels[ndx],
+        }
+
+        for i, (label, pred_prob) in enumerate(pred_prob_order.items()):
+            data[f"Predicted Label {i+1}"] = f"{label} ({pred_prob:.3f})"
+
+        return pd.Series(data)
+
+    df = y_pred_proba.apply(gather_predictions, axis=1)
+    st.table(df)
+
+
+def show_example_predictions(
+    texts: List[str],
+    labels: List[str],
+    y_pred_proba: pd.DataFrame,
+    example_truncate_len: int,
+    example_num_docs: int,
+    example_top_k: int,
+):
+    st.header("Example Predictions")
+
+    example_indices = safe_sample(range(len(texts)), example_num_docs)
+    _show_example_predictions(
+        [texts[i] for i in example_indices],
+        [labels[i] for i in example_indices],
+        y_pred_proba.iloc[example_indices, :].reset_index(drop=True),
+        example_truncate_len,
+        example_top_k,
+    )
 
 
 @click.command()
@@ -147,6 +198,7 @@ def run(
     model_checkpoint = st.sidebar.selectbox("Checkpoint", list(task_metadata.keys()))
     checkpoint_meta = task_metadata[model_checkpoint]
     checkpoint_labels = checkpoint_meta["labels"]
+    num_labels = len(checkpoint_labels)
 
     if labels is not None:
         dataset_labels = set(label_indices.keys())
@@ -167,12 +219,7 @@ def run(
         checkpoint_meta["checkpoint"],
     )
 
-    if labels is None:
-        st.warning(
-            "No ground truth labels found for the passed dataset.  Evaluation/error "
-            "metrics can't be calculated without ground truth labels."
-        )
-    else:
+    if labels is not None:
         st.header("Evaluation")
         evaluation = ClassificationEvaluation(
             labels=checkpoint_labels,
@@ -183,6 +230,35 @@ def run(
 
         metrics_df = pd.DataFrame({"Metric": pd.Series(evaluation.metrics())})
         st.dataframe(metrics_df)
+
+    st.sidebar.header("Example Parameters")
+    example_truncate_len = st.sidebar.number_input(
+        "Example Truncate Length", min_value=1, max_value=None, value=500
+    )
+    example_num_docs = st.sidebar.number_input(
+        "Number of Example Documents", min_value=1, max_value=None, value=5
+    )
+    example_top_k = st.sidebar.number_input(
+        "Top K Predictions to Show",
+        min_value=1,
+        max_value=num_labels,
+        value=min(num_labels, 3),
+    )
+
+    show_example_predictions(
+        sampled_texts,
+        sampled_labels,
+        y_pred_proba,
+        example_truncate_len,
+        example_num_docs,
+        example_top_k,
+    )
+
+    if labels is None:
+        st.warning(
+            "No ground truth labels found for the passed dataset.  Evaluation "
+            "metrics and errors can't be calculated without ground truth labels."
+        )
 
 
 if __name__ == "__main__":

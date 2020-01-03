@@ -42,14 +42,10 @@ def get_tokens(
 def _show_example_documents(
     texts: List[str], labels: Optional[List[str]], truncate_len: int
 ):
-    for i, text in enumerate(texts):
-        st.markdown("---")
-        # TODO monospace text without line breaks doesn't work well for long documents.
-        # Hopefully we can improve this when streamlit has better support for regular text:
-        # https://github.com/streamlit/streamlit/issues/664
-        if labels is not None:
-            st.subheader(f"Label: {labels[i]}")
-        st.text(truncate_text(text, truncate_len))
+    df = pd.DataFrame({"Document": [truncate_text(t, truncate_len) for t in texts]})
+    if labels is not None:
+        df["Label"] = labels
+    st.table(df)
 
 
 def show_example_documents(
