@@ -1,13 +1,23 @@
 import csv
 import itertools
 import os
+import random
+from collections import defaultdict
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
 
 import streamlit as st
 
 import gobbli
 from gobbli.dataset.base import BaseDataset
+
+
+@st.cache
+def get_label_indices(labels: List[str]) -> Dict[str, List[int]]:
+    label_indices = defaultdict(list)
+    for i, label in enumerate(labels):
+        label_indices[label].append(i)
+    return label_indices
 
 
 def _read_delimited(
@@ -104,7 +114,7 @@ def sample_dataset(
       be no longer than n_rows.
     """
     # Apply limit to the dataset, if any
-    if n_rows == -1:
+    if n_rows is None:
         texts = dataset.X_train() + dataset.X_test()
         labels = dataset.y_train() + dataset.y_test()
     else:
@@ -126,6 +136,8 @@ def sample_dataset(
             texts = train_texts
             labels = train_labels
 
+    return texts, labels
+
 
 @st.cache(show_spinner=True)
 def read_data_file_cached(
@@ -140,7 +152,9 @@ def read_data_file_cached(
     return read_data_file(Path(data_file), n_rows=n_rows)
 
 
-def load_data(data: str, n_rows: Optional[int]) -> Tuple[List[str], List[str]]:
+def load_data(
+    data: str, n_rows: Optional[int]
+) -> Tuple[List[str], Optional[List[str]]]:
     """
     Load data according to the given 'data' string and row limit.
 
@@ -154,12 +168,10 @@ def load_data(data: str, n_rows: Optional[int]) -> Tuple[List[str], List[str]]:
     """
     if os.path.exists(data):
         data_path = Path(data)
-        st.title(f"Exploring: {data_path}")
         texts, labels = read_data_file_cached(
             str(data_path), n_rows=None if n_rows == -1 else n_rows
         )
     elif data in gobbli.dataset.__all__:
-        st.title(f"Exploring: {data}")
         dataset = getattr(gobbli.dataset, data).load()
         texts, labels = sample_dataset(dataset, None if n_rows == -1 else n_rows)
     else:
@@ -170,3 +182,52 @@ def load_data(data: str, n_rows: Optional[int]) -> Tuple[List[str], List[str]]:
         )
 
     return texts, labels
+
+
+T = TypeVar("T")
+
+
+@st.cache
+def safe_sample(l: Sequence[T], n: int, seed: Optional[int] = None) -> List[T]:
+    if seed is not None:
+        random.seed(seed)
+
+    # Prevent an error from trying to sample more than the population
+    return list(random.sample(l, min(n, len(l))))
+
+
+def st_sample_data(
+    texts: List[str], labels: Optional[List[str]]
+) -> Tuple[List[str], Optional[List[str]]]:
+    """
+    Generate streamlit sidebar widgets to facilitate sampling a dataset at runtime.
+
+    Args:
+      texts: Full list of texts to sample from.
+      labels: Full list of labels to sample from.
+
+    Returns:
+      2-tuple: the list of sampled texts and list of sampled labels.
+    """
+    st.sidebar.header("Sample Parameters")
+
+    if st.sidebar.button("Randomize Seed"):
+        default_seed = random.randint(0, 1000000)
+    else:
+        default_seed = 1
+    sample_seed = st.sidebar.number_input("Sample Seed", value=default_seed)
+
+    sample_size = st.sidebar.slider(
+        "Sample Size", min_value=1, max_value=len(texts), value=min(100, len(texts))
+    )
+
+    sample_indices = safe_sample(range(len(texts)), sample_size, seed=sample_seed)
+
+    sampled_texts = [texts[i] for i in sample_indices]
+
+    if labels is None:
+        sampled_labels = None
+    else:
+        sampled_labels = [labels[i] for i in sample_indices]
+
+    return sampled_texts, sampled_labels

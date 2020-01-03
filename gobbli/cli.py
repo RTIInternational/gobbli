@@ -24,10 +24,9 @@ def main_explore(args):
 
 
 @main.command("evaluate")
-@click.argument("model_checkpoint", type=str)
-@click.argument("data", type=str)
-def main_evaluate(model_checkpoint, data):
-    _streamlit_run("evaluate", model_checkpoint, data)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+def main_evaluate(args):
+    _streamlit_run("evaluate", *args)
 
 
 if __name__ == "__main__":

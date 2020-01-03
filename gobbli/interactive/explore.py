@@ -11,7 +11,12 @@ import pandas as pd
 import streamlit as st
 
 import gobbli.dataset
-from gobbli.interactive.util import load_data
+from gobbli.interactive.util import (
+    get_label_indices,
+    load_data,
+    safe_sample,
+    st_sample_data,
+)
 from gobbli.util import TokenizeMethod, tokenize, truncate_text
 
 
@@ -34,18 +39,6 @@ def get_tokens(
             raise
 
 
-T = TypeVar("T")
-
-
-@st.cache
-def _safe_sample(l: Sequence[T], n: int, seed: Optional[int] = None) -> List[T]:
-    if seed is not None:
-        random.seed(seed)
-
-    # Prevent an error from trying to sample more than the population
-    return list(random.sample(l, min(n, len(l))))
-
-
 def _show_example_documents(
     texts: List[str], labels: Optional[List[str]], truncate_len: int
 ):
@@ -57,14 +50,6 @@ def _show_example_documents(
         if labels is not None:
             st.subheader(f"Label: {labels[i]}")
         st.text(truncate_text(text, truncate_len))
-
-
-@st.cache
-def get_label_indices(labels: List[str]) -> Dict[str, List[int]]:
-    label_indices = defaultdict(list)
-    for i, label in enumerate(labels):
-        label_indices[label].append(i)
-    return label_indices
 
 
 def show_example_documents(
@@ -85,7 +70,7 @@ def show_example_documents(
     else:
         example_labels = labels
 
-    example_indices = _safe_sample(range(len(texts)), example_num_docs)
+    example_indices = safe_sample(range(len(texts)), example_num_docs)
     _show_example_documents(
         [texts[i] for i in example_indices],
         [example_labels[i] for i in example_indices]
@@ -237,17 +222,21 @@ def show_topic_model(
     show_default=True,
 )
 def run(data: str, n_rows: int):
+    st.title(f"Exploring: {data}")
     texts, labels = load_data(data, None if n_rows == -1 else n_rows)
-    label_indices = get_label_indices(labels)
+    if labels is not None:
+        label_indices = get_label_indices(labels)
 
     #
     # Sidebar
     #
 
-    st.sidebar.header("Sample Parameters")
+    st.sidebar.header("Filter Parameters")
 
     filter_label = None
-    if st.sidebar.checkbox("Filter By Label", key="sample_by_label"):
+    if labels is not None and st.sidebar.checkbox(
+        "Filter By Label", key="sample_by_label"
+    ):
         filter_label = st.sidebar.selectbox("Label", list(sorted(label_indices.keys())))
 
     if filter_label is None:
@@ -257,24 +246,7 @@ def run(data: str, n_rows: int):
         filtered_texts = [texts[i] for i in label_indices[filter_label]]
         filtered_labels = [labels[i] for i in label_indices[filter_label]]
 
-    if st.sidebar.button("Randomize Seed"):
-        default_seed = random.randint(0, 1000000)
-    else:
-        default_seed = 1
-    sample_seed = st.sidebar.number_input("Sample Seed", value=default_seed)
-
-    sample_size = st.sidebar.slider(
-        "Sample Size",
-        min_value=1,
-        max_value=len(filtered_texts),
-        value=min(100, len(filtered_texts)),
-    )
-
-    sample_indices = _safe_sample(
-        range(len(filtered_texts)), sample_size, seed=sample_seed
-    )
-    sampled_texts = [filtered_texts[i] for i in sample_indices]
-    sampled_labels = [filtered_labels[i] for i in sample_indices]
+    sampled_texts, sampled_labels = st_sample_data(filtered_texts, filtered_labels)
 
     st.sidebar.header("Example Parameters")
     example_truncate_len = st.sidebar.number_input(

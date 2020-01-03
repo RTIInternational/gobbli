@@ -74,6 +74,9 @@ class BaseModel(ABC):
             self._data_dir = self.model_class_dir() / generate_uuid()
         else:
             self._data_dir = data_dir
+        # Ensure we have an absolute data dir so any derived paths used in metadata files, etc
+        # aren't ambiguous
+        self._data_dir = self._data_dir.resolve()
         self._data_dir.mkdir(parents=True, exist_ok=True)
 
         if load_existing and self.metadata_path.exists():
