@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Container, Dict, Iterator, List, Optional, TypeVar
 
 import pandas as pd
+import pkg_resources
 import requests
 
 LOGGER = logging.getLogger(__name__)
@@ -38,6 +39,14 @@ def gobbli_dir() -> Path:
     gobbli_dir = Path(os.getenv("GOBBLI_DIR", str(default_gobbli_dir())))
     gobbli_dir.mkdir(parents=True, exist_ok=True)
     return gobbli_dir
+
+
+def gobbli_version() -> str:
+    """
+    Returns:
+      The version of gobbli installed.
+    """
+    return pkg_resources.get_distribution("gobbli").version
 
 
 def pred_prob_to_pred_label(y_pred_proba: pd.DataFrame) -> List[str]:

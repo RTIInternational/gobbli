@@ -12,6 +12,7 @@ from gobbli.util import (
     format_duration,
     generate_uuid,
     gobbli_dir,
+    gobbli_version,
     is_dir_empty,
     read_metadata,
     write_metadata,
@@ -37,6 +38,11 @@ class BaseModel(ABC):
     Functionality to facilitate making GPU(s) available to derived classes is available.
     """
 
+    # File containing information about the model, including type of model and gobbli version
+    # the model was created under
+    _INFO_FILENAME = "gobbli-model-info.json"
+
+    # File containing model parameters (i.e. arguments to init())
     _METADATA_FILENAME = "gobbli-model-meta.json"
 
     _WEIGHTS_DIR_NAME = _WEIGHTS_DIR_NAME
@@ -79,6 +85,23 @@ class BaseModel(ABC):
         self._data_dir = self._data_dir.resolve()
         self._data_dir.mkdir(parents=True, exist_ok=True)
 
+        class_name = self.__class__.__name__
+        cur_gobbli_version = gobbli_version()
+
+        if self.info_path.exists():
+            info = read_metadata(self.info_path)
+            if not info["class"] == class_name:
+                raise ValueError(
+                    f"Model class mismatch: the model stored in {data_dir} is of "
+                    f"class '{info['class']}'.  Expected '{class_name}'."
+                )
+            if not info["gobbli_version"] == cur_gobbli_version:
+                warnings.warn(
+                    f"The model stored in {data_dir} was created with gobbli version "
+                    f"{info['gobbli_version']}, but you're running version {cur_gobbli_version}. "
+                    "You may encounter compatibility issues."
+                )
+
         if load_existing and self.metadata_path.exists():
             params = read_metadata(self.metadata_path)
             if len(kwargs) > 0:
@@ -86,6 +109,7 @@ class BaseModel(ABC):
                     "User-passed params ignored due to existing model being "
                     f"loaded: {kwargs}"
                 )
+
         else:
             if not is_dir_empty(self._data_dir):
                 raise ValueError(
@@ -94,6 +118,10 @@ class BaseModel(ABC):
                 )
             params = kwargs
             write_metadata(params, self.metadata_path)
+            write_metadata(
+                {"class": class_name, "gobbli_version": cur_gobbli_version},
+                self.info_path,
+            )
 
         self.use_gpu = use_gpu
         self.nvidia_visible_devices = nvidia_visible_devices
@@ -113,6 +141,15 @@ class BaseModel(ABC):
           A logger for derived models to use.
         """
         return self._logger
+
+    @property
+    def info_path(self) -> Path:
+        """
+        Returns:
+          The path to the model's info file, containing information about the model including
+          the type of model, gobbli version it was trained using, etc.
+        """
+        return self.data_dir() / BaseModel._INFO_FILENAME
 
     @property
     def metadata_path(self) -> Path:
