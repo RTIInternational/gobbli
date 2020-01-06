@@ -347,7 +347,7 @@ def run(
         false_positives, false_negatives = evaluation.errors_for_label(
             errors_label, k=errors_num_docs
         )
-        st.header("Top Model Errors")
+        st.header(f"Top Model Errors: {errors_label}")
 
         st.subheader("False Positives")
         show_errors(false_positives, truncate_len=errors_truncate_len)
