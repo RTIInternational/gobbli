@@ -1,15 +1,23 @@
 import csv
+import datetime as dt
 import itertools
+import json
 import os
 import random
 from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
 
+import pandas as pd
 import streamlit as st
 
 import gobbli
 from gobbli.dataset.base import BaseDataset
+from gobbli.io import TaskIO
+from gobbli.model.base import BaseModel
+from gobbli.model.context import ContainerTaskContext
+from gobbli.model.mixin import TrainMixin
+from gobbli.util import read_metadata, truncate_text
 
 
 @st.cache
@@ -209,7 +217,7 @@ def st_sample_data(
     Returns:
       2-tuple: the list of sampled texts and list of sampled labels.
     """
-    st.sidebar.header("Sample Parameters")
+    st.sidebar.header("Sample")
 
     if st.sidebar.button("Randomize Seed"):
         default_seed = random.randint(0, 1000000)
@@ -231,3 +239,84 @@ def st_sample_data(
         sampled_labels = [labels[i] for i in sample_indices]
 
     return sampled_texts, sampled_labels
+
+
+def st_example_documents(
+    texts: List[str], labels: Optional[List[str]], truncate_len: int
+):
+    """
+    Generate streamlit elements showing example documents (and optionally labe
+    """
+    df = pd.DataFrame({"Document": [truncate_text(t, truncate_len) for t in texts]})
+    if labels is not None:
+        df["Label"] = labels
+    st.table(df)
+
+
+def format_task(task_dir: Path) -> str:
+    """
+    Format the given task for a human-readable dropdown.
+
+    Args:
+      task_dir: Directory where the task's data is stored.
+
+    Returns:
+      String-formatted, human-readable task metadata.
+    """
+    task_id = task_dir.name
+    task_creation_time = dt.datetime.fromtimestamp(task_dir.stat().st_birthtime)
+    return f"{task_id[:5]} - Created {task_creation_time.strftime('%Y-%m-%d %H:%M:%S')}"
+
+
+def st_select_model_checkpoint(
+    model_data_path: Path, use_gpu: bool, nvidia_visible_devices: str
+):
+    """
+    Generate widgets allowing for users to select a checkpoint from a given model directory.
+
+    Returns:
+      A 3-tuple: the class of model corresponding to the checkpoint, the kwargs to initialize
+      the model with, and the metadata for the checkpoint.
+    """
+
+    model_info = read_metadata(model_data_path / BaseModel._INFO_FILENAME)
+    model_cls_name = model_info["class"]
+    if not hasattr(gobbli.model, model_cls_name):
+        raise ValueError(f"Unknown model type: {model_cls_name}")
+    model_cls = getattr(gobbli.model, model_cls_name)
+
+    model_kwargs = {
+        "data_dir": model_data_path,
+        "load_existing": True,
+        "use_gpu": use_gpu,
+        "nvidia_visible_devices": nvidia_visible_devices,
+    }
+    model = model_cls(**model_kwargs)
+
+    task_metadata = {}
+    if isinstance(model, TrainMixin):
+        # The model can be trained, so it may have some trained weights
+        model_train_dir = model.train_dir()
+
+        # See if any checkpoints are available for the given model
+        for task_dir in model_train_dir.iterdir():
+            task_context = ContainerTaskContext(task_dir)
+            output_dir = task_context.host_output_dir
+
+            if output_dir.exists():
+                metadata_path = output_dir / TaskIO._METADATA_FILENAME
+                if metadata_path.exists():
+                    with open(metadata_path, "r") as f:
+                        metadata = json.load(f)
+
+                        if "checkpoint" in metadata:
+                            task_formatted = format_task(task_dir)
+                            task_metadata[task_formatted] = metadata
+
+    if len(task_metadata) == 0:
+        st.error("No trained checkpoints found for the given model.")
+        return
+
+    st.sidebar.header("Model")
+    model_checkpoint = st.sidebar.selectbox("Checkpoint", list(task_metadata.keys()))
+    return model_cls, model_kwargs, task_metadata[model_checkpoint]

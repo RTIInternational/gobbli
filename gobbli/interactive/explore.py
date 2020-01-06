@@ -181,26 +181,19 @@ def get_topics(
 def show_topic_model(
     run_topic_model: bool, tokens: List[List[str]], label: Optional[str], **model_kwargs
 ):
-    st.header("Topic Model")
+    topics = get_topics(tokens, **model_kwargs)
 
-    if not run_topic_model:
-        st.markdown(
-            "Click the 'Train Model' button in the sidebar to train a topic model."
-        )
-    else:
-        topics = get_topics(tokens, **model_kwargs)
+    if label is not None:
+        st.subheader(f"Label: {label}")
 
-        if label is not None:
-            st.subheader(f"Label: {label}")
+    for i, (topic, coherence) in enumerate(topics):
+        st.subheader(f"Topic {i} (coherence: {coherence:.4f})")
 
-        for i, (topic, coherence) in enumerate(topics):
-            st.subheader(f"Topic {i} (coherence: {coherence:.4f})")
+        md = ""
+        for probability, word in topic:
+            md += f"- {word} ({probability:.4f})\n"
 
-            md = ""
-            for probability, word in topic:
-                md += f"- {word} ({probability:.4f})\n"
-
-            st.markdown(md)
+        st.markdown(md)
 
 
 @click.command()
@@ -222,7 +215,7 @@ def run(data: str, n_rows: int):
     # Sidebar
     #
 
-    st.sidebar.header("Filter Parameters")
+    st.sidebar.header("Filter")
 
     filter_label = None
     if labels is not None and st.sidebar.checkbox(
@@ -239,7 +232,7 @@ def run(data: str, n_rows: int):
 
     sampled_texts, sampled_labels = st_sample_data(filtered_texts, filtered_labels)
 
-    st.sidebar.header("Example Parameters")
+    st.sidebar.header("Examples")
     example_truncate_len = st.sidebar.number_input(
         "Example Truncate Length", min_value=1, max_value=None, value=500
     )
@@ -247,7 +240,7 @@ def run(data: str, n_rows: int):
         "Number of Example Documents", min_value=1, max_value=None, value=5
     )
 
-    st.sidebar.header("Tokenization Parameters")
+    st.sidebar.header("Tokenization")
     tokenize_method = TokenizeMethod[
         st.sidebar.selectbox("Method", tuple(tm.name for tm in TokenizeMethod))
     ]
@@ -258,31 +251,33 @@ def run(data: str, n_rows: int):
             "Vocabulary Size", min_value=1, max_value=None, value=20000
         )
 
-    st.sidebar.header("Topic Model Parameters")
-    run_topic_model = st.sidebar.button("Train Model")
-    num_topics = st.sidebar.number_input(
-        "Number of Topics", min_value=2, max_value=None, value=10
-    )
-    train_chunksize = st.sidebar.number_input(
-        "Training Chunk Size", min_value=1, max_value=None, value=2000
-    )
-    train_passes = st.sidebar.number_input(
-        "Number of Training Passes", min_value=1, max_value=None, value=3
-    )
-    train_iterations = st.sidebar.number_input(
-        "Number of Training Iterations", min_value=1, max_value=None, value=100
-    )
-    do_bigrams = st.sidebar.checkbox("Use Bigrams?", value=True)
-    if do_bigrams:
-        bigram_min_count = st.sidebar.number_input(
-            "Minimum Count for Bigrams", min_value=1, max_value=None, value=20
+    st.sidebar.header("Topic Model")
+    run_topic_model = False
+    if st.sidebar.checkbox("Enable Topic Model"):
+        run_topic_model = st.sidebar.button("Train Topic Model")
+        num_topics = st.sidebar.number_input(
+            "Number of Topics", min_value=2, max_value=None, value=10
         )
-    min_frequency = st.sidebar.number_input(
-        "Minimum Vocabulary Frequency", min_value=1, max_value=None, value=20
-    )
-    max_proportion = st.sidebar.number_input(
-        "Maximum Vocabulary Proportion", min_value=0.0, max_value=1.0, value=0.5
-    )
+        train_chunksize = st.sidebar.number_input(
+            "Training Chunk Size", min_value=1, max_value=None, value=2000
+        )
+        train_passes = st.sidebar.number_input(
+            "Number of Training Passes", min_value=1, max_value=None, value=3
+        )
+        train_iterations = st.sidebar.number_input(
+            "Number of Training Iterations", min_value=1, max_value=None, value=100
+        )
+        do_bigrams = st.sidebar.checkbox("Use Bigrams?", value=True)
+        if do_bigrams:
+            bigram_min_count = st.sidebar.number_input(
+                "Minimum Count for Bigrams", min_value=1, max_value=None, value=20
+            )
+        min_frequency = st.sidebar.number_input(
+            "Minimum Vocabulary Frequency", min_value=1, max_value=None, value=20
+        )
+        max_proportion = st.sidebar.number_input(
+            "Maximum Vocabulary Proportion", min_value=0.0, max_value=1.0, value=0.5
+        )
 
     #
     # Main section
@@ -303,22 +298,28 @@ def run(data: str, n_rows: int):
 
     show_document_length_distribution(tokens)
 
-    try:
-        show_topic_model(
-            run_topic_model,
-            tokens,
-            filter_label,
-            num_topics=num_topics,
-            train_chunksize=train_chunksize,
-            train_passes=train_passes,
-            train_iterations=train_iterations,
-            do_bigrams=do_bigrams,
-            bigram_min_count=bigram_min_count,
-            min_frequency=min_frequency,
-            max_proportion=max_proportion,
+    st.header("Topic Model")
+    if not run_topic_model:
+        st.markdown(
+            "Enable topic modeling in the sidebar and click the 'Train Topic Model' button to train a topic model."
         )
-    except ImportError as e:
-        st.error(str(e))
+    else:
+        try:
+            show_topic_model(
+                run_topic_model,
+                tokens,
+                filter_label,
+                num_topics=num_topics,
+                train_chunksize=train_chunksize,
+                train_passes=train_passes,
+                train_iterations=train_iterations,
+                do_bigrams=do_bigrams,
+                bigram_min_count=bigram_min_count,
+                min_frequency=min_frequency,
+                max_proportion=max_proportion,
+            )
+        except ImportError as e:
+            st.error(str(e))
 
 
 if __name__ == "__main__":
