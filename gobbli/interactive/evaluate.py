@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import click
+import matplotlib
+import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 
@@ -78,6 +80,12 @@ def show_metrics(metrics: Dict[str, Any]):
     for name, value in metrics.items():
         md += f"- **{name}:** {value:.4f}\n"
     st.markdown(md)
+
+
+def show_plot(evaluation: ClassificationEvaluation):
+    evaluation.plot()
+    plt.title("Model Predicted Probability by True Class")
+    st.pyplot()
 
 
 TRUE_LABEL_COLOR = "#1f78b4"
@@ -293,19 +301,20 @@ def run(
         )
 
         show_metrics(evaluation.metrics())
+        show_plot(evaluation.plot())
 
     st.sidebar.header("Example Parameters")
-    example_num_docs = st.sidebar.number_input(
-        "Number of Example Documents", min_value=1, max_value=None, value=5
-    )
-    example_truncate_len = st.sidebar.number_input(
-        "Example Truncate Length", min_value=1, max_value=None, value=500
-    )
     example_top_k = st.sidebar.number_input(
         "Top K Predictions to Show",
         min_value=1,
         max_value=num_labels,
         value=min(num_labels, 3),
+    )
+    example_num_docs = st.sidebar.number_input(
+        "Number of Example Documents to Show", min_value=1, max_value=None, value=5
+    )
+    example_truncate_len = st.sidebar.number_input(
+        "Example Document Truncate Length", min_value=1, max_value=None, value=500
     )
 
     show_example_predictions(
@@ -327,7 +336,7 @@ def run(
             "Label to Show Errors For", options=checkpoint_labels
         )
         errors_num_docs = st.sidebar.number_input(
-            "Number of Errors to Show",
+            "Number of Error Documents to Show",
             min_value=1,
             max_value=num_errors,
             value=min(5, num_errors),

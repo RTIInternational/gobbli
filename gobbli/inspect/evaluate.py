@@ -172,7 +172,9 @@ class ClassificationEvaluation:
             ax=ax,
         )
         plot_ax.set_xticks([0, 0.5, 1])
-        plot_ax.legend(loc="lower right", framealpha=0, fontsize="small")
+        plot_ax.legend(
+            loc="lower right", framealpha=0, fontsize="small", title="Belongs to Class"
+        )
         return plot_ax
 
     def errors_for_label(self, label: str, k: int = 10):
