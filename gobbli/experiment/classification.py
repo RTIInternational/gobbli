@@ -140,7 +140,7 @@ class ClassificationExperimentResults:
         """
         See :meth:`ClassificationEvaluation.errors_report`.
         """
-        return self.evaluation.metrics_report(*args, **kwargs)
+        return self.evaluation.errors_report(*args, **kwargs)
 
 
 @dataclass

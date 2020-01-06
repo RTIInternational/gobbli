@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import click
-import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st

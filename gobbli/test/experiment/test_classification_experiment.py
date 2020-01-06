@@ -107,9 +107,9 @@ def test_classification_run_validation(bad_value):
         # Can't use the TrivialDataset here because it's too small for the standard
         # train/valid/test split
         # Trivial model, no ray
-        (MajorityClassifier, NewsgroupsDataset, {}, 1000, True),
+        (MajorityClassifier, NewsgroupsDataset, {}, 200, True),
         # "Real" model/dataset, use ray cluster
-        (FastText, NewsgroupsDataset, {"lr": [0.1, 0.01]}, 1000, False),
+        (FastText, NewsgroupsDataset, {"lr": [0.1, 0.01]}, 200, False),
         # "Real" model/dataset with more complicated checkpoint structure, use ray cluster
         # Use smaller limit since this model takes a while to train
         (BERT, NewsgroupsDataset, {}, 50, False),
