@@ -1,16 +1,11 @@
 import copy
-import os
-import random
-from collections import defaultdict
-from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
+from typing import List, Optional, Tuple
 
 import altair as alt
 import click
 import pandas as pd
 import streamlit as st
 
-import gobbli.dataset
 from gobbli.interactive.util import (
     get_label_indices,
     load_data,

@@ -6,11 +6,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import click
-import numpy as np
 import pandas as pd
+import streamlit as st
 
 import gobbli
-import streamlit as st
 from gobbli.inspect.evaluate import ClassificationError, ClassificationEvaluation
 from gobbli.interactive.util import (
     get_label_indices,
@@ -22,7 +21,7 @@ from gobbli.io import PredictInput, TaskIO
 from gobbli.model.base import BaseModel
 from gobbli.model.context import ContainerTaskContext
 from gobbli.model.mixin import TrainMixin
-from gobbli.util import pred_prob_to_pred_label, truncate_text
+from gobbli.util import truncate_text
 
 
 def format_task(task_dir: Path) -> str:

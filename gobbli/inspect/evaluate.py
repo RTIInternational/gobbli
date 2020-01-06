@@ -1,21 +1,21 @@
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
 import matplotlib
 import pandas as pd
 import seaborn as sns
-
-from gobbli.util import (
-    escape_line_delimited_text,
-    pred_prob_to_pred_label,
-    truncate_text,
-)
 from sklearn.metrics import (
     accuracy_score,
     classification_report,
     f1_score,
     precision_score,
     recall_score,
+)
+
+from gobbli.util import (
+    escape_line_delimited_text,
+    pred_prob_to_pred_label,
+    truncate_text,
 )
 
 
@@ -110,7 +110,10 @@ class ClassificationEvaluation:
         Returns:
           The predicted class for each observation.
         """
-        return pred_prob_to_pred_label(self.y_pred_proba)
+        if len(self.y_pred_proba) == 0:
+            return []
+        else:
+            return pred_prob_to_pred_label(self.y_pred_proba)
 
     def metrics(self) -> Dict[str, float]:
         """

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from gobbli.interactive.explore import read_data
+from gobbli.interactive.util import read_data_file
 
 
 @pytest.mark.parametrize(
@@ -41,15 +41,15 @@ from gobbli.interactive.explore import read_data
         ("test.txt", "test1\ntest2", 1, (["test1"], None)),
     ],
 )
-def test_read_data(tmpdir, filename, contents, limit, expected):
+def test_read_data_file(tmpdir, filename, contents, limit, expected):
     filepath = Path(tmpdir) / filename
     filepath.write_text(contents)
 
     if inspect.isclass(expected) and issubclass(expected, Exception):
         with pytest.raises(expected):
-            read_data(filepath, limit)
+            read_data_file(filepath, limit)
     else:
-        texts, labels = read_data(filepath, limit)
+        texts, labels = read_data_file(filepath, limit)
         expected_texts, expected_labels = expected
 
         assert texts == expected_texts
