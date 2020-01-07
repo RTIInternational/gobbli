@@ -1,17 +1,19 @@
 import csv
 import datetime as dt
+import inspect
 import itertools
 import json
 import os
 import random
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, TypeVar
 
 import pandas as pd
 import streamlit as st
 
 import gobbli
+import gobbli.model
 from gobbli.dataset.base import BaseDataset
 from gobbli.io import TaskIO
 from gobbli.model.base import BaseModel
@@ -270,16 +272,28 @@ def format_task(task_dir: Path) -> str:
 
 def st_select_model_checkpoint(
     model_data_path: Path, use_gpu: bool, nvidia_visible_devices: str
-):
+) -> Tuple[Any, Dict[str, Any], Dict[str, Any]]:
     """
     Generate widgets allowing for users to select a checkpoint from a given model directory.
+
+    Args:
+      model_data_path: Path to the model data directory to search for checkpoints.
+      use_gpu: If True, initialize the model using a GPU.
+      nvidia_visible_devices: The list of devices to make available to the model container.
+       Should be either "all" or a comma-separated list of device IDs (ex "1,2").
 
     Returns:
       A 3-tuple: the class of model corresponding to the checkpoint, the kwargs to initialize
       the model with, and the metadata for the checkpoint.
     """
+    try:
+        model_info = read_metadata(model_data_path / BaseModel._INFO_FILENAME)
+    except FileNotFoundError:
+        raise ValueError(
+            "The passed model data directory does not appear to contain a saved gobbli model. "
+            "Did you pass the right directory?"
+        )
 
-    model_info = read_metadata(model_data_path / BaseModel._INFO_FILENAME)
     model_cls_name = model_info["class"]
     if not hasattr(gobbli.model, model_cls_name):
         raise ValueError(f"Unknown model type: {model_cls_name}")
@@ -320,3 +334,55 @@ def st_select_model_checkpoint(
     st.sidebar.header("Model")
     model_checkpoint = st.sidebar.selectbox("Checkpoint", list(task_metadata.keys()))
     return model_cls, model_kwargs, task_metadata[model_checkpoint]
+
+
+def st_select_untrained_model(
+    use_gpu: bool,
+    nvidia_visible_devices: str,
+    predicate: Callable[[Any], bool] = lambda _: True,
+) -> Optional[Tuple[Any, Dict[str, Any]]]:
+    """
+    Generate widgets allowing users to select an untrained model and apply arbitrary
+    model parameters.
+
+    Args:
+      use_gpu: If True, initialize the model using a GPU.
+      nvidia_visible_devices: The list of devices to make available to the model container.
+       Should be either "all" or a comma-separated list of device IDs (ex "1,2").
+      predicate: A predicate used to filter the avaliable model classes.
+
+    Returns:
+      A 2-tuple: the class of model and the kwargs to initialized the model with.
+    """
+    model_choices = [
+        cls.__name__
+        for name, cls in inspect.getmembers(gobbli.model)
+        if inspect.isclass(cls) and issubclass(cls, BaseModel) and predicate(cls)
+    ]
+
+    model_cls_name = st.sidebar.selectbox("Model Class", model_choices)
+    model_params_str = st.sidebar.text_area("Model Parameters (JSON)", value="{}")
+
+    model_cls = getattr(gobbli.model, model_cls_name)
+
+    # Validate the model parameter JSON
+    try:
+        model_params = json.loads(model_params_str)
+    except Exception:
+        st.sidebar.error("Model parameters must be valid JSON.")
+        return None
+
+    model_kwargs = {
+        "use_gpu": use_gpu,
+        "nvidia_visible_devices": nvidia_visible_devices,
+        **model_params,
+    }
+
+    # Validate the parameters using the model initialization function
+    try:
+        model_cls(**model_kwargs)
+    except (TypeError, ValueError) as e:
+        st.sidebar.error(f"Error validating model parameters: {e}")
+        return None
+
+    return model_cls, model_kwargs

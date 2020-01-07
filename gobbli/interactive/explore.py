@@ -1,8 +1,10 @@
 import copy
-from typing import List, Optional, Tuple
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 import altair as alt
 import click
+import numpy as np
 import pandas as pd
 import streamlit as st
 
@@ -11,9 +13,15 @@ from gobbli.interactive.util import (
     load_data,
     safe_sample,
     st_sample_data,
+    st_select_model_checkpoint,
+    st_select_untrained_model,
 )
+from gobbli.io import EmbedInput
+from gobbli.model import FastText
+from gobbli.model.mixin import EmbedMixin
 from gobbli.util import TokenizeMethod, tokenize, truncate_text
 
+DEFAULT_EMBED_BATCH_SIZE = EmbedInput.embed_batch_size
 
 # For performance, don't let streamlit try to hash the tokens.  It takes forever
 @st.cache(allow_output_mutation=True)
@@ -178,9 +186,7 @@ def get_topics(
     return model.top_topics(corpus)
 
 
-def show_topic_model(
-    run_topic_model: bool, tokens: List[List[str]], label: Optional[str], **model_kwargs
-):
+def show_topic_model(tokens: List[List[str]], label: Optional[str], **model_kwargs):
     topics = get_topics(tokens, **model_kwargs)
 
     if label is not None:
@@ -196,6 +202,55 @@ def show_topic_model(
         st.markdown(md)
 
 
+@st.cache(show_spinner=True)
+def get_embeddings(
+    model_cls: Any,
+    model_kwargs: Dict[str, Any],
+    texts: List[str],
+    checkpoint_meta: Optional[Dict[str, Any]] = None,
+    batch_size: int = DEFAULT_EMBED_BATCH_SIZE,
+) -> List[np.ndarray]:
+    """
+    Generate embeddings using the given model and optional trained checkpoint.
+
+    Args:
+      model_cls: Class of model to use.
+      model_kwargs: Parameters to pass when initializing the model.
+      texts: Texts to generate embeddings for.
+      checkpoint_meta: Optional metadata for a trained checkpoint.  If passed, a trained model
+        will be used.
+      batch_size: Batch size to use when generating embeddings.
+
+    Returns:
+      The generated embeddings - a numpy array for each passed document.
+    """
+    embed_input = EmbedInput(
+        X=texts,
+        checkpoint=None if checkpoint_meta is None else checkpoint_meta["checkpoint"],
+        embed_batch_size=batch_size,
+    )
+    model = model_cls(**model_kwargs)
+    model.build()
+    embed_output = model.embed(embed_input)
+    return embed_output.X_embedded
+
+
+def show_embeddings(
+    model_cls: Any,
+    model_kwargs: Dict[str, Any],
+    texts: List[str],
+    checkpoint_meta: Optional[Dict[str, Any]] = None,
+    batch_size: int = DEFAULT_EMBED_BATCH_SIZE,
+):
+    X_embedded = get_embeddings(
+        model_cls,
+        model_kwargs,
+        texts,
+        checkpoint_meta=checkpoint_meta,
+        batch_size=batch_size,
+    )
+
+
 @click.command()
 @click.argument("data", type=str)
 @click.option(
@@ -205,7 +260,32 @@ def show_topic_model(
     default=-1,
     show_default=True,
 )
-def run(data: str, n_rows: int):
+@click.option(
+    "--model-data-dir",
+    type=str,
+    help="Optional data directory for a model.  If given, the model checkpoints "
+    "will become available to use for embedding generation, if the model supports it.",
+    default=None,
+)
+@click.option(
+    "--use-gpu/--use-cpu",
+    default=False,
+    help="Which device to run the model on, if any. Defaults to CPU.",
+)
+@click.option(
+    "--nvidia-visible-devices",
+    default="all",
+    help="Which GPUs to make available to the container; ignored if running on CPU. "
+    "If not 'all', should be a comma-separated string: ex. ``1,2``.",
+    show_default=True,
+)
+def run(
+    data: str,
+    n_rows: int,
+    model_data_dir: Optional[str],
+    use_gpu: bool,
+    nvidia_visible_devices: str,
+):
     st.title(f"Exploring: {data}")
     texts, labels = load_data(data, None if n_rows == -1 else n_rows)
     if labels is not None:
@@ -279,6 +359,49 @@ def run(data: str, n_rows: int):
             "Maximum Vocabulary Proportion", min_value=0.0, max_value=1.0, value=0.5
         )
 
+    st.sidebar.header("Embeddings")
+    run_embeddings = False
+    embeddings_error = False
+    embed_batch_size = DEFAULT_EMBED_BATCH_SIZE
+    if st.sidebar.checkbox("Enable Embeddings"):
+        run_embeddings = st.sidebar.button("Generate Embeddings")
+        model_type_options = ["Untrained"]
+        if model_data_dir is not None:
+            model_type_options.insert(0, "Trained")
+        else:
+            st.sidebar.markdown(
+                "**Note**: Using a trained model requires passing a model to this app "
+                "via the --model-data-dir command line argument."
+            )
+        model_type = st.sidebar.selectbox("Model Type", model_type_options)
+
+        if model_type == "Trained" and model_data_dir is not None:
+            model_cls, model_kwargs, checkpoint_meta = st_select_model_checkpoint(
+                Path(model_data_dir), use_gpu, nvidia_visible_devices
+            )
+        else:
+            checkpoint_meta = None
+            model_result = st_select_untrained_model(
+                use_gpu,
+                nvidia_visible_devices,
+                # We want only models that support embeddings and aren't
+                # fastText, since fastText requires training before generating embeddings
+                predicate=lambda m: issubclass(m, EmbedMixin) and m is not FastText,
+            )
+
+            if model_result is None:
+                run_embeddings = False
+                embeddings_error = True
+            else:
+                model_cls, model_kwargs = model_result
+
+        embed_batch_size = st.sidebar.number_input(
+            "Batch Size",
+            min_value=1,
+            max_value=len(sampled_texts),
+            value=DEFAULT_EMBED_BATCH_SIZE,
+        )
+
     #
     # Main section
     #
@@ -306,7 +429,6 @@ def run(data: str, n_rows: int):
     else:
         try:
             show_topic_model(
-                run_topic_model,
                 tokens,
                 filter_label,
                 num_topics=num_topics,
@@ -320,6 +442,25 @@ def run(data: str, n_rows: int):
             )
         except ImportError as e:
             st.error(str(e))
+
+    st.header("Embeddings")
+
+    if embeddings_error:
+        st.error(
+            "Embeddings could not be generated due to bad parameters.  Look for errors in the 'Embeddings' section of the sidebar."
+        )
+    elif not run_embeddings:
+        st.markdown(
+            "Enable embeddings in the sidebar and click the 'Generate Embeddings' button to generate embeddings for the dataset."
+        )
+    else:
+        show_embeddings(
+            model_cls,
+            model_kwargs,
+            sampled_texts,
+            checkpoint_meta,
+            batch_size=embed_batch_size,
+        )
 
 
 if __name__ == "__main__":

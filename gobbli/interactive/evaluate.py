@@ -21,6 +21,8 @@ from gobbli.io import PredictInput
 from gobbli.model.base import BaseModel
 from gobbli.util import truncate_text
 
+DEFAULT_PREDICT_BATCH_SIZE = PredictInput.predict_batch_size
+
 
 @st.cache(show_spinner=True)
 def get_predictions(
@@ -29,7 +31,7 @@ def get_predictions(
     texts: List[str],
     unique_labels: List[str],
     checkpoint: str,
-    batch_size: int = 32,
+    batch_size: int = DEFAULT_PREDICT_BATCH_SIZE,
 ) -> pd.DataFrame:
     """
     Run the given model on the given texts and return the probabilities.
@@ -51,6 +53,7 @@ def get_predictions(
         predict_batch_size=batch_size,
     )
     model = model_cls(**model_kwargs)
+    model.build()
     predict_output = model.predict(predict_input)
     return predict_output.y_pred_proba
 
@@ -200,7 +203,6 @@ def run(
     model_cls, model_kwargs, checkpoint_meta = st_select_model_checkpoint(
         model_data_path, use_gpu, nvidia_visible_devices
     )
-
     st.title(f"Evaluating: {model_cls.__name__} on {data}")
 
     model = model_cls(**model_kwargs)
@@ -228,12 +230,21 @@ def run(
 
     sampled_texts, sampled_labels = st_sample_data(texts, labels)
 
+    st.sidebar.header("Predictions")
+    predict_batch_size = st.sidebar.number_input(
+        "Batch Size",
+        min_value=1,
+        max_value=len(sampled_texts),
+        value=DEFAULT_PREDICT_BATCH_SIZE,
+    )
+
     y_pred_proba = get_predictions(
         model_cls,
         model_kwargs,
         sampled_texts,
         checkpoint_labels,
         checkpoint_meta["checkpoint"],
+        batch_size=predict_batch_size,
     )
 
     evaluation = None
