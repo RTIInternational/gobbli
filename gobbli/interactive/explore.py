@@ -7,6 +7,7 @@ import click
 import numpy as np
 import pandas as pd
 import streamlit as st
+from umap import UMAP
 
 from gobbli.interactive.util import (
     get_label_indices,
@@ -226,7 +227,9 @@ def get_embeddings(
     """
     embed_input = EmbedInput(
         X=texts,
-        checkpoint=None if checkpoint_meta is None else checkpoint_meta["checkpoint"],
+        checkpoint=None
+        if checkpoint_meta is None
+        else Path(checkpoint_meta["checkpoint"]),
         embed_batch_size=batch_size,
     )
     model = model_cls(**model_kwargs)
@@ -239,16 +242,52 @@ def show_embeddings(
     model_cls: Any,
     model_kwargs: Dict[str, Any],
     texts: List[str],
+    labels: Optional[List[str]],
     checkpoint_meta: Optional[Dict[str, Any]] = None,
     batch_size: int = DEFAULT_EMBED_BATCH_SIZE,
+    umap_seed: int = 1,
+    umap_n_neighbors: int = 15,
+    umap_metric: str = "euclidean",
+    umap_min_dist: float = 0.1,
 ):
-    X_embedded = get_embeddings(
-        model_cls,
-        model_kwargs,
-        texts,
-        checkpoint_meta=checkpoint_meta,
-        batch_size=batch_size,
+    X_embedded = pd.DataFrame(
+        get_embeddings(
+            model_cls,
+            model_kwargs,
+            texts,
+            checkpoint_meta=checkpoint_meta,
+            batch_size=batch_size,
+        )
     )
+
+    umap = UMAP(
+        n_neighbors=umap_n_neighbors,
+        metric=umap_metric,
+        min_dist=umap_min_dist,
+        random_state=umap_seed,
+    )
+    umap_data = umap.fit_transform(X_embedded)
+
+    umap_df = pd.DataFrame(umap_data, columns=["UMAP Component 1", "UMAP Component 2"])
+    umap_df["Label"] = labels
+    # NOTE: Altair (or the underlying charting library, vega-lite) will
+    # truncate these texts before being displayed
+    umap_df["Text"] = texts
+
+    umap_chart = (
+        alt.Chart(umap_df, height=700)
+        .mark_circle(size=60)
+        .encode(
+            alt.X("UMAP Component 1", scale=alt.Scale(zero=False), axis=None),
+            alt.Y("UMAP Component 2", scale=alt.Scale(zero=False), axis=None),
+            alt.Color("Label"),
+            tooltip=alt.Tooltip(["Label", "Text"]),
+        )
+    )
+
+    # Hack needed to get streamlit to set the chart height
+    # https://github.com/streamlit/streamlit/issues/542
+    st.altair_chart(umap_chart + umap_chart)
 
 
 @click.command()
@@ -376,9 +415,14 @@ def run(
         model_type = st.sidebar.selectbox("Model Type", model_type_options)
 
         if model_type == "Trained" and model_data_dir is not None:
-            model_cls, model_kwargs, checkpoint_meta = st_select_model_checkpoint(
+            result = st_select_model_checkpoint(
                 Path(model_data_dir), use_gpu, nvidia_visible_devices
             )
+            if result is None:
+                embeddings_error = True
+                st.sidebar.error("Error selecting model checkpoint.")
+            else:
+                model_cls, model_kwargs, checkpoint_meta = result
         else:
             checkpoint_meta = None
             model_result = st_select_untrained_model(
@@ -400,6 +444,17 @@ def run(
             min_value=1,
             max_value=len(sampled_texts),
             value=DEFAULT_EMBED_BATCH_SIZE,
+        )
+
+        umap_seed = st.sidebar.number_input(
+            "UMAP Random Seed", min_value=1, max_value=None, value=1
+        )
+        umap_n_neighbors = st.sidebar.number_input(
+            "UMAP Number of Neigbors", min_value=1, max_value=None, value=15
+        )
+        umap_metric = st.sidebar.text_input("UMAP Distance Metric", value="euclidean")
+        umap_min_dist = st.sidebar.number_input(
+            "UMAP Minimum Distance", min_value=0.0, max_value=1.0, value=0.1
         )
 
     #
@@ -458,8 +513,13 @@ def run(
             model_cls,
             model_kwargs,
             sampled_texts,
+            sampled_labels,
             checkpoint_meta,
             batch_size=embed_batch_size,
+            umap_seed=umap_seed,
+            umap_n_neighbors=umap_n_neighbors,
+            umap_metric=umap_metric,
+            umap_min_dist=umap_min_dist,
         )
 
 

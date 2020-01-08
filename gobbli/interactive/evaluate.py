@@ -199,6 +199,7 @@ def run(
     use_gpu: bool,
     nvidia_visible_devices: str,
 ):
+    st.sidebar.header("Model")
     model_data_path = Path(model_data_dir)
     model_cls, model_kwargs, checkpoint_meta = st_select_model_checkpoint(
         model_data_path, use_gpu, nvidia_visible_devices

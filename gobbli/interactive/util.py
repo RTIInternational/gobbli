@@ -331,8 +331,9 @@ def st_select_model_checkpoint(
         st.error("No trained checkpoints found for the given model.")
         return
 
-    st.sidebar.header("Model")
-    model_checkpoint = st.sidebar.selectbox("Checkpoint", list(task_metadata.keys()))
+    model_checkpoint = st.sidebar.selectbox(
+        "Model Checkpoint", list(task_metadata.keys())
+    )
     return model_cls, model_kwargs, task_metadata[model_checkpoint]
 
 
@@ -362,6 +363,10 @@ def st_select_untrained_model(
 
     model_cls_name = st.sidebar.selectbox("Model Class", model_choices)
     model_params_str = st.sidebar.text_area("Model Parameters (JSON)", value="{}")
+
+    # Slight convenience if the user deletes the text area contents
+    if model_params_str == "":
+        model_params_str = "{}"
 
     model_cls = getattr(gobbli.model, model_cls_name)
 
