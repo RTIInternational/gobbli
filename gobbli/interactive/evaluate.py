@@ -4,8 +4,8 @@ from collections import OrderedDict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+import altair as alt
 import click
-import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 
@@ -66,10 +66,9 @@ def show_metrics(metrics: Dict[str, Any]):
     st.markdown(md)
 
 
-def show_plot(evaluation: ClassificationEvaluation):
-    evaluation.plot()
-    plt.title("Model Predicted Probability by True Class")
-    st.pyplot()
+def show_plot(plot: alt.Chart):
+    st.header("Model Predicted Probability by True Class")
+    st.altair_chart(plot)
 
 
 TRUE_LABEL_COLOR = "#1f78b4"

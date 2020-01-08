@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
 
-import matplotlib
+import altair as alt
 import pandas as pd
 import ray
 from sklearn.model_selection import ParameterGrid, train_test_split
@@ -122,7 +122,7 @@ class ClassificationExperimentResults:
         """
         return self.evaluation.metrics_report(*args, **kwargs)
 
-    def plot(self, *args, **kwargs) -> matplotlib.axes.Axes:
+    def plot(self, *args, **kwargs) -> alt.Chart:
         """
         See :meth:`ClassificationEvaluation.plot`.
         """

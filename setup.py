@@ -32,7 +32,7 @@ setup(
         "pandas >= 0.24.0",
         "scikit-learn >= 0.22.0",
         "ray >= 0.7.3",
-        "seaborn >= 0.9.0",
+        "altair >= 3.2.0",
         "click >= 7.0",
     ],
     extras_require={
@@ -40,7 +40,6 @@ setup(
         "tokenize": ["sentencepiece >= v0.1.83"],
         "interactive": [
             "streamlit >= 0.52.2",
-            "altair >= 3.2.0",
             "gensim >= 3.8.0",
             "umap-learn >= 0.3.10",
         ],

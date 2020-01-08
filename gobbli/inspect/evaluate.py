@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
-import matplotlib
+import altair as alt
 import pandas as pd
-import seaborn as sns
 from sklearn.metrics import (
     accuracy_score,
     classification_report,
@@ -147,10 +146,10 @@ class ClassificationEvaluation:
             f"{classification_report(self.y_true, self.y_pred)}\n"
         )
 
-    def plot(self, ax: Optional[matplotlib.axes.Axes] = None) -> matplotlib.axes.Axes:
+    def plot(self) -> alt.Chart:
         """
         Returns:
-          A plot visualizing predicted probabilities and true classes to visually identify
+          An Altair chart visualizing predicted probabilities and true classes to visually identify
           where errors are being made.
         """
         pred_prob_df = self.y_pred_proba.copy()
@@ -161,21 +160,41 @@ class ClassificationEvaluation:
         )
         plot_df["Belongs to Class"] = plot_df["True Class"] == plot_df["Class"]
 
-        plot_ax = sns.stripplot(
-            y="Class",
-            x="Predicted Probability",
-            hue="Belongs to Class",
-            dodge=True,
-            data=plot_df,
-            size=3,
-            palette="muted",
-            ax=ax,
-        )
-        plot_ax.set_xticks([0, 0.5, 1])
-        plot_ax.legend(
-            loc="lower right", framealpha=0, fontsize="small", title="Belongs to Class"
-        )
-        return plot_ax
+        charts = []
+        # Ideally, we'd use alt.Row to create a faceted chart, but streamlit doesn't
+        # respect an Altair chart's height unless it's layered, and you can't layer
+        # faceted charts.  So we manually concatenate a bunch of layered charts.
+        uniq_cls = plot_df["Class"].unique()
+        uniq_cls.sort()
+        for cls in uniq_cls:
+            charts.append(
+                # Layer needed to get streamlit to set chart height
+                alt.layer(
+                    alt.Chart(plot_df, title=cls, height=40)
+                    .mark_circle(size=8)
+                    .encode(
+                        x=alt.X(
+                            "Predicted Probability", type="quantitative", title=None
+                        ),
+                        y=alt.Y(
+                            "jitter",
+                            type="quantitative",
+                            title=None,
+                            axis=alt.Axis(
+                                values=[0], ticks=True, grid=False, labels=False
+                            ),
+                            scale=alt.Scale(),
+                        ),
+                        color=alt.Color("Belongs to Class", type="nominal"),
+                    )
+                    .transform_calculate(
+                        # Generate Gaussian jitter with a Box-Muller transform
+                        jitter="sqrt(-2*log(random()))*cos(2*PI*random())/32"
+                    )
+                    .properties(height=40)
+                )
+            )
+        return alt.vconcat(*charts)
 
     def errors_for_label(self, label: str, k: int = 10):
         """
