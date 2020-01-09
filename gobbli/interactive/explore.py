@@ -231,14 +231,21 @@ def show_topic_model(tokens: List[List[str]], label: Optional[str], **model_kwar
     if label is not None:
         st.subheader(f"Label: {label}")
 
+    topic_df_data = []
     for i, (topic, coherence) in enumerate(topics):
-        st.subheader(f"Topic {i} (coherence: {coherence:.4f})")
+        topic_data = {"Coherence": coherence}
 
-        md = ""
-        for probability, word in topic:
-            md += f"- {word} ({probability:.4f})\n"
+        for j, (probability, word) in enumerate(topic):
+            topic_data[j + 1] = f"{word} ({probability:.4f})"
 
-        st.markdown(md)
+        topic_df_data.append(topic_data)
+
+    topic_df = pd.DataFrame(topic_df_data).T
+    topic_df.columns = [f"Topic {i+1}" for i in range(len(topic_df.columns))]
+
+    # This is enough to show the full df, but streamlit renders it with a scrollbar still,
+    # so there's still a little bit of scroll
+    st.dataframe(topic_df, height=750)
 
 
 @st.cache(show_spinner=True)
