@@ -6,7 +6,7 @@ import tensorflow_hub as hub
 
 
 def read_texts(input_file):
-    with open(input_file, "r") as f:
+    with open(input_file, "r", encoding="utf-8") as f:
         return f.readlines()
 
 
