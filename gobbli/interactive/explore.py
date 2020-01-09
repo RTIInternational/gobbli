@@ -84,20 +84,58 @@ def get_document_lengths(tokens: List[List[str]]) -> List[int]:
     return [len(d) for d in tokens]
 
 
-def show_label_distribution(labels: List[str]):
-    if labels is not None:
+def _collect_label_counts(labels: List[str]) -> pd.DataFrame:
+    label_counts = (
+        pd.Series(labels).value_counts(normalize=True).to_frame(name="Proportion")
+    )
+    label_counts.index.name = "Label"
+    return label_counts.reset_index()
+
+
+def show_label_distribution(
+    sample_labels: List[str], all_labels: Optional[List[str]] = None
+):
+    if sample_labels is not None:
         st.header("Label Distribution")
-        label_counts = pd.Series(labels).value_counts().to_frame(name="Count")
-        label_counts.index.name = "Label"
-        label_counts = label_counts.reset_index()
-        label_chart = (
-            alt.Chart(label_counts, height=500)
-            .mark_bar()
-            .encode(alt.X("Label", type="nominal"), alt.Y("Count", type="quantitative"))
-        )
-        # Hack needed to get streamlit to set the chart height
-        # https://github.com/streamlit/streamlit/issues/542
-        st.altair_chart(label_chart + label_chart)
+        label_counts = _collect_label_counts(sample_labels)
+
+        if all_labels is None:
+            label_chart = (
+                alt.Chart(label_counts, height=500)
+                .mark_bar()
+                .encode(
+                    alt.X("Label", type="nominal"),
+                    alt.Y("Proportion", type="quantitative"),
+                )
+            )
+            # Hack needed to get streamlit to set the chart height
+            # https://github.com/streamlit/streamlit/issues/542
+            label_chart += label_chart
+        else:
+            label_counts["Label Set"] = "Sample"
+            all_label_counts = _collect_label_counts(all_labels)
+            all_label_counts["Label Set"] = "All Documents"
+            label_counts = pd.concat([label_counts, all_label_counts])
+
+            label_chart = (
+                alt.Chart(label_counts, width=100)
+                .mark_bar()
+                .encode(
+                    alt.X(
+                        "Label Set",
+                        type="nominal",
+                        title=None,
+                        sort=["Sample", "All Documents"],
+                    ),
+                    alt.Y("Proportion", type="quantitative"),
+                    alt.Column(
+                        "Label", type="nominal", header=alt.Header(labelAngle=0)
+                    ),
+                    alt.Color("Label Set", type="nominal", legend=None),
+                )
+            )
+
+        st.altair_chart(label_chart)
 
 
 def show_document_length_distribution(tokens: List[List[str]]):
@@ -359,6 +397,9 @@ def run(
         "Number of Example Documents", min_value=1, max_value=None, value=5
     )
 
+    st.sidebar.header("Labels")
+    show_full_label_distribution = st.sidebar.checkbox("Show Full Label Distribution")
+
     st.sidebar.header("Tokenization")
     tokenize_method = TokenizeMethod[
         st.sidebar.selectbox("Method", tuple(tm.name for tm in TokenizeMethod))
@@ -470,7 +511,10 @@ def run(
     )
 
     if filter_label is None:
-        show_label_distribution(sampled_labels)
+        show_label_distribution(
+            sampled_labels,
+            all_labels=filtered_labels if show_full_label_distribution else None,
+        )
 
     tokens = get_tokens(sampled_texts, tokenize_method, vocab_size)
 
