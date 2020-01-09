@@ -209,7 +209,7 @@ class BaseModel(ABC):
         Returns:
             The path to the weights directory.
         """
-        return self.data_dir() / BaseModel._WEIGHTS_DIR_NAME
+        return self.model_class_dir() / BaseModel._WEIGHTS_DIR_NAME
 
     def build(self):
         """
