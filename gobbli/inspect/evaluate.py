@@ -170,7 +170,9 @@ class ClassificationEvaluation:
             charts.append(
                 # Layer needed to get streamlit to set chart height
                 alt.layer(
-                    alt.Chart(plot_df, title=cls, height=40)
+                    alt.Chart(
+                        plot_df[plot_df["True Class"] == cls], title=cls, height=40
+                    )
                     .mark_circle(size=8)
                     .encode(
                         x=alt.X(
