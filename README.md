@@ -20,6 +20,38 @@ See [the docs](https://gobbli.readthedocs.io/en/latest/) for prerequisites, a qu
 
 You may also want to check out the [benchmarks](./benchmark) to see some comparisons of gobbli's implementation of various models in different situations.
 
+### Interactive
+
+**UNDER DEVELOPMENT**
+
+gobbli provides [streamlit](https://www.streamlit.io/) apps to perform some interactive tasks in a web browser, such as data exploration and model evaluation.  Once you've installed the library, you can run the bundled apps using the `gobbli` command line application.  Run `gobbli --help` for more info.
+
+#### gobbli explore
+
+Use this app to explore the characteristics of a dataset and perform unsupervised tasks, such as topic modeling or plotting embeddings.  Use the following command to run this app:
+
+    gobbli explore <data>
+    
+`<data>` can be the name of a built-in gobbli `Dataset` (ex. `NewsgroupsDataset` or `IMDBDataset`) or a path to a data file.  Supported data file formats are:
+
+ - `.txt`: Line-delimited texts without labels
+ - `.csv`: Comma-delimited file containing a `text` column and optional `label` column
+ - `.tsv`: Tab-delimited file containing a `text` column and optional `label` column
+ 
+You can optionally pass a trained gobbli model to use for embedding generation.  To do so, use the `--model-data-dir` command line argument.  The model data directory is obtained by calling the `.data_dir()` method on a trained model.
+
+Run `gobbli explore --help` to see additional available options, including GPU usage.
+
+#### gobbli evaluate
+
+Use this app to evaluate performance of a trained model on a dataset.  Run the following command:
+
+    gobbli evaluate <model_data_dir> <data>
+    
+The `<data>` and `<model_data_dir>`arguments behave exactly as described above under `gobbli explore`, except the model data directory is now mandatory.
+
+Run `gobbli evaluate --help` to see additional available options, including GPU usage.
+
 ## Development
 
 Assuming you have all prerequisites noted above, you need to install the package and all required + optional dependencies in development mode:
