@@ -62,7 +62,9 @@ class Transformer(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         - ``adam_eps``: Epsilon value for the AdamW optimizer.
         - ``gradient_accumulation_steps``: Number of iterations to accumulate gradients before
           updating the model.  Used to allow larger effective batch sizes for models too big to
-          fit a large batch on the GPU.
+          fit a large batch on the GPU.  The "effective batch size" is
+          ``gradient_accumulation_steps`` * batch size.  If you encounter memory errors while
+          training, try decreasing the batch size and increasing ``gradient_accumulation_steps``.
 
         Note that gobbli relies on transformers to perform validation on these parameters,
         so initialization errors may not be caught until model runtime.
