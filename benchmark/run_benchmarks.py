@@ -53,11 +53,13 @@ def load_specs(specs_file: Path) -> Dict[str, Any]:
 @click.option(
     "--output-dir",
     default=str(BENCHMARK_OUTPUT_DIR),
+    show_default=True,
     help="Directory to save benchmark output in.",
 )
 @click.option(
     "--log-level",
     default="INFO",
+    show_default=True,
     help="Verbosity of logging -- can be any value accepted by logging.setLevel.",
 )
 @click.option(
