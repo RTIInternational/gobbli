@@ -1,8 +1,9 @@
 import logging
 import multiprocessing
 import os
+import traceback
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from spacy.lang.en import English
 
@@ -11,6 +12,17 @@ from gobbli.experiment.classification import (
     ClassificationExperimentResults,
 )
 from gobbli.model.fasttext import FastText
+
+LOGGER = logging.getLogger(__name__)
+
+
+def format_exception(e: BaseException):
+    """
+    Generate an informative warning message for a given error.
+    """
+    return "\n".join(
+        ("\n".join(traceback.format_tb(e.__traceback__)), f"{type(e).__name__}: {e}\n")
+    )
 
 
 def init_benchmark_env():
@@ -51,6 +63,12 @@ def bert_preprocess(texts: List[str]) -> List[str]:
     """
     # BERT truncates input, so don't pass in more than is needed
     return [text[:512] for text in texts]
+
+
+PREPROCESS_FUNCS: Dict[str, Callable[[List[str]], List[str]]] = {
+    "fasttext_preprocess": fasttext_preprocess,
+    "bert_preprocess": bert_preprocess,
+}
 
 
 def run_benchmark_experiment(

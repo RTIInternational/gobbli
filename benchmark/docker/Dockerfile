@@ -13,12 +13,4 @@ RUN pip install -e '.[augment,tokenize]' \
 # Copy the rest of the repository in
 COPY ./ /code
 
-EXPOSE 8080
-CMD [ \
-    "jupyter", "lab", \
-    "--ip", "0.0.0.0", \
-    "--allow-root", \
-    "--port", "8080", \
-    "--no-browser", \
-    "--LabApp.token=''" \
-]
+ENTRYPOINT ["python", "run_benchmarks.py"]

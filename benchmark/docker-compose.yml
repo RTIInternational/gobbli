@@ -11,27 +11,23 @@ services:
     environment:
       NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
       GOBBLI_USE_GPU: "1"
-    working_dir: $PWD/..
     shm_size: 4G
-    ports:
-      - "${GOBBLI_JUPYTER_PORT:-8080}:8080"
     volumes:
       # Needed to spawn containers
       - /var/run/docker.sock:/var/run/docker.sock
-      # Needed for CI to perform bind mounts as we would on the host
-      - $PWD/..:$PWD/..
+      # Needed to perform bind mounts as we would on the host
+      - $PWD:$PWD
+    working_dir: $PWD
 
   gobbli-benchmark:
     build:
       context: ../
       dockerfile: ./benchmark/docker/Dockerfile
     image: gobbli-benchmark:latest
-    working_dir: $PWD/..
     shm_size: 4G
-    ports:
-      - "${GOBBLI_JUPYTER_PORT:-8080}:8080"
     volumes:
       # Needed to spawn containers
       - /var/run/docker.sock:/var/run/docker.sock
-      # Needed for CI to perform bind mounts as we would on the host
-      - $PWD/..:$PWD/..
+      # Needed to perform bind mounts as we would on the host
+      - $PWD:$PWD
+    working_dir: $PWD

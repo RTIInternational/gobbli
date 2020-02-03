@@ -20,3 +20,6 @@ pip-wheel-metadata/
 benchmark/benchmark_data/
 benchmark/benchmark_meta/
 benchmark/benchmark_gobbli/
+benchmark/benchmark_output_debug/
+
+scratch/
