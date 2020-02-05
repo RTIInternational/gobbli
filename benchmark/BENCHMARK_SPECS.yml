@@ -1,32 +1,171 @@
 - scenario: "newsgroups"
   runs:
-    - model_name: "BERT"
+    - name: "BERT"
+      model_name: "BERT"
       param_grid:
-        bert_model: ["bert-base-uncased", "scibert-uncased"]
+        bert_model: ["bert-base-uncased", "bert-base-cased", "scibert-uncased"]
         max_seq_length: [128]
-      preprocess_func: "benchmark_util.bert_preprocess"
-    - model_name: "MTDNN"
+      preprocess_func: "bert_preprocess"
+    - name: "MTDNN"
+      model_name: "MTDNN"
       param_grid:
-        bert_model: ["mt-dnn-base"]
+        mtdnn_model: ["mt-dnn-base"]
         max_seq_length: [128]
       preprocess_func: "bert_preprocess"
       run_kwargs:
         train_batch_size: 16
+    - name: "FastText"
+      model_name: "FastText"
+      param_grid:
+        word_ngrams: [1, 2]
+        dim: [100, 300]
+        lr: [0.5, 1.0]
+      preprocess_func: "fasttext_preprocess"
+    - name: "XLM"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-mlm-tlm-xnli15-1024", "xlm-clm-ende-1024"]
+        transformer_model: ["XLM"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "XLNet"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlnet-base-cased"]
+        transformer_model: ["XLNet"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["roberta-base"]
+        transformer_model: ["Roberta"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "GPT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["openai-gpt"]
+        transformer_model: ["GPT"]
+      preprocess_func: "bert_preprocess"
+    - name: "GPT2"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["gpt2"]
+        transformer_model: ["GPT2"]
+      preprocess_func: "bert_preprocess"
+    - name: "DistilBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["distilbert-base-uncased", "distilbert-base-uncased-distilled-squad", "distilgpt2"]
+        transformer_model: ["DistilBERT"]
+      preprocess_func: "bert_preprocess"
+    - name: "ALBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["albert-base-v1", "albert-large-v1", "albert-xlarge-v1", "albert-base-v2", "albert-large-v2", "albert-xlarge-v2"]
+        transformer_model: ["ALBERT"]
+      preprocess_func: "bert_preprocess"
+    - name: "T5"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["t5-small"]
+        transformer_model: ["T5"]
+      preprocess_func: "bert_preprocess"
+    - name: "XLM-RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-roberta-base"]
+        transformer_model: ["XLMRoberta"]
+      preprocess_func: "bert_preprocess"
+
 
 - scenario: "imdb"
   runs:
-    - model_name: "BERT"
+    - name: "BERT"
+      model_name: "BERT"
       param_grid:
-        bert_model: ["bert-base-uncased", "scibert-uncased"]
+        bert_model: ["bert-base-uncased", "bert-base-cased", "scibert-uncased"]
         max_seq_length: [128]
-      preprocess_func: "benchmark_util.bert_preprocess"
-    - model_name: "MTDNN"
+      preprocess_func: "bert_preprocess"
+    - name: "MTDNN"
+      model_name: "MTDNN"
       param_grid:
-        bert_model: ["mt-dnn-base"]
+        mtdnn_model: ["mt-dnn-base"]
         max_seq_length: [128]
       preprocess_func: "bert_preprocess"
       run_kwargs:
         train_batch_size: 16
+    - name: "FastText"
+      model_name: "FastText"
+      param_grid:
+        word_ngrams: [1, 2]
+        dim: [100, 300]
+        lr: [0.5, 1.0]
+      preprocess_func: "fasttext_preprocess"
+    - name: "XLM"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-mlm-tlm-xnli15-1024", "xlm-clm-ende-1024"]
+        transformer_model: ["XLM"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "XLNet"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlnet-base-cased"]
+        transformer_model: ["XLNet"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["roberta-base"]
+        transformer_model: ["Roberta"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "GPT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["openai-gpt"]
+        transformer_model: ["GPT"]
+      preprocess_func: "bert_preprocess"
+    - name: "GPT2"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["gpt2"]
+        transformer_model: ["GPT2"]
+      preprocess_func: "bert_preprocess"
+    - name: "DistilBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["distilbert-base-uncased", "distilbert-base-uncased-distilled-squad", "distilgpt2"]
+        transformer_model: ["DistilBERT"]
+      preprocess_func: "bert_preprocess"
+    - name: "ALBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["albert-base-v1", "albert-large-v1", "albert-xlarge-v1", "albert-base-v2", "albert-large-v2", "albert-xlarge-v2"]
+        transformer_model: ["ALBERT"]
+      preprocess_func: "bert_preprocess"
+    - name: "T5"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["t5-small"]
+        transformer_model: ["T5"]
+      preprocess_func: "bert_preprocess"
+    - name: "XLM-RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-roberta-base"]
+        transformer_model: ["XLMRoberta"]
+      preprocess_func: "bert_preprocess"
 
 - scenario: "class_imbalance"
   params:
@@ -38,18 +177,87 @@
       - 0.33
       - 0.5
   runs:
-    - model_name: "FastText"
+    - name: "BERT"
+      model_name: "BERT"
       param_grid:
-        word_ngrams: [1]
-        autotune_duration: [120]
-      preprocess_func: "fasttext_preprocess"
-    - model_name: "MTDNN"
+        bert_model: ["bert-base-uncased", "bert-base-cased", "scibert-uncased"]
+        max_seq_length: [128]
+      preprocess_func: "bert_preprocess"
+    - name: "MTDNN"
+      model_name: "MTDNN"
       param_grid:
-        bert_model: ["mt-dnn-base"]
+        mtdnn_model: ["mt-dnn-base"]
         max_seq_length: [128]
       preprocess_func: "bert_preprocess"
       run_kwargs:
         train_batch_size: 16
+    - name: "FastText"
+      model_name: "FastText"
+      param_grid:
+        word_ngrams: [1, 2]
+        dim: [100, 300]
+        lr: [0.5, 1.0]
+      preprocess_func: "fasttext_preprocess"
+    - name: "XLM"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-mlm-tlm-xnli15-1024", "xlm-clm-ende-1024"]
+        transformer_model: ["XLM"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "XLNet"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlnet-base-cased"]
+        transformer_model: ["XLNet"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["roberta-base"]
+        transformer_model: ["Roberta"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "GPT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["openai-gpt"]
+        transformer_model: ["GPT"]
+      preprocess_func: "bert_preprocess"
+    - name: "GPT2"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["gpt2"]
+        transformer_model: ["GPT2"]
+      preprocess_func: "bert_preprocess"
+    - name: "DistilBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["distilbert-base-uncased", "distilbert-base-uncased-distilled-squad", "distilgpt2"]
+        transformer_model: ["DistilBERT"]
+      preprocess_func: "bert_preprocess"
+    - name: "ALBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["albert-base-v1", "albert-large-v1", "albert-xlarge-v1", "albert-base-v2", "albert-large-v2", "albert-xlarge-v2"]
+        transformer_model: ["ALBERT"]
+      preprocess_func: "bert_preprocess"
+    - name: "T5"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["t5-small"]
+        transformer_model: ["T5"]
+      preprocess_func: "bert_preprocess"
+    - name: "XLM-RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-roberta-base"]
+        transformer_model: ["XLMRoberta"]
+      preprocess_func: "bert_preprocess"
 
 
 - scenario: "low_resource"
@@ -97,6 +305,7 @@
     param_grid:
       word_ngrams: [1]
       autotune_duration: [120]
+    preprocess_func: "fasttext_preprocess"
     augment_probability: 0.15
   runs:
     - augment_name: "Word2Vec"
