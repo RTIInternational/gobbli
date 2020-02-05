@@ -115,6 +115,7 @@ def run(
     LOGGER.info(f"Running scenarios: {scenario_names}")
 
     for scenario_name in scenario_names:
+        LOGGER.info(f"Loading scenario: {scenario_name}")
         if scenario_name not in ALL_SCENARIOS:
             raise ValueError(
                 f"Unknown scenario type: '{scenario_name}'. Valid values are: "
@@ -135,7 +136,9 @@ def run(
             force=force,
         )
 
+        LOGGER.info(f"Running scenario: {scenario_name}")
         scenario.run(raise_exceptions=raise_exceptions)
+        LOGGER.info(f"Scenario complete: {scenario_name}")
 
 
 if __name__ == "__main__":

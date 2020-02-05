@@ -117,8 +117,15 @@ class BaseScenario(ABC):  # type: ignore
             run_output_dir.mkdir(exist_ok=True, parents=True)
             run_output_file = run_output_dir / self.output_filename
             run_error_file = run_output_dir / self.error_filename
+            last_run_errored = run_error_file.exists()
 
-            if self.force or run_error_file.exists() or self.should_run(run):
+            if self.force or last_run_errored or self.should_run(run):
+                if last_run_errored:
+                    LOGGER.debug(
+                        f"Last run errored; removing existing error file at {run_error_file}"
+                    )
+                    run_error_file.unlink()
+
                 LOGGER.debug(f"Running benchmark for key '{run.key}'")
                 init_benchmark_env()
 
@@ -550,14 +557,14 @@ class DataAugmentationScenario(AugmentScenario):
         assert_type("param_grid", self.params.get("param_grid", {}), dict)
 
         assert_param_required("model_name", self.params)
-        assert_type("model_name", str)
+        assert_type("model_name", self.params["model_name"], str)
         assert_valid_model(self.params["model_name"])
 
         assert_param_required("augment_probability", self.params)
         assert_type("augment_probability", p, float)
         assert_proportion("augment_probability", p)
 
-        assert_param_required("preprocess_func")
+        assert_param_required("preprocess_func", self.params)
         assert_in("preprocess_func", self.params["preprocess_func"], PREPROCESS_FUNCS)
 
     def _do_run(self, run: AugmentRun, run_output_dir: Path) -> str:
@@ -656,7 +663,8 @@ class DocumentWindowingScenario(ModelScenario):
         window_len_poolings = self.params["window_len_poolings"]
         assert_type("window_len_poolings", window_len_poolings, list)
         for w, p in window_len_poolings:
-            assert_type(w, int)
+            assert_type("window_len", w, int)
+            assert_type("pooling", p, str)
             # This raises an exception if p isn't a valid pooling method
             WindowPooling(p)
 
@@ -716,10 +724,12 @@ class DocumentWindowingScenario(ModelScenario):
             )
 
             if window_len is not None:
-                pooled_output = PredictOutput(y_pred_proba=results.y_pred_proba)
+                pooled_output = PredictOutput(y_pred_proba=results.y_pred_proba.copy())
 
                 pool_document_windows(
-                    pooled_output, X_test_windowed_indices, pooling=pooling
+                    pooled_output,
+                    X_test_windowed_indices,
+                    pooling=WindowPooling(pooling),
                 )
 
             all_results.append(results.metrics())
