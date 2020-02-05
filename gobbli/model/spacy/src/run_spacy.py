@@ -9,6 +9,16 @@ import spacy
 from spacy.gold import GoldParse
 from spacy.util import minibatch
 
+from spacy_transformers import TransformersLanguage
+
+
+def is_transformer(nlp):
+    """
+    Determine whether the given spacy language instance is backed
+    by a transformer model or a regular spaCy model.
+    """
+    return isinstance(nlp, TransformersLanguage)
+
 
 def read_unique_labels(labels_path):
     """
@@ -105,9 +115,12 @@ def train(
     Make sure to restore any disabled pipeline components before saving so we can reuse the
     saved checkpoint however we need to.
     """
-    textcat = nlp.create_pipe(
-        "textcat", config={"exclusive_classes": True, "architecture": architecture}
-    )
+    if is_transformer(nlp):
+        textcat = nlp.create_pipe("trf_textcat", config={"exclusive_classes": True})
+    else:
+        textcat = nlp.create_pipe(
+            "textcat", config={"exclusive_classes": True, "architecture": architecture}
+        )
     nlp.add_pipe(textcat, last=True)
 
     for label in labels:
@@ -299,8 +312,9 @@ if __name__ == "__main__":
 
     if args.mode == "embed":
         # Don't need the text categorizer (if present) for embeddings
-        if nlp.has_pipe("textcat"):
-            disabled_components.add("textcat")
+        for textcat_pipe in ("textcat", "trf_textcat"):
+            if nlp.has_pipe(textcat_pipe):
+                disabled_components.add(textcat_pipe)
 
         if model_name.endswith("sm"):
             # No vectors available for small models -- we need to enable the
