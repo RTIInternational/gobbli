@@ -12,7 +12,7 @@ from spacy.util import minibatch
 from spacy_transformers import TransformersLanguage
 
 
-def is_transformer(nlp: Any) -> bool:
+def is_transformer(nlp):
     """
     Determine whether the given spacy language instance is backed
     by a transformer model or a regular spaCy model.
