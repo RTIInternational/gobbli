@@ -1,7 +1,10 @@
 import logging
 import multiprocessing
 import os
+import random
+import sys
 import traceback
+from io import StringIO
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
@@ -15,6 +18,26 @@ from gobbli.experiment.classification import (
 from gobbli.model.fasttext import FastText
 
 LOGGER = logging.getLogger(__name__)
+
+
+class StdoutCatcher:
+    """
+    Context manager used to intercept Ray worker logs headed to stdout and
+    record them in a string buffer for saving to benchmark output.
+    """
+
+    def __init__(self):
+        self._log_buffer = StringIO()
+
+    def __enter__(self):
+        self.old_stdout = sys.stdout
+        sys.stdout = self._log_buffer
+
+    def __exit__(self, et, ev, tb):
+        sys.stdout = self.old_stdout
+
+    def get_logs(self) -> str:
+        return self._log_buffer.getvalue()
 
 
 def format_exception(e: BaseException):
@@ -62,6 +85,34 @@ def assert_valid_augment(name: str):
     if getattr(gobbli.augment, name, None) is None:
         raise ValueError(
             f"Invalid augmentation method name: {name}.  Must be an attribute of `gobbli.augment`."
+        )
+
+
+def maybe_limit(
+    X_train_valid: List[str],
+    y_train_valid: List[str],
+    X_test: List[str],
+    y_test: List[str],
+    limit: Optional[int],
+) -> Tuple[List[str], List[str], List[str], List[str]]:
+    """
+    If the given limit is not None, apply it to each individual dataset.
+    Take a random sample to ensure we don't end up with all the same class, which
+    screws up some of the calculations.
+    """
+    if limit is None:
+        return X_train_valid, y_train_valid, X_test, y_test
+    else:
+        random.seed(1)
+        train_valid_sample_indices = random.sample(
+            list(range(len(X_train_valid))), limit
+        )
+        test_sample_indices = random.sample(list(range(len(X_test))), limit)
+        return (
+            [X_train_valid[i] for i in train_valid_sample_indices],
+            [y_train_valid[i] for i in train_valid_sample_indices],
+            [X_test[i] for i in test_sample_indices],
+            [y_test[i] for i in test_sample_indices],
         )
 
 

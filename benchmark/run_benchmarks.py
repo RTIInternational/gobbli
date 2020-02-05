@@ -80,7 +80,8 @@ def load_specs(specs_file: Path) -> Dict[str, Any]:
     "--debug/--no-debug",
     default=False,
     help="If --debug, use a minimal configuration for each scenario to facilitate debugging "
-    "benchmark scenario implementations.",
+    "benchmark scenario implementations.  This will also shrink the dataset size to make "
+    "scenarios run faster.",
 )
 @click.option(
     "--raise-exceptions/--catch-exceptions",
@@ -102,9 +103,11 @@ def run(
 
     output_path = Path(output_dir)
     specs_file = BENCHMARK_SPECS_FILE
+    dataset_limit = None
     if debug:
         output_path = BENCHMARK_DEBUG_OUTPUT_DIR
         specs_file = BENCHMARK_DEBUG_SPECS_FILE
+        dataset_limit = 50
 
     output_path.mkdir(exist_ok=True, parents=True)
     specs = load_specs(specs_file)
@@ -134,6 +137,7 @@ def run(
             spec.get("params", {}),
             spec.get("runs", []),
             force=force,
+            dataset_limit=dataset_limit,
         )
 
         LOGGER.info(f"Running scenario: {scenario_name}")

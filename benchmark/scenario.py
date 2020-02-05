@@ -2,11 +2,12 @@ import datetime as dt
 import json
 import logging
 import tempfile
+import time
 import warnings
 from abc import ABC, abstractmethod
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -16,12 +17,14 @@ from sklearn.model_selection import train_test_split
 import gobbli.model
 from benchmark_util import (
     PREPROCESS_FUNCS,
+    StdoutCatcher,
     assert_param_required,
     assert_proportion,
     assert_valid_augment,
     assert_valid_model,
     format_exception,
     init_benchmark_env,
+    maybe_limit,
     run_benchmark_experiment,
 )
 from gobbli.dataset.base import BaseDataset
@@ -56,6 +59,7 @@ class ModelRun(BaseRun):
     Parameters for a benchmark scenario run for a single model.
     """
 
+    name: str
     model_name: str
     param_grid: Dict[str, List[Any]]
     preprocess_func: str
@@ -63,7 +67,7 @@ class ModelRun(BaseRun):
 
     @property
     def key(self):
-        return self.model_name
+        return self.name
 
 
 @dataclass
@@ -86,12 +90,28 @@ class AugmentRun(BaseRun):
 class BaseScenario(ABC):  # type: ignore
     """
     Base class for benchmark scenarios.
+
+    Args:
+      output_dir: Directory to write combined output for the whole scenario.
+        Individual run output should be created in subdirectories.
+      params: Parameters for the scenario.  Each scenario implementation should
+        validate these as thoroughly as possible at load time to prevent errors
+        during time-consuming scenario runs.
+      runs: A list of runs (different configurations) to apply in the scenario.
+        Each scenario will specify a type of run to use (ex. one run per model type
+        or one run per augmentation type).
+      force: If True, rerun all runs even if they've already completed with the same
+        parameters.  Otherwise, only rerun for which output already exists.
+      dataset_limit: If given, limit the size of the individual (train + valid, test)
+        datasets used during the scenario to decrease runtime for easier debugging.
+        Scenario implementations are expected to respect this limit.
     """
 
     output_dir: Path
     params: Dict[str, Any]
     runs: Sequence[BaseRun]
     force: bool = False
+    dataset_limit: Optional[int] = None
 
     def __post_init__(self):
         self.output_dir.mkdir(exist_ok=True, parents=True)
@@ -248,8 +268,9 @@ class DatasetScenario(ModelScenario):  # type: ignore
 
     def _do_run(self, run: ModelRun, run_output_dir: Path) -> str:
         ds = self.dataset.load()
-        X_train_valid, X_test = ds.X_train(), ds.X_test()
-        y_train_valid, y_test = ds.y_train(), ds.y_test()
+        X_train_valid, y_train_valid, X_test, y_test = maybe_limit(
+            ds.X_train(), ds.y_train(), ds.X_test(), ds.y_test(), self.dataset_limit
+        )
 
         assert_in("preprocess_func", run.preprocess_func, PREPROCESS_FUNCS)
         preprocess_func = PREPROCESS_FUNCS[run.preprocess_func]
@@ -259,16 +280,20 @@ class DatasetScenario(ModelScenario):  # type: ignore
         assert_valid_model(run.model_name)
         model_cls = getattr(gobbli.model, run.model_name)
 
-        results = run_benchmark_experiment(
-            f"{self.name}_{run.key}",
-            X_train_valid_preprocessed,
-            y_train_valid,
-            model_cls,
-            run.param_grid,
-            test_dataset=(X_test_preprocessed, y_test),
-            worker_log_level=logging.INFO,
-            run_kwargs=run.run_kwargs,
-        )
+        stdout_catcher = StdoutCatcher()
+        with stdout_catcher:
+            results = run_benchmark_experiment(
+                f"{self.name}_{run.key}",
+                X_train_valid_preprocessed,
+                y_train_valid,
+                model_cls,
+                run.param_grid,
+                test_dataset=(X_test_preprocessed, y_test),
+                worker_log_level=logging.INFO,
+                run_kwargs=run.run_kwargs,
+            )
+            # Sleep a few seconds to let logs from the worker catch up
+            time.sleep(3)
 
         fig = plt.figure(figsize=(15, 15))
         ax = fig.add_subplot()
@@ -277,6 +302,7 @@ class DatasetScenario(ModelScenario):  # type: ignore
         fig.savefig(plot_path)
 
         md = f"# Results: {run.key}\n"
+        md += f"```\n{stdout_catcher.get_logs()}\n```\n"
         md += tabulate(
             pd.DataFrame(results.training_results), tablefmt="pipe", headers="keys"
         )
@@ -355,8 +381,9 @@ class ClassImbalanceScenario(ModelScenario):
 
     def _do_run(self, run: ModelRun, run_output_dir: Path) -> str:
         ds = IMDBDataset.load()
-        X_train_valid, X_test = ds.X_train(), ds.X_test()
-        y_train_valid, y_test = ds.y_train(), ds.y_test()
+        X_train_valid, y_train_valid, X_test, y_test = maybe_limit(
+            ds.X_train(), ds.y_train(), ds.X_test(), ds.y_test(), self.dataset_limit
+        )
 
         assert_in("preprocess_func", run.preprocess_func, PREPROCESS_FUNCS)
         preprocess_func = PREPROCESS_FUNCS[run.preprocess_func]
@@ -474,8 +501,9 @@ class LowResourceScenario(ModelScenario):
 
     def _do_run(self, run: ModelRun, run_output_dir: Path) -> str:
         ds = IMDBDataset.load()
-        X_train_valid, X_test = ds.X_train(), ds.X_test()
-        y_train_valid, y_test = ds.y_train(), ds.y_test()
+        X_train_valid, y_train_valid, X_test, y_test = maybe_limit(
+            ds.X_train(), ds.y_train(), ds.X_test(), ds.y_test(), self.dataset_limit
+        )
 
         assert_in("preprocess_func", run.preprocess_func, PREPROCESS_FUNCS)
         preprocess_func = PREPROCESS_FUNCS[run.preprocess_func]
@@ -569,8 +597,9 @@ class DataAugmentationScenario(AugmentScenario):
 
     def _do_run(self, run: AugmentRun, run_output_dir: Path) -> str:
         ds = IMDBDataset.load()
-        X_train_valid, X_test = ds.X_train(), ds.X_test()
-        y_train_valid, y_test = ds.y_train(), ds.y_test()
+        X_train_valid, y_train_valid, X_test, y_test = maybe_limit(
+            ds.X_train(), ds.y_train(), ds.X_test(), ds.y_test(), self.dataset_limit
+        )
 
         preprocess_func = PREPROCESS_FUNCS[self.params["preprocess_func"]]
         X_test_preprocessed = preprocess_func(X_test)
@@ -670,8 +699,9 @@ class DocumentWindowingScenario(ModelScenario):
 
     def _do_run(self, run: ModelRun, run_output_dir: Path) -> str:
         ds = IMDBDataset.load()
-        X_train_valid, X_test = ds.X_train(), ds.X_test()
-        y_train_valid, y_test = ds.y_train(), ds.y_test()
+        X_train_valid, y_train_valid, X_test, y_test = maybe_limit(
+            ds.X_train(), ds.y_train(), ds.X_test(), ds.y_test(), self.dataset_limit
+        )
 
         assert_in("preprocess_func", run.preprocess_func, PREPROCESS_FUNCS)
         preprocess_func = PREPROCESS_FUNCS[run.preprocess_func]
@@ -766,6 +796,7 @@ def load_scenario(
     params: Dict[str, Any],
     run_dicts: List[Dict[str, Any]],
     force: bool = False,
+    dataset_limit: Optional[int] = None,
 ) -> BaseScenario:
     if issubclass(scenario_cls, ModelScenario):
         run_cls: Any = ModelRun
@@ -776,4 +807,10 @@ def load_scenario(
 
     runs = [run_cls(**d) for d in run_dicts]
 
-    return scenario_cls(output_dir=output_dir, params=params, runs=runs, force=force)
+    return scenario_cls(
+        output_dir=output_dir,
+        params=params,
+        runs=runs,
+        force=force,
+        dataset_limit=dataset_limit,
+    )
