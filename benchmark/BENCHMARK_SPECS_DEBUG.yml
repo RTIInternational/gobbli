@@ -52,6 +52,7 @@
       autotune_duration: [5]
       dim: [10]
       word_ngrams: [1]
+    preprocess_func: "fasttext_preprocess"
     augment_probability: 0.15
   runs:
     - augment_name: "WordNet"

@@ -5,7 +5,15 @@ from typing import Any, Dict, List
 import click
 import yaml
 
-from scenario import NewsgroupsScenario, load_scenario
+from scenario import (
+    ClassImbalanceScenario,
+    DataAugmentationScenario,
+    DocumentWindowingScenario,
+    IMDBScenario,
+    LowResourceScenario,
+    NewsgroupsScenario,
+    load_scenario,
+)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -17,7 +25,14 @@ BENCHMARK_OUTPUT_DIR = BENCHMARK_DIR / "benchmark_output"
 BENCHMARK_DEBUG_OUTPUT_DIR = BENCHMARK_DIR / "benchmark_output_debug"
 BENCHMARK_DEBUG_SPECS_FILE = BENCHMARK_DIR / "BENCHMARK_SPECS_DEBUG.yml"
 
-ALL_SCENARIOS: Dict[str, Any] = {"newsgroups": NewsgroupsScenario}
+ALL_SCENARIOS: Dict[str, Any] = {
+    "newsgroups": NewsgroupsScenario,
+    "imdb": IMDBScenario,
+    "class_imbalance": ClassImbalanceScenario,
+    "low_resource": LowResourceScenario,
+    "data_augmentation": DataAugmentationScenario,
+    "document_windowing": DocumentWindowingScenario,
+}
 
 
 def load_specs(specs_file: Path) -> Dict[str, Any]:
@@ -53,7 +68,6 @@ def load_specs(specs_file: Path) -> Dict[str, Any]:
 @click.option(
     "--output-dir",
     default=str(BENCHMARK_OUTPUT_DIR),
-    show_default=True,
     help="Directory to save benchmark output in.",
 )
 @click.option(
@@ -82,7 +96,9 @@ def run(
     debug: bool,
     raise_exceptions: bool,
 ):
-    logging.basicConfig(level=log_level, format="[%(levelname)s] %(name)s: %(message)s")
+    logging.basicConfig(
+        level=log_level, format="[%(asctime)s] %(levelname)s - %(name)s: %(message)s"
+    )
 
     output_path = Path(output_dir)
     specs_file = BENCHMARK_SPECS_FILE

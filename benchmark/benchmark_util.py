@@ -7,6 +7,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from spacy.lang.en import English
 
+import gobbli.model
 from gobbli.experiment.classification import (
     ClassificationExperiment,
     ClassificationExperimentResults,
@@ -30,6 +31,38 @@ def init_benchmark_env():
     Initialize the environment for a benchmark experiment.
     """
     os.environ["GOBBLI_DIR"] = os.path.join(os.path.abspath("."), "benchmark_gobbli")
+
+
+def assert_param_required(name: str, params: Dict[str, Any]):
+    """
+    Show a helpful error message if the given parameter wasn't provided.
+    """
+    if name not in params:
+        raise ValueError(f"Missing required parameter '{name}'.")
+
+
+def assert_proportion(name: str, p: Union[float, int]):
+    """
+    Show a helpful error message if the given number isn't a valid proportion.
+    """
+    if not 0 < p <= 1:
+        raise ValueError(
+            "{name} '{p}' must be greater than 0 and less than or equal to 1"
+        )
+
+
+def assert_valid_model(name: str):
+    if getattr(gobbli.model, name, None) is None:
+        raise ValueError(
+            f"Invalid model name: {name}.  Must be an attribute of `gobbli.model`."
+        )
+
+
+def assert_valid_augment(name: str):
+    if getattr(gobbli.augment, name, None) is None:
+        raise ValueError(
+            f"Invalid augmentation method name: {name}.  Must be an attribute of `gobbli.augment`."
+        )
 
 
 def fasttext_preprocess(texts: List[str]) -> List[str]:

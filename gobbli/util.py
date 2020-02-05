@@ -10,6 +10,7 @@ import shutil
 import tarfile
 import tempfile
 import uuid
+import warnings
 import zipfile
 from pathlib import Path
 from typing import Any, Container, Dict, Iterator, List, Optional, TypeVar
@@ -257,11 +258,16 @@ def download_file(url: str, filename: Optional[str] = None) -> Path:
         with requests.get(url, stream=True) as r:
             with open(local_filepath, "wb") as f:
                 shutil.copyfileobj(r.raw, f)
-    except Exception:
+    except Exception as e:
         # Don't leave the file in a partially downloaded state
-        local_filepath.unlink()
-        LOGGER.debug(f"Removed partially downloaded file at '{local_filepath}'")
-        raise
+        try:
+            local_filepath.unlink()
+            LOGGER.debug(f"Removed partially downloaded file at '{local_filepath}'")
+        except Exception:
+            warnings.warn(
+                "Failed to remove partially downloaded file at '{local_filepath}'."
+            )
+        raise e
 
     return local_filepath
 
