@@ -149,7 +149,8 @@ def bert_preprocess(texts: List[str]) -> List[str]:
     return [text[:512] for text in texts]
 
 
-PREPROCESS_FUNCS: Dict[str, Callable[[List[str]], List[str]]] = {
+PREPROCESS_FUNCS: Dict[Optional[str], Callable[[List[str]], List[str]]] = {
+    None: lambda x: x,
     "fasttext_preprocess": fasttext_preprocess,
     "bert_preprocess": bert_preprocess,
 }

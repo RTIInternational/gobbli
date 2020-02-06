@@ -62,7 +62,7 @@ class ModelRun(BaseRun):
     name: str
     model_name: str
     param_grid: Dict[str, List[Any]]
-    preprocess_func: str
+    preprocess_func: Optional[str] = None
     run_kwargs: Dict[str, Any] = field(default_factory=dict)
 
     @property
