@@ -540,23 +540,27 @@ class LowResourceScenario(ModelScenario):
 
         all_metrics = pd.DataFrame(
             [
-                {"data_proportion": p, **r.metrics()}
+                {
+                    "data_proportion": p,
+                    "num_documents": int(p * len(X_train_valid)),
+                    **r.metrics(),
+                }
                 for p, r in zip(self.params["data_proportions"], all_results)
             ]
         )
 
         fig = plt.figure(figsize=(10, 10))
         f1_ax = fig.add_subplot()
-        all_metrics.plot(x="data_proportion", y="Weighted F1 Score", ax=f1_ax)
+        all_metrics.plot(x="num_documents", y="Weighted F1 Score", ax=f1_ax)
 
         acc_ax = fig.add_subplot()
-        all_metrics.plot(x="data_proportion", y="Accuracy", ax=acc_ax)
+        all_metrics.plot(x="num_documents", y="Accuracy", ax=acc_ax)
 
-        plt.xlabel("Proportion of Data Used (out of 20,000 documents)")
+        plt.xlabel("Number of Documents Used for Training/Validation")
         plt.title(
-            f"Model Performance by Proportion of Data Used - {model_cls.__name__}"
+            f"Model Performance by Number of Documents Used for Training/Validation - {model_cls.__name__}"
         )
-        plt.xlim(0, 1)
+        plt.xlim(0, int(all_metrics["num_documents"].max() * 1.1))
         plt.ylim(0, 1)
         plot_path = run_output_dir / "plot.png"
         fig.savefig(plot_path)
