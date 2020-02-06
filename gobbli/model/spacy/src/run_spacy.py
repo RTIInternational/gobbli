@@ -55,7 +55,10 @@ def evaluate(tokenizer, nlp, valid_data, labels):
     # to make sure this is compatible with GPU (cupy array)
     # or without (numpy array)
     scores = np.zeros((len(cats), len(labels)), dtype="f")
-    textcat = nlp.get_pipe("textcat")
+    if is_transformer(nlp):
+        textcat = nlp.get_pipe(PIPES.textcat)
+    else:
+        textcat = nlp.get_pipe("textcat")
     scores = textcat.model.ops.asarray(scores)
 
     num_correct = 0
@@ -79,7 +82,7 @@ def evaluate(tokenizer, nlp, valid_data, labels):
         golds.append(GoldParse(doc, cats=gold_cats))
 
     accuracy = num_correct / (len(texts) + 1e-8)
-    loss, _ = nlp.get_pipe("textcat").get_loss(texts, golds, scores)
+    loss, _ = textcat.get_loss(texts, golds, scores)
 
     return accuracy, loss
 
