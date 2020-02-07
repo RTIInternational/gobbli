@@ -6,9 +6,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import spacy
+import torch
 from spacy.gold import GoldParse
 from spacy.util import minibatch
-
 from spacy_transformers import TransformersLanguage
 from spacy_transformers.util import PIPES
 
@@ -297,6 +297,8 @@ if __name__ == "__main__":
     output_dir = Path(args.output_dir)
 
     using_gpu = spacy.prefer_gpu()
+    if using_gpu:
+        torch.set_default_tensor_type("torch.cuda.FloatTensor")
 
     device = "gpu" if using_gpu else "cpu"
     print(f"Using device: {device}")
