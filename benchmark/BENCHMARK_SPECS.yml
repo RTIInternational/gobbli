@@ -54,7 +54,7 @@
     - name: "ALBERT"
       model_name: "Transformer"
       param_grid:
-        transformer_weights: ["albert-base-v1", "albert-large-v1", "albert-base-v2", "albert-large-v2"]
+        transformer_weights: ["albert-base-v1", "albert-base-v2"]
         transformer_model: ["Albert"]
       preprocess_func: "bert_preprocess"
     - name: "XLM-RoBERTa"
@@ -68,14 +68,17 @@
       param_grid: {}
       preprocess_func: "fasttext_preprocess"
     - name: "spaCy"
-      model_name: "SpacyModel"
+      model_name: "SpaCyModel"
       param_grid:
         model: ["en_core_web_sm", "en_core_web_lg"]
         architecture: ["bow", "simple_cnn", "ensemble"]
     - name: "spacy-transformers"
-      model_name: "SpacyModel"
+      model_name: "SpaCyModel"
       param_grid:
         model: ["en_trf_bertbaseuncased_lg", "en_trf_xlnetbasecased_lg", "en_trf_robertabase_lg", "en_trf_distilbertbaseuncased_lg"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
 
 
 - scenario: "imdb"

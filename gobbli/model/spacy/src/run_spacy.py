@@ -106,9 +106,11 @@ def train(
     saved checkpoint however we need to.
     """
     if is_transformer(nlp):
+        textcat_pipe_name = PIPES.textcat
         textcat = nlp.create_pipe(
-            PIPES.textcat,
+            textcat_pipe_name,
             config={
+                "architecture": "softmax_last_hidden",
                 "exclusive_classes": True,
                 # We get an error about token_vector_width being unset if it isn't set
                 # explicitly here.  We can't set it to an arbitrary value, either.  It must
@@ -117,8 +119,10 @@ def train(
             },
         )
     else:
+        textcat_pipe_name = textcat
         textcat = nlp.create_pipe(
-            "textcat", config={"exclusive_classes": True, "architecture": architecture}
+            textcat_pipe_name,
+            config={"exclusive_classes": True, "architecture": architecture},
         )
     nlp.add_pipe(textcat, last=True)
 
@@ -148,8 +152,9 @@ def train(
 
             with textcat.model.use_params(optimizer.averages):
                 accuracy, valid_loss = evaluate(nlp.tokenizer, nlp, valid_data, labels)
+                train_loss = losses[textcat_pipe_name]
                 print(
-                    f"Iter {i}\tTrain Loss: {losses['textcat']:.3f}\tValid Loss: {valid_loss:.3f}\tAccuracy: {accuracy:.3f}"
+                    f"Iter {i}\tTrain Loss: {train_loss:.3f}\tValid Loss: {valid_loss:.3f}\tAccuracy: {accuracy:.3f}"
                 )
 
     checkpoint_dir = output_dir / "checkpoint"
@@ -160,7 +165,7 @@ def train(
 
     metrics = {
         "valid_accuracy": accuracy,
-        "mean_train_loss": losses["textcat"] / len(X_train),
+        "mean_train_loss": losses[textcat_pipe_name] / len(X_train),
         "mean_valid_loss": valid_loss / len(X_valid),
     }
 
