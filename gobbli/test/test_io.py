@@ -69,7 +69,7 @@ def test_validate_X_y(X, y, err_class):
 @pytest.mark.parametrize(
     "df,y_pred",
     [
-        (pd.DataFrame({"a": [], "b": []}), []),
+        (pd.DataFrame({"a": [], "b": []}, dtype="float"), []),
         (pd.DataFrame({"a": [1], "b": [0]}), ["a"]),
         (pd.DataFrame({"a": [0.7, 0.3], "b": [0.3, 0.7]}), ["a", "b"]),
     ],

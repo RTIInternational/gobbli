@@ -62,14 +62,14 @@ def check_predict_output(train_output, predict_input, predict_output):
         (
             FastText,
             TrivialDataset,
-            {"autotune_duration": 10},
+            {"autotune_duration": 10, "word_ngrams": 1},
             {"num_train_epochs": 1, "train_batch_size": 1, "valid_batch_size": 1},
             {"predict_batch_size": 1},
         ),
         (
             FastText,
             NewsgroupsDataset,
-            {"autotune_duration": 10},
+            {"autotune_duration": 10, "word_ngrams": 1},
             {"num_train_epochs": 1, "train_batch_size": 32, "valid_batch_size": 32},
             {"predict_batch_size": 32},
         ),

@@ -6,6 +6,7 @@ from gobbli.dataset.trivial import TrivialDataset
 from gobbli.model.bert import BERT
 from gobbli.model.fasttext import FastText
 from gobbli.model.random import RandomEmbedder
+from gobbli.model.sklearn import TfidfEmbedder
 from gobbli.model.spacy import SpaCyModel
 from gobbli.model.transformer import Transformer
 from gobbli.model.use import USE
@@ -98,6 +99,8 @@ def check_embed_output(
         ),
         (SpaCyModel, TrivialDataset, {"model": "en_core_web_sm"}, {}, {}),
         (SpaCyModel, NewsgroupsDataset, {"model": "en_core_web_sm"}, {}, {}),
+        (TfidfEmbedder, TrivialDataset, {}, {}, {}),
+        (TfidfEmbedder, NewsgroupsDataset, {}, {}, {}),
     ],
 )
 def test_embeddings(
@@ -115,8 +118,11 @@ def test_embeddings(
     Ensure embedding models train and generate embeddings appropriately
     across a few example datasets.
     """
-    if model_cls in (USE, FastText) and pooling == gobbli.io.EmbedPooling.NONE:
-        pytest.xfail("pooling is required for USE and FastText models")
+    if (
+        model_cls in (USE, FastText, TfidfEmbedder)
+        and pooling == gobbli.io.EmbedPooling.NONE
+    ):
+        pytest.xfail(f"pooling is required for {model_cls.__name__}")
 
     # These combinations of model and dataset require a lot of memory
     if model_cls in (BERT, Transformer) and dataset_cls in (NewsgroupsDataset,):
