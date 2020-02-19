@@ -47,7 +47,7 @@ class SpaCyModel(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
 
         - ``model`` (:obj:`str`): Name of a spaCy model to use.
           Available values are in `the spaCy model docs <https://spacy.io/models>`__ and
-          `the spacy-transformers docs<https://github.com/explosion/spacy-transformers>`__.
+          `the spacy-transformers docs <https://github.com/explosion/spacy-transformers>`__.
         - ``architecture`` (:obj:`str`): Model architecture to use.
           Available values are in `the spaCy API docs <https://spacy.io/api/textcategorizer#architectures>`__.
           This is ignored if using a spacy-transformers model.
