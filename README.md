@@ -6,7 +6,7 @@
     <a href="https://travis-ci.com/RTIInternational/gobbli"><img src="https://travis-ci.com/RTIInternational/gobbli.svg?branch=master" alt="PyPI version"></a>
     <a href="https://badge.fury.io/py/gobbli"><img src="https://badge.fury.io/py/gobbli.svg" alt="PyPI version"></a>
     <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/gobbli" />
-    <a href="https://doi.org/10.5281/zenodo.3387610"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3387610.svg" alt="DOI"></a>
+    <a href="https://doi.org/10.5281/zenodo.3516024"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3516024.svg" alt="DOI"></a>
   </div>
 </div>
 
