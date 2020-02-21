@@ -119,7 +119,7 @@ def train(
             },
         )
     else:
-        textcat_pipe_name = textcat
+        textcat_pipe_name = "textcat"
         textcat = nlp.create_pipe(
             textcat_pipe_name,
             config={"exclusive_classes": True, "architecture": architecture},
@@ -139,7 +139,10 @@ def train(
     valid_data = list(zip(X_valid, [{"cats": cats} for cats in valid_labels]))
 
     with nlp.disable_pipes(*disabled_components):
-        optimizer = nlp.begin_training()
+        if is_transformer(nlp):
+            optimizer = nlp.resume_training()
+        else:
+            optimizer = nlp.begin_training()
         for i in range(num_train_epochs):
             losses = {}
             random.shuffle(train_data)
