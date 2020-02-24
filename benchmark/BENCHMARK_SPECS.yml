@@ -131,13 +131,13 @@
     - name: "DistilBERT"
       model_name: "Transformer"
       param_grid:
-        transformer_weights: ["distilbert-base-uncased", "distilbert-base-uncased-distilled-squad", "distilgpt2"]
+        transformer_weights: ["distilbert-base-uncased", "distilbert-base-uncased-distilled-squad"]
         transformer_model: ["DistilBert"]
       preprocess_func: "bert_preprocess"
     - name: "ALBERT"
       model_name: "Transformer"
       param_grid:
-        transformer_weights: ["albert-base-v1", "albert-large-v1", "albert-xlarge-v1", "albert-base-v2", "albert-large-v2", "albert-xlarge-v2"]
+        transformer_weights: ["albert-base-v1", "albert-base-v2"]
         transformer_model: ["Albert"]
       preprocess_func: "bert_preprocess"
     - name: "XLM-RoBERTa"
@@ -146,6 +146,22 @@
         transformer_weights: ["xlm-roberta-base"]
         transformer_model: ["XLMRoberta"]
       preprocess_func: "bert_preprocess"
+    - name: "SKLearn"
+      model_name: "SKLearnClassifier"
+      param_grid: {}
+      preprocess_func: "fasttext_preprocess"
+    - name: "spaCy"
+      model_name: "SpaCyModel"
+      param_grid:
+        model: ["en_core_web_sm", "en_core_web_lg"]
+        architecture: ["bow", "simple_cnn", "ensemble"]
+    - name: "spacy-transformers"
+      model_name: "SpaCyModel"
+      param_grid:
+        model: ["en_trf_bertbaseuncased_lg", "en_trf_xlnetbasecased_lg", "en_trf_robertabase_lg", "en_trf_distilbertbaseuncased_lg"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
 
 - scenario: "class_imbalance"
   params:
@@ -202,29 +218,17 @@
       preprocess_func: "bert_preprocess"
       run_kwargs:
         train_batch_size: 16
-    - name: "GPT"
-      model_name: "Transformer"
-      param_grid:
-        transformer_weights: ["openai-gpt"]
-        transformer_model: ["GPT"]
-      preprocess_func: "bert_preprocess"
-    - name: "GPT2"
-      model_name: "Transformer"
-      param_grid:
-        transformer_weights: ["gpt2"]
-        transformer_model: ["GPT2"]
-      preprocess_func: "bert_preprocess"
     - name: "DistilBERT"
       model_name: "Transformer"
       param_grid:
-        transformer_weights: ["distilbert-base-uncased", "distilbert-base-uncased-distilled-squad", "distilgpt2"]
-        transformer_model: ["DistilBERT"]
+        transformer_weights: ["distilbert-base-uncased", "distilbert-base-uncased-distilled-squad"]
+        transformer_model: ["DistilBert"]
       preprocess_func: "bert_preprocess"
     - name: "ALBERT"
       model_name: "Transformer"
       param_grid:
-        transformer_weights: ["albert-base-v1", "albert-large-v1", "albert-xlarge-v1", "albert-base-v2", "albert-large-v2", "albert-xlarge-v2"]
-        transformer_model: ["ALBERT"]
+        transformer_weights: ["albert-base-v1", "albert-base-v2"]
+        transformer_model: ["Albert"]
       preprocess_func: "bert_preprocess"
     - name: "XLM-RoBERTa"
       model_name: "Transformer"
@@ -232,6 +236,22 @@
         transformer_weights: ["xlm-roberta-base"]
         transformer_model: ["XLMRoberta"]
       preprocess_func: "bert_preprocess"
+    - name: "SKLearn"
+      model_name: "SKLearnClassifier"
+      param_grid: {}
+      preprocess_func: "fasttext_preprocess"
+    - name: "spaCy"
+      model_name: "SpaCyModel"
+      param_grid:
+        model: ["en_core_web_sm", "en_core_web_lg"]
+        architecture: ["bow", "simple_cnn", "ensemble"]
+    - name: "spacy-transformers"
+      model_name: "SpaCyModel"
+      param_grid:
+        model: ["en_trf_bertbaseuncased_lg", "en_trf_xlnetbasecased_lg", "en_trf_robertabase_lg", "en_trf_distilbertbaseuncased_lg"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
 
 
 - scenario: "low_resource"
@@ -245,15 +265,82 @@
       - 0.5
       - 0.75
   runs:
-    - model_name: "FastText"
+    - name: "BERT"
+      model_name: "BERT"
       param_grid:
-        word_ngrams: [1]
-        autotune_duration: [120]
-      preprocess_func: "fasttext_preprocess"
-    - model_name: "MTDNN"
-      param_grid:
-        bert_model: ["mt-dnn-base"]
+        bert_model: ["bert-base-uncased", "bert-base-cased", "scibert-uncased"]
         max_seq_length: [128]
+      preprocess_func: "bert_preprocess"
+    - name: "MTDNN"
+      model_name: "MTDNN"
+      param_grid:
+        mtdnn_model: ["mt-dnn-base"]
+        max_seq_length: [128]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "FastText"
+      model_name: "FastText"
+      param_grid:
+        word_ngrams: [1, 2]
+        dim: [100, 300]
+        lr: [0.5, 1.0]
+      preprocess_func: "fasttext_preprocess"
+    - name: "XLM"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-mlm-tlm-xnli15-1024", "xlm-clm-ende-1024"]
+        transformer_model: ["XLM"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "XLNet"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlnet-base-cased"]
+        transformer_model: ["XLNet"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["roberta-base"]
+        transformer_model: ["Roberta"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "DistilBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["distilbert-base-uncased", "distilbert-base-uncased-distilled-squad"]
+        transformer_model: ["DistilBert"]
+      preprocess_func: "bert_preprocess"
+    - name: "ALBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["albert-base-v1", "albert-base-v2"]
+        transformer_model: ["Albert"]
+      preprocess_func: "bert_preprocess"
+    - name: "XLM-RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-roberta-base"]
+        transformer_model: ["XLMRoberta"]
+      preprocess_func: "bert_preprocess"
+    - name: "SKLearn"
+      model_name: "SKLearnClassifier"
+      param_grid: {}
+      preprocess_func: "fasttext_preprocess"
+    - name: "spaCy"
+      model_name: "SpaCyModel"
+      param_grid:
+        model: ["en_core_web_sm", "en_core_web_lg"]
+        architecture: ["bow", "simple_cnn", "ensemble"]
+    - name: "spacy-transformers"
+      model_name: "SpaCyModel"
+      param_grid:
+        model: ["en_trf_bertbaseuncased_lg", "en_trf_xlnetbasecased_lg", "en_trf_robertabase_lg", "en_trf_distilbertbaseuncased_lg"]
       preprocess_func: "bert_preprocess"
       run_kwargs:
         train_batch_size: 16
@@ -287,6 +374,8 @@
         model: "glove.6B.300d"
         tokenizer: "spacy"
     - augment_name: "WordNet"
+      params: {}
+    - augment_name: "BERTMaskedLM"
       params: {}
 
 - scenario: "document_windowing"
