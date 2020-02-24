@@ -157,6 +157,8 @@ class SKLearnClassifier(BaseModel, TrainMixin, PredictMixin):
 
         - ``estimator_path`` (:obj:`str`): Path to an estimator pickled by joblib.
           The pickle will be loaded, and the resulting object will be used as the estimator.
+          If not provided, a default pipeline composed of a TF-IDF vectorizer and a
+          logistic regression will be used.
         """
         estimator = None
 
