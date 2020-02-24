@@ -25,7 +25,7 @@ I'm running out of GPU memory
 
 Some models are larger than others.  You can try:
 
- - Decreasing the :paramref:`train_batch_size <gobbli.io.TrainInput.params.train_batch_size>` if you're training; this is the biggest driver of GPU memory usage.
+ - Decreasing the :paramref:`train_batch_size <gobbli.io.TrainInput.params.train_batch_size>` if you're training; this is the biggest driver of GPU memory usage.  Beware of making the batch size so small that the model can't update gradients accurately, though. The :class:`gobbli.model.transformer.Transformer` model implements gradient accumulation, which can be used to counteract the detrimental effect of a smaller batch size.
  - Decreasing the ``max_seq_len`` parameter of your model, if it has one.  Consider using :ref:`document-windowing` if you do this to account for the truncation of your texts.
  - Using a smaller set of pretrained weights (ex. instead of ``bert-large-uncased``, try ``bert-base-uncased``).
 

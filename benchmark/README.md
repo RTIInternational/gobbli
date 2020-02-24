@@ -1,24 +1,16 @@
 # gobbli Benchmarks
 
-This directory contains benchmarking code that can be run interactively in a Docker container via Jupyter Lab.
+This directory contains benchmarking code and output for various aspects of gobbli model performance.
 
-To run the Jupyter server:
+To run the benchmarks (note -- this may take several days depending on available computing resources):
 
-    ./run_jupyter.sh interactive
-    
+    ./run_benchmarks.sh
+
 To run with GPU support enabled:
 
     export GOBBLI_USE_GPU=1
-    ./run_jupyter.sh interactive
+    ./run_benchmarks.sh
     
-You can access and rerun individual notebooks.  You may obtain slightly different accuracy numbers if you rerun the models.
+Use `--help` to see additional arguments in case you want to debug individual benchmarks, force re-running, etc.
 
-If you want to regenerate the benchmarks on a server, you can use headless mode:
-
-    ./run_jupyter.sh headless <notebook name>
-
-If you want to rerun all notebooks in headless mode (after a functionality change or adding a new model to a large group of them), you can use `run_all_benchmarks.sh`:
-
-    ./run_all_benchmarks.sh
-    
-**NOTE:** Some of the benchmarks are very time-consuming and may take days to run.
+    ./run_benchmarks.sh --help

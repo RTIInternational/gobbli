@@ -15,7 +15,7 @@ from sklearn.pipeline import Pipeline
 import gobbli.io
 from gobbli.model.base import BaseModel
 from gobbli.model.context import ContainerTaskContext
-from gobbli.model.mixin import PredictMixin, TrainMixin
+from gobbli.model.mixin import EmbedMixin, PredictMixin, TrainMixin
 from gobbli.util import assert_type, generate_uuid
 
 
@@ -157,6 +157,8 @@ class SKLearnClassifier(BaseModel, TrainMixin, PredictMixin):
 
         - ``estimator_path`` (:obj:`str`): Path to an estimator pickled by joblib.
           The pickle will be loaded, and the resulting object will be used as the estimator.
+          If not provided, a default pipeline composed of a TF-IDF vectorizer and a
+          logistic regression will be used.
         """
         estimator = None
 
@@ -266,3 +268,45 @@ class SKLearnClassifier(BaseModel, TrainMixin, PredictMixin):
                 pred_proba_df[label] = 0.0
 
         return gobbli.io.PredictOutput(y_pred_proba=pred_proba_df)
+
+
+class TfidfEmbedder(BaseModel, EmbedMixin):
+    """
+    Embedding wrapper for scikit-learn's :class:`sklearn.feature_extraction.text.TfidfVectorizer`.
+    Generates "embeddings" composed of TF-IDF vectors.
+    """
+
+    def init(self, params: Dict[str, Any]):
+        """
+        See :meth:`gobbli.model.base.BaseModel.init`.
+
+        TFidfEmbedder parameters will be passed directly to the
+        :class:`sklearn.feature_extraction.text.TfidfVectorizer` constructor, which will
+        perform its own validation.
+        """
+        # This should raise an error if there's anything wrong with any of the passed
+        # parameters
+        self.vec = TfidfVectorizer(**params)
+
+    def _build(self):
+        """
+        No build step required for this model.
+        """
+
+    def _embed(
+        self, embed_input: gobbli.io.EmbedInput, context: ContainerTaskContext
+    ) -> gobbli.io.EmbedOutput:
+        if embed_input.checkpoint is not None:
+            warnings.warn(
+                "TfidfEmbedder does not support embedding from an existing "
+                "checkpoint, so the passed checkpoint will be ignored."
+            )
+        if embed_input.pooling == gobbli.io.EmbedPooling.NONE:
+            raise ValueError(
+                "TfidfEmbedder embeds whole documents, so pooling is required."
+            )
+        X_vectorized = self.vec.fit_transform(embed_input.X)
+
+        return gobbli.io.EmbedOutput(
+            X_embedded=[np.squeeze(np.asarray(vec.todense())) for vec in X_vectorized]
+        )

@@ -46,14 +46,17 @@ class SpaCyModel(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         spaCy parameters:
 
         - ``model`` (:obj:`str`): Name of a spaCy model to use.
-          Available values are in `the spaCy model docs <https://spacy.io/models>`__.
+          Available values are in `the spaCy model docs <https://spacy.io/models>`__ and
+          `the spacy-transformers docs <https://github.com/explosion/spacy-transformers>`__.
         - ``architecture`` (:obj:`str`): Model architecture to use.
           Available values are in `the spaCy API docs <https://spacy.io/api/textcategorizer#architectures>`__.
+          This is ignored if using a spacy-transformers model.
         - ``dropout`` (:obj:`float`): Dropout proportion for training.
         - ``full_pipeline`` (:obj:`bool`): If True, enable the full spaCy language pipeline
           (including tagging, parsing, and named entity recognition) for the TextCategorizer
           model used in training and prediction.  This makes training/prediction much slower
-          but theoretically provides more information to the model.
+          but theoretically provides more information to the model.  This is ignored if using a
+          spacy-transformers model.
 
         Note that gobbli relies on spaCy to perform validation on these parameters,
         so initialization errors may not be caught until model runtime.

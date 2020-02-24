@@ -1,16 +1,52 @@
 import logging
 import multiprocessing
 import os
+import random
+import sys
+import traceback
+from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from spacy.lang.en import English
 
+import gobbli.model
 from gobbli.experiment.classification import (
     ClassificationExperiment,
     ClassificationExperimentResults,
 )
 from gobbli.model.fasttext import FastText
+
+LOGGER = logging.getLogger(__name__)
+
+
+class StdoutCatcher:
+    """
+    Context manager used to intercept Ray worker logs headed to stdout and
+    record them in a string buffer for saving to benchmark output.
+    """
+
+    def __init__(self):
+        self._log_buffer = StringIO()
+
+    def __enter__(self):
+        self.old_stdout = sys.stdout
+        sys.stdout = self._log_buffer
+
+    def __exit__(self, et, ev, tb):
+        sys.stdout = self.old_stdout
+
+    def get_logs(self) -> str:
+        return self._log_buffer.getvalue()
+
+
+def format_exception(e: BaseException):
+    """
+    Generate an informative warning message for a given error.
+    """
+    return "\n".join(
+        ("\n".join(traceback.format_tb(e.__traceback__)), f"{type(e).__name__}: {e}\n")
+    )
 
 
 def init_benchmark_env():
@@ -18,6 +54,66 @@ def init_benchmark_env():
     Initialize the environment for a benchmark experiment.
     """
     os.environ["GOBBLI_DIR"] = os.path.join(os.path.abspath("."), "benchmark_gobbli")
+
+
+def assert_param_required(name: str, params: Dict[str, Any]):
+    """
+    Show a helpful error message if the given parameter wasn't provided.
+    """
+    if name not in params:
+        raise ValueError(f"Missing required parameter '{name}'.")
+
+
+def assert_proportion(name: str, p: Union[float, int]):
+    """
+    Show a helpful error message if the given number isn't a valid proportion.
+    """
+    if not 0 < p <= 1:
+        raise ValueError(
+            "{name} '{p}' must be greater than 0 and less than or equal to 1"
+        )
+
+
+def assert_valid_model(name: str):
+    if getattr(gobbli.model, name, None) is None:
+        raise ValueError(
+            f"Invalid model name: {name}.  Must be an attribute of `gobbli.model`."
+        )
+
+
+def assert_valid_augment(name: str):
+    if getattr(gobbli.augment, name, None) is None:
+        raise ValueError(
+            f"Invalid augmentation method name: {name}.  Must be an attribute of `gobbli.augment`."
+        )
+
+
+def maybe_limit(
+    X_train_valid: List[str],
+    y_train_valid: List[str],
+    X_test: List[str],
+    y_test: List[str],
+    limit: Optional[int],
+) -> Tuple[List[str], List[str], List[str], List[str]]:
+    """
+    If the given limit is not None, apply it to each individual dataset.
+    Take a random sample to ensure we don't end up with all the same class, which
+    screws up some of the calculations.
+    """
+    if limit is None:
+        return X_train_valid, y_train_valid, X_test, y_test
+    else:
+        random.seed(1)
+        train_valid_sample_indices = random.sample(
+            list(range(len(X_train_valid))), limit
+        )
+        test_sample_indices = random.sample(list(range(len(X_test))), limit)
+        return (
+            [X_train_valid[i] for i in train_valid_sample_indices],
+            [y_train_valid[i] for i in train_valid_sample_indices],
+            [X_test[i] for i in test_sample_indices],
+            [y_test[i] for i in test_sample_indices],
+        )
 
 
 def fasttext_preprocess(texts: List[str]) -> List[str]:
@@ -51,6 +147,13 @@ def bert_preprocess(texts: List[str]) -> List[str]:
     """
     # BERT truncates input, so don't pass in more than is needed
     return [text[:512] for text in texts]
+
+
+PREPROCESS_FUNCS: Dict[Optional[str], Callable[[List[str]], List[str]]] = {
+    None: lambda x: x,
+    "fasttext_preprocess": fasttext_preprocess,
+    "bert_preprocess": bert_preprocess,
+}
 
 
 def run_benchmark_experiment(

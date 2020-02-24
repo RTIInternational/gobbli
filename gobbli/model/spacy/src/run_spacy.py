@@ -6,8 +6,19 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import spacy
+import torch
 from spacy.gold import GoldParse
 from spacy.util import minibatch
+from spacy_transformers import TransformersLanguage
+from spacy_transformers.util import PIPES, cyclic_triangular_rate
+
+
+def is_transformer(nlp):
+    """
+    Determine whether the given spacy language instance is backed
+    by a transformer model or a regular spaCy model.
+    """
+    return isinstance(nlp, TransformersLanguage)
 
 
 def read_unique_labels(labels_path):
@@ -37,54 +48,43 @@ def spacy_format_labels(ys, labels):
 
 def evaluate(tokenizer, nlp, valid_data, labels):
     """Evaluate model performance on a test dataset."""
-    # Use small nonzero numbers for fp/fn to avoid division by zero
-    tp = 0.0
-    fp = 1e-8
-    fn = 1e-8
-    tn = 0.0
-
     texts, cats = zip(*valid_data)
 
-    docs = []
     golds = []
     # Use the model's ops module
     # to make sure this is compatible with GPU (cupy array)
     # or without (numpy array)
     scores = np.zeros((len(cats), len(labels)), dtype="f")
-    textcat = nlp.get_pipe("textcat")
+    if is_transformer(nlp):
+        textcat = nlp.get_pipe(PIPES.textcat)
+    else:
+        textcat = nlp.get_pipe("textcat")
     scores = textcat.model.ops.asarray(scores)
 
+    num_correct = 0
     for i, doc in enumerate(nlp.pipe(texts)):
         gold_cats = cats[i]["cats"]
+        gold_prediction = max(gold_cats, key=lambda label: gold_cats[label])
+        doc_prediction = None
+        max_score = -1
         for j, (label, score) in enumerate(doc.cats.items()):
             if label not in gold_cats:
                 raise ValueError(f"Prediction for unexpected label: {label}")
-            gold_score = gold_cats[label]
-
-            if score >= 0.5 and gold_score >= 0.5:
-                tp += 1.0
-            elif score > +0.5 and gold_score < 0.5:
-                fp += 1.0
-            elif score < 0.5 and gold_score < 0.5:
-                tn += 1
-            elif score < 0.5 and gold_score >= 0.5:
-                fn += 1
+            if score > max_score:
+                max_score = score
+                doc_prediction = label
 
             scores[i, j] = score
-        docs.append(doc)
+
+        if doc_prediction == gold_prediction:
+            num_correct += 1
+
         golds.append(GoldParse(doc, cats=gold_cats))
 
-    precision = tp / (tp + fp)
-    recall = tp / (tp + fn)
-    accuracy = (tp + tn) / (tp + tn + fp + fn)
-    if (precision + recall) == 0:
-        f_score = 0.0
-    else:
-        f_score = 2 * (precision * recall) / (precision + recall)
+    accuracy = num_correct / (len(texts) + 1e-8)
+    loss, _ = textcat.get_loss(texts, golds, scores)
 
-    loss, _ = nlp.get_pipe("textcat").get_loss(texts, golds, scores)
-
-    return accuracy, precision, recall, f_score, loss
+    return accuracy, loss
 
 
 def train(
@@ -105,9 +105,25 @@ def train(
     Make sure to restore any disabled pipeline components before saving so we can reuse the
     saved checkpoint however we need to.
     """
-    textcat = nlp.create_pipe(
-        "textcat", config={"exclusive_classes": True, "architecture": architecture}
-    )
+    if is_transformer(nlp):
+        textcat_pipe_name = PIPES.textcat
+        textcat = nlp.create_pipe(
+            textcat_pipe_name,
+            config={
+                "architecture": "softmax_last_hidden",
+                "exclusive_classes": True,
+                # We get an error about token_vector_width being unset if it isn't set
+                # explicitly here.  We can't set it to an arbitrary value, either.  It must
+                # be set based on the model
+                "token_vector_width": nlp.get_pipe(PIPES.tok2vec).model.nO,
+            },
+        )
+    else:
+        textcat_pipe_name = "textcat"
+        textcat = nlp.create_pipe(
+            textcat_pipe_name,
+            config={"exclusive_classes": True, "architecture": architecture},
+        )
     nlp.add_pipe(textcat, last=True)
 
     for label in labels:
@@ -123,23 +139,35 @@ def train(
     valid_data = list(zip(X_valid, [{"cats": cats} for cats in valid_labels]))
 
     with nlp.disable_pipes(*disabled_components):
-        optimizer = nlp.begin_training()
+        if is_transformer(nlp):
+            optimizer = nlp.resume_training()
+            optimizer.alpha = 0.001
+            optimizer.trf_weight_decay = 0.005
+            optimizer.L2 = 0.0
+            learn_rate = 2e-5
+            learn_rates = cyclic_triangular_rate(
+                learn_rate / 3, learn_rate * 3, 2 * len(train_data) // train_batch_size
+            )
+        else:
+            optimizer = nlp.begin_training()
         for i in range(num_train_epochs):
             losses = {}
             random.shuffle(train_data)
             batches = minibatch(train_data, train_batch_size)
             for batch in batches:
                 texts, annotations = zip(*batch)
+                if is_transformer(nlp):
+                    optimizer.trf_lr = next(learn_rates)
+
                 nlp.update(
                     texts, annotations, sgd=optimizer, drop=dropout, losses=losses
                 )
 
             with textcat.model.use_params(optimizer.averages):
-                accuracy, precision, recall, f_score, valid_loss = evaluate(
-                    nlp.tokenizer, nlp, valid_data, labels
-                )
+                accuracy, valid_loss = evaluate(nlp.tokenizer, nlp, valid_data, labels)
+                train_loss = losses[textcat_pipe_name]
                 print(
-                    f"Iter {i}\tTrain Loss: {losses['textcat']:.3f}\tValid Loss: {valid_loss:.3f}\tAccuracy: {accuracy:.3f}\tPrecision: {precision:.3f}\tRecall: {recall:.3f}\tF: {f_score:.3f}"
+                    f"Iter {i}\tTrain Loss: {train_loss:.3f}\tValid Loss: {valid_loss:.3f}\tAccuracy: {accuracy:.3f}"
                 )
 
     checkpoint_dir = output_dir / "checkpoint"
@@ -150,7 +178,7 @@ def train(
 
     metrics = {
         "valid_accuracy": accuracy,
-        "mean_train_loss": losses["textcat"] / len(X_train),
+        "mean_train_loss": losses[textcat_pipe_name] / len(X_train),
         "mean_valid_loss": valid_loss / len(X_valid),
     }
 
@@ -282,15 +310,19 @@ if __name__ == "__main__":
     output_dir = Path(args.output_dir)
 
     using_gpu = spacy.prefer_gpu()
+    if using_gpu:
+        torch.set_default_tensor_type("torch.cuda.FloatTensor")
 
     device = "gpu" if using_gpu else "cpu"
     print(f"Using device: {device}")
 
     print("Initializing spaCy model...")
     print(f"  Language Model: {args.model}")
-    print(f"  TextCategorizer Architecture: {args.architecture}")
 
     nlp = spacy.load(args.model)
+    if not is_transformer(nlp):
+        print(f"  TextCategorizer Architecture: {args.architecture}")
+
     model_name = nlp.meta.get("name", "")
 
     print(f"Model '{model_name}' loaded.")
@@ -299,8 +331,9 @@ if __name__ == "__main__":
 
     if args.mode == "embed":
         # Don't need the text categorizer (if present) for embeddings
-        if nlp.has_pipe("textcat"):
-            disabled_components.add("textcat")
+        for textcat_pipe in ("textcat", "trf_textcat"):
+            if nlp.has_pipe(textcat_pipe):
+                disabled_components.add(textcat_pipe)
 
         if model_name.endswith("sm"):
             # No vectors available for small models -- we need to enable the
@@ -310,7 +343,8 @@ if __name__ == "__main__":
         else:
             # If vectors are available, disable everything, since we just want the vectors
             for component in ("tagger", "parser", "ner"):
-                disabled_components.add(component)
+                if nlp.has_pipe(component):
+                    disabled_components.add(component)
 
     elif args.mode in ("train", "predict"):
         if args.full_pipeline:
@@ -320,7 +354,8 @@ if __name__ == "__main__":
         else:
             # Otherwise, disable everything that isn't part of the text categorizer model
             for component in ("tagger", "parser", "ner"):
-                disabled_components.add(component)
+                if nlp.has_pipe(component):
+                    disabled_components.add(component)
 
     # We need a list of labels for training or prediction so we know what the
     # output shape of the model should be

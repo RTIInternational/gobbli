@@ -1,4 +1,5 @@
 import tempfile
+import warnings
 from pathlib import Path
 
 import pandas as pd
@@ -49,7 +50,12 @@ def test_classification_results_checkpoint(tmpdir):
     )
 
     # Bytes checkpoint, no base_path (results object creates tempdir)
-    bytes_checkpoint = bytes_results.get_checkpoint()
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            "No base_path provided; checkpoint extracting to temporary directory.",
+        )
+        bytes_checkpoint = bytes_results.get_checkpoint()
     assert bytes_checkpoint.read_text() == checkpoint_contents
 
     # Bytes checkpoint, base path

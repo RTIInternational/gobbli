@@ -1,0 +1,399 @@
+- scenario: "newsgroups"
+  runs:
+    - name: "BERT"
+      model_name: "BERT"
+      param_grid:
+        bert_model: ["bert-base-uncased", "bert-base-cased", "scibert-uncased"]
+        max_seq_length: [128]
+      preprocess_func: "bert_preprocess"
+    - name: "MTDNN"
+      model_name: "MTDNN"
+      param_grid:
+        mtdnn_model: ["mt-dnn-base"]
+        max_seq_length: [128]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "FastText"
+      model_name: "FastText"
+      param_grid:
+        word_ngrams: [1, 2]
+        dim: [100, 300]
+        lr: [0.5, 1.0]
+      preprocess_func: "fasttext_preprocess"
+    - name: "XLM"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-mlm-tlm-xnli15-1024", "xlm-clm-ende-1024"]
+        transformer_model: ["XLM"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "XLNet"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlnet-base-cased"]
+        transformer_model: ["XLNet"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["roberta-base"]
+        transformer_model: ["Roberta"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "DistilBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["distilbert-base-uncased", "distilbert-base-uncased-distilled-squad"]
+        transformer_model: ["DistilBert"]
+      preprocess_func: "bert_preprocess"
+    - name: "ALBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["albert-base-v1", "albert-base-v2"]
+        transformer_model: ["Albert"]
+      preprocess_func: "bert_preprocess"
+    - name: "XLM-RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-roberta-base"]
+        transformer_model: ["XLMRoberta"]
+      preprocess_func: "bert_preprocess"
+    - name: "SKLearn"
+      model_name: "SKLearnClassifier"
+      param_grid: {}
+      preprocess_func: "fasttext_preprocess"
+    - name: "spaCy"
+      model_name: "SpaCyModel"
+      param_grid:
+        model: ["en_core_web_sm", "en_core_web_lg"]
+        architecture: ["bow", "simple_cnn", "ensemble"]
+    - name: "spacy-transformers"
+      model_name: "SpaCyModel"
+      param_grid:
+        model: ["en_trf_bertbaseuncased_lg", "en_trf_xlnetbasecased_lg", "en_trf_robertabase_lg", "en_trf_distilbertbaseuncased_lg"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+
+
+- scenario: "imdb"
+  runs:
+    - name: "BERT"
+      model_name: "BERT"
+      param_grid:
+        bert_model: ["bert-base-uncased", "bert-base-cased", "scibert-uncased"]
+        max_seq_length: [128]
+      preprocess_func: "bert_preprocess"
+    - name: "MTDNN"
+      model_name: "MTDNN"
+      param_grid:
+        mtdnn_model: ["mt-dnn-base"]
+        max_seq_length: [128]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "FastText"
+      model_name: "FastText"
+      param_grid:
+        word_ngrams: [1, 2]
+        dim: [100, 300]
+        lr: [0.5, 1.0]
+      preprocess_func: "fasttext_preprocess"
+    - name: "XLM"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-mlm-tlm-xnli15-1024", "xlm-clm-ende-1024"]
+        transformer_model: ["XLM"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "XLNet"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlnet-base-cased"]
+        transformer_model: ["XLNet"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["roberta-base"]
+        transformer_model: ["Roberta"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "DistilBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["distilbert-base-uncased", "distilbert-base-uncased-distilled-squad"]
+        transformer_model: ["DistilBert"]
+      preprocess_func: "bert_preprocess"
+    - name: "ALBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["albert-base-v1", "albert-base-v2"]
+        transformer_model: ["Albert"]
+      preprocess_func: "bert_preprocess"
+    - name: "XLM-RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-roberta-base"]
+        transformer_model: ["XLMRoberta"]
+      preprocess_func: "bert_preprocess"
+    - name: "SKLearn"
+      model_name: "SKLearnClassifier"
+      param_grid: {}
+      preprocess_func: "fasttext_preprocess"
+    - name: "spaCy"
+      model_name: "SpaCyModel"
+      param_grid:
+        model: ["en_core_web_sm", "en_core_web_lg"]
+        architecture: ["bow", "simple_cnn", "ensemble"]
+    - name: "spacy-transformers"
+      model_name: "SpaCyModel"
+      param_grid:
+        model: ["en_trf_bertbaseuncased_lg", "en_trf_xlnetbasecased_lg", "en_trf_robertabase_lg", "en_trf_distilbertbaseuncased_lg"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+
+- scenario: "class_imbalance"
+  params:
+    imbalance_proportions:
+      - 0.01
+      - 0.05
+      - 0.1
+      - 0.25
+      - 0.33
+      - 0.5
+  runs:
+    - name: "BERT"
+      model_name: "BERT"
+      param_grid:
+        bert_model: ["bert-base-uncased", "bert-base-cased", "scibert-uncased"]
+        max_seq_length: [128]
+      preprocess_func: "bert_preprocess"
+    - name: "MTDNN"
+      model_name: "MTDNN"
+      param_grid:
+        mtdnn_model: ["mt-dnn-base"]
+        max_seq_length: [128]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "FastText"
+      model_name: "FastText"
+      param_grid:
+        word_ngrams: [1, 2]
+        dim: [100, 300]
+        lr: [0.5, 1.0]
+      preprocess_func: "fasttext_preprocess"
+    - name: "XLM"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-mlm-tlm-xnli15-1024", "xlm-clm-ende-1024"]
+        transformer_model: ["XLM"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "XLNet"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlnet-base-cased"]
+        transformer_model: ["XLNet"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["roberta-base"]
+        transformer_model: ["Roberta"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "DistilBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["distilbert-base-uncased", "distilbert-base-uncased-distilled-squad"]
+        transformer_model: ["DistilBert"]
+      preprocess_func: "bert_preprocess"
+    - name: "ALBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["albert-base-v1", "albert-base-v2"]
+        transformer_model: ["Albert"]
+      preprocess_func: "bert_preprocess"
+    - name: "XLM-RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-roberta-base"]
+        transformer_model: ["XLMRoberta"]
+      preprocess_func: "bert_preprocess"
+    - name: "SKLearn"
+      model_name: "SKLearnClassifier"
+      param_grid: {}
+      preprocess_func: "fasttext_preprocess"
+    - name: "spaCy"
+      model_name: "SpaCyModel"
+      param_grid:
+        model: ["en_core_web_sm", "en_core_web_lg"]
+        architecture: ["bow", "simple_cnn", "ensemble"]
+    - name: "spacy-transformers"
+      model_name: "SpaCyModel"
+      param_grid:
+        model: ["en_trf_bertbaseuncased_lg", "en_trf_xlnetbasecased_lg", "en_trf_robertabase_lg", "en_trf_distilbertbaseuncased_lg"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+
+
+- scenario: "low_resource"
+  params:
+    data_proportions:
+      - 0.005
+      - 0.01
+      - 0.1
+      - 0.25
+      - 0.33
+      - 0.5
+      - 0.75
+  runs:
+    - name: "BERT"
+      model_name: "BERT"
+      param_grid:
+        bert_model: ["bert-base-uncased", "bert-base-cased", "scibert-uncased"]
+        max_seq_length: [128]
+      preprocess_func: "bert_preprocess"
+    - name: "MTDNN"
+      model_name: "MTDNN"
+      param_grid:
+        mtdnn_model: ["mt-dnn-base"]
+        max_seq_length: [128]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "FastText"
+      model_name: "FastText"
+      param_grid:
+        word_ngrams: [1, 2]
+        dim: [100, 300]
+        lr: [0.5, 1.0]
+      preprocess_func: "fasttext_preprocess"
+    - name: "XLM"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-mlm-tlm-xnli15-1024", "xlm-clm-ende-1024"]
+        transformer_model: ["XLM"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "XLNet"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlnet-base-cased"]
+        transformer_model: ["XLNet"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["roberta-base"]
+        transformer_model: ["Roberta"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+    - name: "DistilBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["distilbert-base-uncased", "distilbert-base-uncased-distilled-squad"]
+        transformer_model: ["DistilBert"]
+      preprocess_func: "bert_preprocess"
+    - name: "ALBERT"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["albert-base-v1", "albert-base-v2"]
+        transformer_model: ["Albert"]
+      preprocess_func: "bert_preprocess"
+    - name: "XLM-RoBERTa"
+      model_name: "Transformer"
+      param_grid:
+        transformer_weights: ["xlm-roberta-base"]
+        transformer_model: ["XLMRoberta"]
+      preprocess_func: "bert_preprocess"
+    - name: "SKLearn"
+      model_name: "SKLearnClassifier"
+      param_grid: {}
+      preprocess_func: "fasttext_preprocess"
+    - name: "spaCy"
+      model_name: "SpaCyModel"
+      param_grid:
+        model: ["en_core_web_sm", "en_core_web_lg"]
+        architecture: ["bow", "simple_cnn", "ensemble"]
+    - name: "spacy-transformers"
+      model_name: "SpaCyModel"
+      param_grid:
+        model: ["en_trf_bertbaseuncased_lg", "en_trf_xlnetbasecased_lg", "en_trf_robertabase_lg", "en_trf_distilbertbaseuncased_lg"]
+      preprocess_func: "bert_preprocess"
+      run_kwargs:
+        train_batch_size: 16
+
+- scenario: "data_augmentation"
+  params:
+    percent_multipliers:
+      - [0.005, 0]
+      - [0.005, 1]
+      - [0.005, 5]
+      - [0.005, 10]
+      - [0.05, 0]
+      - [0.05, 1]
+      - [0.05, 5]
+      - [0.05, 10]
+      - [0.33, 0]
+      - [0.33, 1]
+      - [0.33, 5]
+      - [0.75, 0]
+      - [0.75, 1]
+      - [0.75, 5]
+    model_name: "FastText"
+    param_grid:
+      word_ngrams: [1]
+      autotune_duration: [120]
+    preprocess_func: "fasttext_preprocess"
+    augment_probability: 0.15
+  runs:
+    - augment_name: "Word2Vec"
+      params:
+        model: "glove.6B.300d"
+        tokenizer: "spacy"
+    - augment_name: "WordNet"
+      params: {}
+    - augment_name: "BERTMaskedLM"
+      params: {}
+
+- scenario: "document_windowing"
+  params:
+    vocab_size: 2000
+    sample_size: 0.1
+    window_len_poolings:
+      - [null, null]
+      - [50, "mean"]
+      - [125, "mean"]
+      - [250, "mean"]
+      - [50, "max"]
+      - [125, "max"]
+      - [250, "max"]
+      - [50, "min"]
+      - [125, "min"]
+      - [250, "min"]
+  runs:
+    - model_name: "BERT"
+      param_grid: {}
+      preprocess_func: "bert_preprocess"
