@@ -10,7 +10,7 @@ import torch
 from spacy.gold import GoldParse
 from spacy.util import minibatch
 from spacy_transformers import TransformersLanguage
-from spacy_transformers.util import PIPES
+from spacy_transformers.util import PIPES, cyclic_triangular_rate
 
 
 def is_transformer(nlp):
@@ -141,6 +141,13 @@ def train(
     with nlp.disable_pipes(*disabled_components):
         if is_transformer(nlp):
             optimizer = nlp.resume_training()
+            optimizer.alpha = 0.001
+            optimizer.trf_weight_decay = 0.005
+            optimizer.L2 = 0.0
+            learn_rate = 2e-5
+            learn_rates = cyclic_triangular_rate(
+                learn_rate / 3, learn_rate * 3, 2 * len(train_data) // train_batch_size
+            )
         else:
             optimizer = nlp.begin_training()
         for i in range(num_train_epochs):
@@ -149,6 +156,9 @@ def train(
             batches = minibatch(train_data, train_batch_size)
             for batch in batches:
                 texts, annotations = zip(*batch)
+                if is_transformer(nlp):
+                    optimizer.trf_lr = next(learn_rates)
+
                 nlp.update(
                     texts, annotations, sgd=optimizer, drop=dropout, losses=losses
                 )
