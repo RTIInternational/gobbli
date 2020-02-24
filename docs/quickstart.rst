@@ -16,6 +16,8 @@ We recommend scaffolding your code using one of these techniques before switchin
 - `Universal Sentence Encoder (USE) <https://tfhub.dev/google/universal-sentence-encoder/2>`__: (:class:`gobbli.model.use.USE`) Supports embedding generation.
 - `Facebook's fastText <https://github.com/facebookresearch/fastText>`__: (:class:`gobbli.model.fasttext.FastText`) Supports training, prediction, and embedding generation.
 - `transformer models <https://github.com/huggingface/transformers>`__: (:class:`gobbli.model.transformer.Transformer`) Models with a ``<model>ForSequenceClassification`` version implemented can be used for training, prediction, and embedding generation (ex. ``Bert``).  All other models can only be used for embedding generation.
+- `scikit-learn models <https://scikit-learn.org/stable/>`__: (:class:`gobbli.model.sklearn.SKLearnClassifier`) Any scikit-learn pipeline which accepts text input and outputs a predicted probability can be used as a gobbli model.  A simple default is implemented composing TF-IDF vectorization and logistic regression.  Baseline "embeddings" are also provided via a TF-IDF vectorizer (:class:`gobbli.model.sklearn.TfidfEmbedder`).
+- `spaCy models <https://spacy.io/>`__: (:class:`gobbli.model.spacy.SpaCyModel`) The text categorizer component of any spaCy language model (or spacy-transformers model) can be trained and used for prediction.  The spaCy model vectors can also be retrieved as static embeddings (pre-training not supported).
 
 Most models can accept model-specific parameters during initialization.  See the documentation for each model's :meth:`init` method for information on model-specific parameters.
 
