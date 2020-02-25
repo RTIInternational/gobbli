@@ -15,11 +15,13 @@ import streamlit as st
 import gobbli
 import gobbli.model
 from gobbli.dataset.base import BaseDataset
-from gobbli.io import TaskIO
+from gobbli.io import PredictInput, TaskIO
 from gobbli.model.base import BaseModel
 from gobbli.model.context import ContainerTaskContext
 from gobbli.model.mixin import TrainMixin
 from gobbli.util import read_metadata, truncate_text
+
+DEFAULT_PREDICT_BATCH_SIZE = PredictInput.predict_batch_size
 
 
 @st.cache
@@ -391,3 +393,45 @@ def st_select_untrained_model(
         return None
 
     return model_cls, model_kwargs
+
+
+def st_model_metadata(model: BaseModel):
+    with open(model.metadata_path, "r") as f:
+        model_metadata = json.load(f)
+
+    st.header("Model Metadata")
+    st.json(model_metadata)
+
+
+@st.cache(show_spinner=True)
+def get_predictions(
+    model_cls: BaseModel,
+    model_kwargs: Dict[str, Any],
+    texts: List[str],
+    unique_labels: List[str],
+    checkpoint: str,
+    batch_size: int = DEFAULT_PREDICT_BATCH_SIZE,
+) -> pd.DataFrame:
+    """
+    Run the given model on the given texts and return the probabilities.
+
+    Args:
+      model: Model to use for prediction.
+      texts: List of texts to generate predictions for.
+      unique_labels: Ordered list of unique labels.
+      checkpoint: Model checkpoint to use for prediction.
+      batch_size: Batch size for prediction.
+
+    Returns:
+      A dataframe containing the predicted probability for each text and label.
+    """
+    predict_input = PredictInput(
+        X=texts,
+        labels=unique_labels,
+        checkpoint=checkpoint,
+        predict_batch_size=batch_size,
+    )
+    model = model_cls(**model_kwargs)
+    model.build()
+    predict_output = model.predict(predict_input)
+    return predict_output.y_pred_proba

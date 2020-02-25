@@ -38,5 +38,13 @@ def main_evaluate(args):
     _streamlit_run("evaluate", *args)
 
 
+@main.command(
+    "explain", context_settings=dict(ignore_unknown_options=True), add_help_option=False
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+def main_explain(args):
+    _streamlit_run("explain", *args)
+
+
 if __name__ == "__main__":
     main()

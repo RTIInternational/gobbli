@@ -11,51 +11,17 @@ import streamlit as st
 
 from gobbli.inspect.evaluate import ClassificationError, ClassificationEvaluation
 from gobbli.interactive.util import (
+    DEFAULT_PREDICT_BATCH_SIZE,
     get_label_indices,
+    get_predictions,
     load_data,
     safe_sample,
+    st_model_metadata,
     st_sample_data,
     st_select_model_checkpoint,
 )
-from gobbli.io import PredictInput
 from gobbli.model.base import BaseModel
 from gobbli.util import truncate_text
-
-DEFAULT_PREDICT_BATCH_SIZE = PredictInput.predict_batch_size
-
-
-@st.cache(show_spinner=True)
-def get_predictions(
-    model_cls: BaseModel,
-    model_kwargs: Dict[str, Any],
-    texts: List[str],
-    unique_labels: List[str],
-    checkpoint: str,
-    batch_size: int = DEFAULT_PREDICT_BATCH_SIZE,
-) -> pd.DataFrame:
-    """
-    Run the given model on the given texts and return the probabilities.
-
-    Args:
-      model: Model to use for prediction.
-      texts: List of texts to generate predictions for.
-      unique_labels: Ordered list of unique labels.
-      checkpoint: Model checkpoint to use for prediction.
-      batch_size: Batch size for prediction.
-
-    Returns:
-      A dataframe containing the predicted probability for each text and label.
-    """
-    predict_input = PredictInput(
-        X=texts,
-        labels=unique_labels,
-        checkpoint=checkpoint,
-        predict_batch_size=batch_size,
-    )
-    model = model_cls(**model_kwargs)
-    model.build()
-    predict_output = model.predict(predict_input)
-    return predict_output.y_pred_proba
 
 
 def show_metrics(metrics: Dict[str, Any]):
@@ -206,11 +172,7 @@ def run(
     st.title(f"Evaluating: {model_cls.__name__} on {data}")
 
     model = model_cls(**model_kwargs)
-    with open(model.metadata_path, "r") as f:
-        model_metadata = json.load(f)
-
-    st.header("Model Metadata")
-    st.json(model_metadata)
+    st_model_metadata(model)
 
     texts, labels = load_data(data, n_rows=None if n_rows == -1 else n_rows)
     if labels is not None:
