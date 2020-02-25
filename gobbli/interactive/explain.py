@@ -5,10 +5,7 @@ import click
 import eli5
 import numpy as np
 import pandas as pd
-import spacy
 import streamlit as st
-from alibi.explainers import AnchorText
-from alibi.utils.download import spacy_model as download_spacy_model
 from eli5.lime import TextExplainer
 
 from gobbli.interactive.util import (
@@ -85,24 +82,6 @@ def st_lime_explanation(
         st.dataframe(target_explanation_df)
 
 
-def st_anchor_explanation(
-    text: str, predict_func: Callable[[List[str]], np.ndarray], spacy_model: str
-):
-    download_spacy_model(spacy_model)
-    nlp = spacy.load(spacy_model)
-    explainer = AnchorText(nlp, predict_func)
-    explanation = explainer.explain(
-        text,
-        threshold=threshold,
-        use_similarity_proba=True,
-        use_unk=False,
-        sample_proba=0.5,
-        top_n=20,
-        temperature=0.2,
-    )
-    st.dataframe(pd.DataFrame(explanation))
-
-
 @click.command()
 @click.argument("model_data_dir", type=str)
 @click.argument("data", type=str)
@@ -172,7 +151,6 @@ def run(
     )
 
     do_lime = st.sidebar.checkbox("Generate LIME explanation")
-    do_anchor = st.sidebar.checkbox("Generate Anchor explanation")
 
     do_run = st.sidebar.button("Run")
 
@@ -194,13 +172,7 @@ def run(
                 position_dependent=position_dependent,
             )
 
-    if do_anchor:
-        spacy_model = st.sidebar.text_input("SpaCy Model", value="en_core_web_sm")
-        if do_run:
-            st.header("Anchor Explanation")
-            st_anchor_explanation(texts[example_ndx], predict_func, spacy_model)
-
-    if not do_lime and not do_anchor:
+    if not do_lime:
         st.header("Explanation")
         st.markdown(
             "Select one or more explanation methods in the sidebar and click 'Run' to generate explanations."

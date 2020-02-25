@@ -43,8 +43,6 @@ setup(
             "gensim >= 3.8.0",
             "umap-learn >= 0.3.10",
             "eli5 >= 0.10.1",
-            "alibi >= 0.3.2",
-            "spacy >= 2.1.4",
         ],
     },
     python_requires=">=3.7",
