@@ -63,7 +63,9 @@ def st_lime_explanation(
     for target_ndx, target in enumerate(
         sorted(explanation.targets, key=lambda t: -t.proba)
     ):
-        target_explanation_df = explanation_df[explanation_df["target"] == target_ndx]
+        target_explanation_df = explanation_df[
+            explanation_df["target"] == target_ndx
+        ].copy()
 
         target_explanation_df["contribution"] = (
             target_explanation_df["weight"] * target_explanation_df["value"]
@@ -121,7 +123,7 @@ def run(
     model = model_cls(**model_kwargs)
     st_model_metadata(model)
 
-    texts, _ = load_data(data, n_rows=None if n_rows == -1 else n_rows)
+    texts, labels = load_data(data, n_rows=None if n_rows == -1 else n_rows)
 
     st.sidebar.header("Example")
     example_ndx = st.sidebar.number_input(
@@ -131,7 +133,11 @@ def run(
         value=0,
     )
 
-    st.header("Example to Explain")
+    if labels is None:
+        header_text = "Example to Explain"
+    else:
+        header_text = f"Example to Explain (label: {labels[example_ndx]})"
+    st.header(header_text)
     st.text(texts[example_ndx])
 
     st.sidebar.header("Predictions")
