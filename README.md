@@ -52,6 +52,17 @@ The `<data>` and `<model_data_dir>`arguments behave exactly as described above u
 
 Run `gobbli evaluate --help` to see additional available options, including GPU usage.
 
+
+#### gobbli explain
+
+Use this app to generate local explanations for model predictions on a single observation at a time.  Run the following command:
+
+    gobbli explain <model_data_dir> <data>
+    
+The `<data>` and `<model_data_dir>`arguments behave exactly as described above under `gobbli explore`, except the model data directory is now mandatory.
+
+Run `gobbli explain --help` to see additional available options, including GPU usage.
+
 ## Development
 
 Assuming you have all prerequisites noted above, you need to install the package and all required + optional dependencies in development mode:
