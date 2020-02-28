@@ -346,6 +346,8 @@ def show_embeddings(
         umap_df["Cluster"] = umap_df["Cluster"].astype(str)
     elif labels is not None:
         color_attr = "Label"
+    else:
+        color_attr = None
 
     # NOTE: Altair (or the underlying charting library, vega-lite) will
     # truncate these texts before being displayed
@@ -357,10 +359,12 @@ def show_embeddings(
         .encode(
             alt.X("UMAP Component 1", scale=alt.Scale(zero=False), axis=None),
             alt.Y("UMAP Component 2", scale=alt.Scale(zero=False), axis=None),
-            alt.Color(color_attr),
             tooltip=alt.Tooltip(tooltip_attrs),
         )
     )
+
+    if color_attr is not None:
+        umap_chart = umap_chart.encode(alt.Color(color_attr))
 
     # Hack needed to get streamlit to set the chart height
     # https://github.com/streamlit/streamlit/issues/542
@@ -523,7 +527,7 @@ def run(
             "Batch Size",
             min_value=1,
             max_value=len(sampled_texts),
-            value=DEFAULT_EMBED_BATCH_SIZE,
+            value=min(len(sampled_texts), DEFAULT_EMBED_BATCH_SIZE),
         )
 
         umap_seed = st.sidebar.number_input(
@@ -665,6 +669,7 @@ def run(
             umap_metric=umap_metric,
             umap_min_dist=umap_min_dist,
             clusterer=clusterer,
+            cluster_when=cluster_when,
         )
 
 

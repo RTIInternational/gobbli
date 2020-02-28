@@ -1,4 +1,3 @@
-import json
 import re
 from collections import OrderedDict
 from pathlib import Path
@@ -20,7 +19,6 @@ from gobbli.interactive.util import (
     st_sample_data,
     st_select_model_checkpoint,
 )
-from gobbli.model.base import BaseModel
 from gobbli.util import truncate_text
 
 

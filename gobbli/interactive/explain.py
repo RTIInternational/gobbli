@@ -4,7 +4,6 @@ from typing import Any, Callable, Dict, List
 import click
 import eli5
 import numpy as np
-import pandas as pd
 import streamlit as st
 from eli5.lime import TextExplainer
 
@@ -13,11 +12,8 @@ from gobbli.interactive.util import (
     get_predictions,
     load_data,
     st_model_metadata,
-    st_sample_data,
     st_select_model_checkpoint,
 )
-from gobbli.io import PredictInput
-from gobbli.model.base import BaseModel
 
 
 def make_predict_func(
