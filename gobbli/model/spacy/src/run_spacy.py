@@ -6,9 +6,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import spacy
-import torch
 from spacy.gold import GoldParse
 from spacy.util import minibatch
+
+import torch
 from spacy_transformers import TransformersLanguage
 from spacy_transformers.util import PIPES, cyclic_triangular_rate
 
