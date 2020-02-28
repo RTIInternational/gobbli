@@ -4,6 +4,7 @@ import gensim
 import pytest
 
 from gobbli.augment.word2vec import _WORD2VEC_MODEL_ARCHIVES, WORD2VEC_MODELS, Word2Vec
+from gobbli.util import TokenizeMethod
 
 
 def test_word2vec_models():
@@ -42,25 +43,33 @@ def test_word2vec_init(tmpdir):
 
 
 @pytest.mark.parametrize(
-    "n_similar,diversity,exception_cls",
+    "n_similar,diversity,tokenizer,exception_cls",
     [
         # wrong type n_similar
-        (5.5, 1.0, TypeError),
+        (5.5, 1.0, TokenizeMethod.SPLIT, TypeError),
         # wrong type diversity
-        (5, 1, TypeError),
+        (5, 1, TokenizeMethod.SPLIT, TypeError),
+        # wrong type tokenizer
+        (5, 0.8, 1, TypeError),
         # bad value n_similar
-        (0, 1.0, ValueError),
+        (0, 1.0, TokenizeMethod.SPLIT, ValueError),
         # bad value diversity (<= 0)
-        (5, 0.0, ValueError),
+        (5, 0.0, TokenizeMethod.SPLIT, ValueError),
         # bad value diversity (> 1)
-        (5, 1.1, ValueError),
-        # ok
-        (5, 0.8, None),
+        (5, 1.1, TokenizeMethod.SPLIT, ValueError),
+        # bad value str tokenizer (no match)
+        (5, 0.8, "no such tokenizer", KeyError),
+        # ok (enum tokenizer)
+        (5, 0.8, TokenizeMethod.SPLIT, None),
+        # ok (callable tokenizer)
+        (5, 0.8, lambda s: s.split(), None),
+        # ok (str tokenizer)
+        (5, 0.8, "SPLIT", None),
     ],
 )
-def test_word2vec_kwargs(tmpdir, n_similar, diversity, exception_cls):
+def test_word2vec_kwargs(tmpdir, n_similar, diversity, tokenizer, exception_cls):
     weights_file = make_weights_file(tmpdir)
-    kwargs = {"n_similar": n_similar, "diversity": diversity}
+    kwargs = {"n_similar": n_similar, "diversity": diversity, "tokenizer": tokenizer}
 
     if exception_cls is None:
         Word2Vec(weights_file, **kwargs)

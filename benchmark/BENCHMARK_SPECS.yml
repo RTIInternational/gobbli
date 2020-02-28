@@ -372,7 +372,7 @@
     - augment_name: "Word2Vec"
       params:
         model: "glove.6B.300d"
-        tokenizer: "spacy"
+        tokenizer: "SPACY"
     - augment_name: "WordNet"
       params: {}
     - augment_name: "BERTMaskedLM"
