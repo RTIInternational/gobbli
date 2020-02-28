@@ -1,4 +1,5 @@
 import copy
+from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -21,7 +22,7 @@ from gobbli.interactive.util import (
     st_select_model_checkpoint,
     st_select_untrained_model,
 )
-from gobbli.io import EmbedInput
+from gobbli.io import EmbedInput, EmbedPooling
 from gobbli.model import FastText
 from gobbli.model.mixin import EmbedMixin
 from gobbli.util import TokenizeMethod, tokenize, truncate_text
@@ -259,7 +260,8 @@ def get_embeddings(
     texts: List[str],
     checkpoint_meta: Optional[Dict[str, Any]] = None,
     batch_size: int = DEFAULT_EMBED_BATCH_SIZE,
-) -> List[np.ndarray]:
+    pooling: EmbedPooling = EmbedPooling.MEAN,
+) -> Tuple[List[np.ndarray], Optional[List[List[str]]]]:
     """
     Generate embeddings using the given model and optional trained checkpoint.
 
@@ -270,9 +272,12 @@ def get_embeddings(
       checkpoint_meta: Optional metadata for a trained checkpoint.  If passed, a trained model
         will be used.
       batch_size: Batch size to use when generating embeddings.
+      pooling: Pooling method for combining embeddings across documents.
 
     Returns:
-      The generated embeddings - a numpy array for each passed document.
+      A 2-tuple: First element is the generated embeddings - a numpy array for each passed
+      document.  If pooling method is NONE, the second element is the corresponding nested list of
+      tokens; otherwise, the second element is None.
     """
     embed_input = EmbedInput(
         X=texts,
@@ -280,11 +285,15 @@ def get_embeddings(
         if checkpoint_meta is None
         else Path(checkpoint_meta["checkpoint"]),
         embed_batch_size=batch_size,
+        pooling=pooling,
     )
     model = model_cls(**model_kwargs)
     model.build()
     embed_output = model.embed(embed_input)
-    return embed_output.X_embedded
+    if pooling == EmbedPooling.NONE:
+        return embed_output.X_embedded, embed_output.embed_tokens
+    else:
+        return embed_output.X_embedded, None
 
 
 def show_embeddings(
@@ -300,19 +309,19 @@ def show_embeddings(
     umap_min_dist: float = 0.1,
     cluster_when: str = "before",
     clusterer: Optional[Any] = None,
+    show_vocab_overlap: bool = False,
 ):
     if cluster_when not in ("before", "after"):
         raise ValueError(f"Unexpected cluster_when value: '{cluster_when}'")
 
-    X_embedded = pd.DataFrame(
-        get_embeddings(
-            model_cls,
-            model_kwargs,
-            texts,
-            checkpoint_meta=checkpoint_meta,
-            batch_size=batch_size,
-        )
+    embeddings, _ = get_embeddings(
+        model_cls,
+        model_kwargs,
+        texts,
+        checkpoint_meta=checkpoint_meta,
+        batch_size=batch_size,
     )
+    X_embedded = pd.DataFrame(embeddings)
 
     umap = UMAP(
         n_neighbors=umap_n_neighbors,
@@ -369,6 +378,59 @@ def show_embeddings(
     # Hack needed to get streamlit to set the chart height
     # https://github.com/streamlit/streamlit/issues/542
     st.altair_chart(umap_chart + umap_chart)
+
+    if show_vocab_overlap:
+        missing_token_counts = defaultdict(int)
+        oov_count = 0
+        total_count = 0
+        try:
+            embeddings, embed_tokens = get_embeddings(
+                model_cls,
+                model_kwargs,
+                texts,
+                checkpoint_meta=checkpoint_meta,
+                batch_size=batch_size,
+                pooling=EmbedPooling.NONE,
+            )
+        except ValueError:
+            st.error(
+                "This model doesn't support generating token-level embeddings, "
+                "so the vocabulary overlap report can't be calculated."
+            )
+            return
+
+        for doc_embedding, doc_tokens in zip(embeddings, embed_tokens):
+            oov_embeddings = np.abs(doc_embedding).sum(axis=1) == 0
+            oov_count += oov_embeddings.sum()
+            total_count += len(doc_tokens)
+            for oov_token_ndx in np.argwhere(oov_embeddings).ravel():
+                missing_token_counts[doc_tokens[oov_token_ndx]] += 1
+
+        st.subheader("Vocabulary Overlap")
+        num_oov_tokens_show = 20
+        st.markdown(
+            f"""
+            - Total number of tokens: {total_count:,}
+            - Number of out-of-vocabulary tokens: {oov_count:,} ({(oov_count / total_count) * 100:.2f}%)
+            """
+        )
+        if oov_count > 0:
+            st.markdown(
+                f"""
+                - Top {num_oov_tokens_show} most frequent out-of-vocabulary tokens:
+                """
+            )
+            oov_df = pd.DataFrame.from_dict(
+                {
+                    tok: count
+                    for tok, count in sorted(
+                        missing_token_counts.items(), key=lambda kv: -kv[1]
+                    )
+                },
+                orient="index",
+            ).tail(num_oov_tokens_show)
+            oov_df.columns = ["Out-of-Vocabulary Token Count"]
+            st.dataframe(oov_df)
 
 
 @click.command()
@@ -543,6 +605,8 @@ def run(
             "UMAP Minimum Distance", min_value=0.0, max_value=1.0, value=0.1
         )
 
+        show_vocab_overlap = st.sidebar.checkbox("Calculate Vocabulary Overlap")
+
         cluster_when = "before"
         clusterer = None
         if st.sidebar.checkbox("Cluster Embeddings"):
@@ -670,6 +734,7 @@ def run(
             umap_min_dist=umap_min_dist,
             clusterer=clusterer,
             cluster_when=cluster_when,
+            show_vocab_overlap=show_vocab_overlap,
         )
 
 
