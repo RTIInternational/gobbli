@@ -86,7 +86,7 @@ class Word2Vec(BaseAugment):
         # available, and we need to make the union include a gensim type
         model: Any,
         tokenizer: Union[
-            TokenizeMethod, Callable[[List[str]], List[List[str]]]
+            str, TokenizeMethod, Callable[[List[str]], List[List[str]]]
         ] = TokenizeMethod.SPLIT,
         n_similar: int = 10,
         diversity: float = 0.8,
@@ -147,6 +147,9 @@ class Word2Vec(BaseAugment):
         if not 0 < diversity <= 1:
             raise ValueError("diversity must be > 0 and <= 1")
         self.diversity = diversity
+
+        if isinstance(tokenizer, str):
+            tokenizer = TokenizeMethod[tokenizer]
 
         if isinstance(tokenizer, TokenizeMethod):
             # Avoid mypy error when passing a partially-applied function created by
