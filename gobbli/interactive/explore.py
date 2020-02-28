@@ -4,10 +4,14 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import altair as alt
 import click
+import hdbscan
 import numpy as np
 import pandas as pd
 import streamlit as st
+from sklearn.cluster import KMeans
+from sklearn.neighbors import VALID_METRICS as SKLEARN_DISTANCE_METRICS
 from umap import UMAP
+from umap.distances import named_distances
 
 from gobbli.interactive.util import (
     get_label_indices,
@@ -294,7 +298,12 @@ def show_embeddings(
     umap_n_neighbors: int = 15,
     umap_metric: str = "euclidean",
     umap_min_dist: float = 0.1,
+    cluster_when: str = "before",
+    clusterer: Optional[Any] = None,
 ):
+    if cluster_when not in ("before", "after"):
+        raise ValueError(f"Unexpected cluster_when value: '{cluster_when}'")
+
     X_embedded = pd.DataFrame(
         get_embeddings(
             model_cls,
@@ -311,10 +320,33 @@ def show_embeddings(
         min_dist=umap_min_dist,
         random_state=umap_seed,
     )
+
+    clusters = None
+    if clusterer is not None and cluster_when == "before":
+        clusterer.fit(X_embedded)
+        clusters = clusterer.labels_
+
     umap_data = umap.fit_transform(X_embedded)
 
+    if clusterer is not None and cluster_when == "after":
+        clusterer.fit(umap_data)
+        clusters = clusterer.labels_
+
     umap_df = pd.DataFrame(umap_data, columns=["UMAP Component 1", "UMAP Component 2"])
-    umap_df["Label"] = labels
+    tooltip_attrs = ["Text"]
+
+    if labels is not None:
+        tooltip_attrs.append("Label")
+        umap_df["Label"] = labels
+
+    if clusters is not None:
+        color_attr = "Cluster"
+        tooltip_attrs.append("Cluster")
+        umap_df["Cluster"] = clusters
+        umap_df["Cluster"] = umap_df["Cluster"].astype(str)
+    elif labels is not None:
+        color_attr = "Label"
+
     # NOTE: Altair (or the underlying charting library, vega-lite) will
     # truncate these texts before being displayed
     umap_df["Text"] = texts
@@ -325,8 +357,8 @@ def show_embeddings(
         .encode(
             alt.X("UMAP Component 1", scale=alt.Scale(zero=False), axis=None),
             alt.Y("UMAP Component 2", scale=alt.Scale(zero=False), axis=None),
-            alt.Color("Label"),
-            tooltip=alt.Tooltip(["Label", "Text"]),
+            alt.Color(color_attr),
+            tooltip=alt.Tooltip(tooltip_attrs),
         )
     )
 
@@ -500,10 +532,71 @@ def run(
         umap_n_neighbors = st.sidebar.number_input(
             "UMAP Number of Neigbors", min_value=1, max_value=None, value=15
         )
-        umap_metric = st.sidebar.text_input("UMAP Distance Metric", value="euclidean")
+        umap_metric = st.sidebar.selectbox(
+            "UMAP Distance Metric", list(named_distances.keys())
+        )
         umap_min_dist = st.sidebar.number_input(
             "UMAP Minimum Distance", min_value=0.0, max_value=1.0, value=0.1
         )
+
+        cluster_when = "before"
+        clusterer = None
+        if st.sidebar.checkbox("Cluster Embeddings"):
+            clustering_algorithm = st.sidebar.selectbox(
+                "Clustering Algorithm", ["K-Means", "HDBSCAN"]
+            )
+            cluster_when_labels = {
+                "before": "Before Dimensionality Reduction",
+                "after": "After Dimensionality Reduction",
+            }
+            cluster_when = st.sidebar.selectbox(
+                "When to Apply Clusters",
+                ["before", "after"],
+                format_func=lambda l: cluster_when_labels[l],
+            )
+            if clustering_algorithm == "K-Means":
+                n_clusters = st.sidebar.number_input(
+                    "K-Means Number of Clusters", min_value=1, max_value=None, value=10
+                )
+                max_iter = st.sidebar.number_input(
+                    "K-Means Max Iterations", min_value=1, max_value=None, value=300
+                )
+
+                kmeans_seed = st.sidebar.number_input(
+                    "K-Means Random Seed", min_value=1, max_value=None, value=1
+                )
+                clusterer = KMeans(
+                    n_clusters=n_clusters, max_iter=max_iter, random_state=kmeans_seed
+                )
+            else:
+                hdbscan_min_cluster_size = st.sidebar.number_input(
+                    "HDBSCAN Minimum Cluster Size", min_value=1, max_value=None, value=2
+                )
+                hdbscan_min_samples = st.sidebar.number_input(
+                    "HDBSCAN Minimum Samples", min_value=1, max_value=None, value=2
+                )
+                hdbscan_cluster_selection_epsilon = st.sidebar.number_input(
+                    "HDBSCAN Cluster Selection Epsilon",
+                    min_value=0.0,
+                    max_value=1.0,
+                    value=0.1,
+                )
+                # There's a list of these available directly in HDBSCAN, but it's not
+                # necessarily up-to-date with the distance metrics that are actually
+                # implemented in sklearn
+                hdbscan_metric_options = SKLEARN_DISTANCE_METRICS["ball_tree"]
+                hdbscan_metric = st.sidebar.selectbox(
+                    "HDBSCAN Distance Metric",
+                    hdbscan_metric_options,
+                    index=hdbscan_metric_options.index("euclidean"),
+                )
+
+                clusterer = hdbscan.HDBSCAN(
+                    min_cluster_size=hdbscan_min_cluster_size,
+                    min_samples=hdbscan_min_samples,
+                    cluster_selection_epsilon=hdbscan_cluster_selection_epsilon,
+                    metric=hdbscan_metric,
+                )
 
     #
     # Main section
@@ -571,6 +664,7 @@ def run(
             umap_n_neighbors=umap_n_neighbors,
             umap_metric=umap_metric,
             umap_min_dist=umap_min_dist,
+            clusterer=clusterer,
         )
 
 
