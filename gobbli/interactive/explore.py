@@ -255,7 +255,6 @@ def corr_df_to_heatmap_df(
 def st_heatmap(
     heatmap_df: pd.DataFrame, x_col_name: str, y_col_name: str, color_col_name: str
 ):
-    print(heatmap_df)
     heatmap = (
         alt.Chart(heatmap_df, height=700, width=700)
         .mark_rect()
