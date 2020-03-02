@@ -1,5 +1,5 @@
 ARG GPU
-FROM tensorflow/tensorflow:1.11.0${GPU:+-gpu}-py3
+FROM tensorflow/tensorflow:2.0.1${GPU:+-gpu}-py3
 
 WORKDIR /code/use
 COPY ./src/requirements.txt ./

@@ -1,7 +1,6 @@
 import argparse
 import json
 
-import tensorflow as tf
 import tensorflow_hub as hub
 
 
@@ -38,16 +37,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    embed = hub.Module(args.module_dir)
+    embed = hub.load(args.module_dir)
     texts = read_texts(args.input_file)
 
-    # Turn off an optimization that affects ability to run this on the GPU
-    # https://github.com/tensorflow/hub/issues/160
-    config = tf.ConfigProto()
-    config.graph_options.rewrite_options.shape_optimization = 2
-
-    with tf.Session(config=config) as session:
-        session.run([tf.global_variables_initializer(), tf.tables_initializer()])
-        embeddings = session.run(embed(texts))
-
-        write_embeddings(embeddings, args.output_file)
+    embeddings = embed(texts).numpy()
+    write_embeddings(embeddings, args.output_file)

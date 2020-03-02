@@ -1,1 +1,1 @@
-tensorflow-hub==0.4.0
+tensorflow-hub==0.7.0

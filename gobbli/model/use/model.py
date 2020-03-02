@@ -22,8 +22,10 @@ def _read_embeddings(output_file: Path) -> np.ndarray:
 
 
 USE_MODEL_ARCHIVES = {
-    "universal-sentence-encoder": "https://tfhub.dev/google/universal-sentence-encoder/2?tf-hub-format=compressed",
-    "universal-sentence-encoder-large": "https://tfhub.dev/google/universal-sentence-encoder-large/3?tf-hub-format=compressed",
+    "universal-sentence-encoder": "https://tfhub.dev/google/universal-sentence-encoder/4?tf-hub-format=compressed",
+    "universal-sentence-encoder-large": "https://tfhub.dev/google/universal-sentence-encoder-large/5?tf-hub-format=compressed",
+    "universal-sentence-encoder-multilingual": "https://tfhub.dev/google/universal-sentence-encoder-multilingual/3?tf-hub-format=compressed",
+    "universal-sentence-encoder-multilingual-large": "https://tfhub.dev/google/universal-sentence-encoder-multilingual-large/3?tf-hub-format=compressed",
 }
 """
 A mapping from model names to TFHub URLs.
@@ -35,7 +37,7 @@ Larger models require more time and GPU memory to run.
 class USE(BaseModel, EmbedMixin):
     """
     Wrapper for Universal Sentence Encoder embeddings:
-    https://tfhub.dev/google/universal-sentence-encoder/2
+    https://tfhub.dev/google/universal-sentence-encoder/4
     """
 
     _BUILD_PATH = Path(__file__).parent
