@@ -11,6 +11,11 @@
         word_ngrams: [1]
       preprocess_func: "fasttext_preprocess"
 
+- scenario: "newsgroups_embed"
+  runs:
+    - name: "RandomEmbedder"
+      model_name: "RandomEmbedder"
+
 - scenario: "imdb"
   runs:
     - name: "FastText"
@@ -20,6 +25,11 @@
         dim: [10]
         word_ngrams: [1]
       preprocess_func: "fasttext_preprocess"
+
+- scenario: "imdb_embed"
+  runs:
+    - name: "FastText"
+      model_name: "FastText"
 
 - scenario: "class_imbalance"
   params:

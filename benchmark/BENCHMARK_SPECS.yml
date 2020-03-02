@@ -81,6 +81,103 @@
         train_batch_size: 16
 
 
+- scenario: "newsgroups_embed"
+  runs:
+    - name: "BERT"
+      model_name: "BERT"
+      model_params:
+        bert_model: "bert-base-uncased"
+        max_seq_length: 128
+      preprocess_func: "bert_preprocess"
+    - name: "MTDNN"
+      model_name: "MTDNN"
+      model_params:
+        mtdnn_model: "mt-dnn-base"
+        max_seq_length: 128
+      preprocess_func: "bert_preprocess"
+      batch_size: 16
+    - name: "XLM"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "xlm-clm-ende-1024"
+        transformer_model: "XLM"
+      preprocess_func: "bert_preprocess"
+      batch_size: 16
+    - name: "XLNet"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "xlnet-base-cased"
+        transformer_model: "XLNet"
+      preprocess_func: "bert_preprocess"
+      batch_size: 16
+    - name: "RoBERTa"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "roberta-base"
+        transformer_model: "Roberta"
+      preprocess_func: "bert_preprocess"
+      batch_size: 16
+    - name: "DistilBERT"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "distilbert-base-uncased"
+        transformer_model: "DistilBert"
+      preprocess_func: "bert_preprocess"
+    - name: "ALBERT"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "albert-base-v2"
+        transformer_model: "Albert"
+      preprocess_func: "bert_preprocess"
+    - name: "XLM-RoBERTa"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "xlm-roberta-base"
+        transformer_model: "XLMRoberta"
+      preprocess_func: "bert_preprocess"
+    - name: "GPT"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "openai-gpt"
+        transformer_model: "OpenAIGPT"
+    - name: "GPT2"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "gpt2-large"
+        transformer_model: "GPT2"
+      batch_size: 16
+    - name: "TransformerXL"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "transfo-xl-wt103"
+        transformer_model: "TransfoXL"
+      batch_size: 16
+    - name: "T5Model"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "t5-base"
+        transformer_model: "T5"
+      preprocess_func: "bert_preprocess"
+      batch_size: 16
+    - name: "sklearn_TF-IDF"
+      model_name: "TfidfEmbedder"
+      preprocess_func: "fasttext_preprocess"
+    - name: "spaCy"
+      model_name: "SpaCyModel"
+      model_params:
+        model: "en_core_web_lg"
+    - name: "spacy-transformers"
+      model_name: "SpaCyModel"
+      model_params:
+        model: "en_trf_robertabase_lg"
+      preprocess_func: "bert_preprocess"
+      batch_size: 16
+    - name: "USE"
+      model_name: "USE"
+      model_params:
+        use_model: "universal-sentence-encoder"
+
+
 - scenario: "imdb"
   runs:
     - name: "BERT"
@@ -162,6 +259,102 @@
       preprocess_func: "bert_preprocess"
       run_kwargs:
         train_batch_size: 16
+
+- scenario: "imdb_embed"
+  runs:
+    - name: "BERT"
+      model_name: "BERT"
+      model_params:
+        bert_model: "bert-base-uncased"
+        max_seq_length: 128
+      preprocess_func: "bert_preprocess"
+    - name: "MTDNN"
+      model_name: "MTDNN"
+      model_params:
+        mtdnn_model: "mt-dnn-base"
+        max_seq_length: 128
+      preprocess_func: "bert_preprocess"
+      batch_size: 16
+    - name: "XLM"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "xlm-clm-ende-1024"
+        transformer_model: "XLM"
+      preprocess_func: "bert_preprocess"
+      batch_size: 16
+    - name: "XLNet"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "xlnet-base-cased"
+        transformer_model: "XLNet"
+      preprocess_func: "bert_preprocess"
+      batch_size: 16
+    - name: "RoBERTa"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "roberta-base"
+        transformer_model: "Roberta"
+      preprocess_func: "bert_preprocess"
+      batch_size: 16
+    - name: "DistilBERT"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "distilbert-base-uncased"
+        transformer_model: "DistilBert"
+      preprocess_func: "bert_preprocess"
+    - name: "ALBERT"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "albert-base-v2"
+        transformer_model: "Albert"
+      preprocess_func: "bert_preprocess"
+    - name: "XLM-RoBERTa"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "xlm-roberta-base"
+        transformer_model: "XLMRoberta"
+      preprocess_func: "bert_preprocess"
+    - name: "GPT"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "openai-gpt"
+        transformer_model: "OpenAIGPT"
+    - name: "GPT2"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "gpt2-large"
+        transformer_model: "GPT2"
+      batch_size: 16
+    - name: "TransformerXL"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "transfo-xl-wt103"
+        transformer_model: "TransfoXL"
+      batch_size: 16
+    - name: "T5Model"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "t5-base"
+        transformer_model: "T5"
+      preprocess_func: "bert_preprocess"
+      batch_size: 16
+    - name: "sklearn_TF-IDF"
+      model_name: "TfidfEmbedder"
+      preprocess_func: "fasttext_preprocess"
+    - name: "spaCy"
+      model_name: "SpaCyModel"
+      model_params:
+        model: "en_core_web_lg"
+    - name: "spacy-transformers"
+      model_name: "SpaCyModel"
+      model_params:
+        model: "en_trf_robertabase_lg"
+      preprocess_func: "bert_preprocess"
+      batch_size: 16
+    - name: "USE"
+      model_name: "USE"
+      model_params:
+        use_model: "universal-sentence-encoder"
 
 - scenario: "class_imbalance"
   params:

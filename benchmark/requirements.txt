@@ -1,3 +1,5 @@
 jupyterlab==0.35.6
 PyYAML==5.3
 tabulate==0.8.6
+umap-learn==0.3.10
+matplotlib==3.1.3

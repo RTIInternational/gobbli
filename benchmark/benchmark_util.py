@@ -19,6 +19,15 @@ from gobbli.model.fasttext import FastText
 
 LOGGER = logging.getLogger(__name__)
 
+# Main gobbli data directory
+BENCHMARK_GOBBLI_DIR = Path("./benchmark_gobbli")
+
+# Directory storing experiment metadata
+BENCHMARK_META_DIR = Path("./benchmark_meta")
+
+# Directory storing model data from worker processes in experiments
+BENCHMARK_DATA_DIR = Path("./benchmark_data")
+
 
 class StdoutCatcher:
     """
@@ -53,7 +62,7 @@ def init_benchmark_env():
     """
     Initialize the environment for a benchmark experiment.
     """
-    os.environ["GOBBLI_DIR"] = os.path.join(os.path.abspath("."), "benchmark_gobbli")
+    os.environ["GOBBLI_DIR"] = str(BENCHMARK_GOBBLI_DIR)
 
 
 def assert_param_required(name: str, params: Dict[str, Any]):
@@ -196,12 +205,12 @@ def run_benchmark_experiment(
         model_cls=model_cls,
         dataset=(X, y),
         test_dataset=test_dataset,
-        data_dir=Path("./benchmark_meta"),
+        data_dir=BENCHMARK_META_DIR,
         name=name,
         param_grid=param_grid,
         task_num_cpus=1,
         task_num_gpus=gpus_needed,
-        worker_gobbli_dir=Path("./benchmark_data"),
+        worker_gobbli_dir=BENCHMARK_DATA_DIR,
         worker_log_level=worker_log_level,
         ignore_ray_initialized_error=True,
         overwrite_existing=True,

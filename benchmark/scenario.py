@@ -1,6 +1,7 @@
 import datetime as dt
 import json
 import logging
+import os
 import tempfile
 import time
 import warnings
@@ -13,6 +14,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
+from umap import UMAP
 
 import gobbli.model
 from benchmark_util import (
@@ -31,6 +33,7 @@ from gobbli.dataset.base import BaseDataset
 from gobbli.dataset.imdb import IMDBDataset
 from gobbli.dataset.newsgroups import NewsgroupsDataset
 from gobbli.io import (
+    EmbedInput,
     PredictOutput,
     WindowPooling,
     make_document_windows,
@@ -54,9 +57,9 @@ class BaseRun(ABC):
 
 
 @dataclass
-class ModelRun(BaseRun):
+class ModelClassificationRun(BaseRun):
     """
-    Parameters for a benchmark scenario run for a single model.
+    Parameters for a benchmark scenario run for a single model in a classification context.
     """
 
     name: str
@@ -64,6 +67,23 @@ class ModelRun(BaseRun):
     param_grid: Dict[str, List[Any]]
     preprocess_func: Optional[str] = None
     run_kwargs: Dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def key(self):
+        return self.name
+
+
+@dataclass
+class ModelEmbeddingRun(BaseRun):
+    """
+    Parameters for a benchmark scenario run for a single model in an embedding context.
+    """
+
+    name: str
+    model_name: str
+    model_params: Dict[str, Any] = field(default_factory=dict)
+    preprocess_func: Optional[str] = None
+    batch_size: int = 32
 
     @property
     def key(self):
@@ -225,15 +245,20 @@ class BaseScenario(ABC):  # type: ignore
 
 
 @dataclass
-class ModelScenario(BaseScenario):  # type: ignore
-    """
-    Base class for scenarios whose primary purpose is to benchmark a model.
-    """
-
-    runs: Sequence[ModelRun]
+class ModelClassificationScenario(BaseScenario):  # type: ignore
+    runs: Sequence[ModelClassificationRun]
 
     @abstractmethod
-    def _do_run(self, run: ModelRun, run_output_dir: Path) -> str:
+    def _do_run(self, run: ModelClassificationRun, run_output_dir: Path) -> str:
+        raise NotImplementedError
+
+
+@dataclass
+class ModelEmbeddingScenario(BaseScenario):  # type: ignore
+    runs: Sequence[ModelEmbeddingRun]
+
+    @abstractmethod
+    def _do_run(self, run: ModelEmbeddingRun, run_output_dir: Path) -> str:
         raise NotImplementedError
 
 
@@ -251,10 +276,10 @@ class AugmentScenario(BaseScenario):  # type: ignore
 
 
 @dataclass
-class DatasetScenario(ModelScenario):  # type: ignore
+class DatasetClassificationScenario(ModelClassificationScenario):  # type: ignore
     """
     Base class for scenarios which run a model on a gobbli Dataset and evaluate its
-    performance.
+    performance in a classification context.
     """
 
     @property
@@ -266,7 +291,7 @@ class DatasetScenario(ModelScenario):  # type: ignore
         for p in self.params:
             raise ValueError(f"Unexpected parameter: {p}")
 
-    def _do_run(self, run: ModelRun, run_output_dir: Path) -> str:
+    def _do_run(self, run: ModelClassificationRun, run_output_dir: Path) -> str:
         ds = self.dataset.load()
         X_train_valid, y_train_valid, X_test, y_test = maybe_limit(
             ds.X_train(), ds.y_train(), ds.X_test(), ds.y_test(), self.dataset_limit
@@ -313,9 +338,9 @@ class DatasetScenario(ModelScenario):  # type: ignore
 
 
 @dataclass
-class NewsgroupsScenario(DatasetScenario):
+class NewsgroupsClassificationScenario(DatasetClassificationScenario):
     """
-    Benchmarking model performance on the 20 Newsgroups dataset.
+    Benchmarking model classification performance on the 20 Newsgroups dataset.
     """
 
     @property
@@ -328,9 +353,9 @@ class NewsgroupsScenario(DatasetScenario):
 
 
 @dataclass
-class IMDBScenario(DatasetScenario):
+class IMDBClassificationScenario(DatasetClassificationScenario):
     """
-    Benchmarking model performance on the IMDB dataset.
+    Benchmarking model classification performance on the IMDB dataset.
     """
 
     @property
@@ -343,7 +368,121 @@ class IMDBScenario(DatasetScenario):
 
 
 @dataclass
-class ClassImbalanceScenario(ModelScenario):
+class DatasetEmbeddingScenario(ModelEmbeddingScenario):  # type: ignore
+    """
+    Base class for scenarios which run a model on a gobbli Dataset and evaluate its
+    performance in an embedding context.  The evaluation will be performed qualitatively
+    by plotting the embeddings after reducing dimensionality.
+    """
+
+    runs: Sequence[ModelEmbeddingRun]
+
+    @property
+    @abstractmethod
+    def dataset(self) -> BaseDataset:
+        raise NotImplementedError
+
+    def _validate_params(self):
+        for p in self.params:
+            raise ValueError(f"Unexpected parameter: {p}")
+
+    def _do_run(self, run: ModelEmbeddingRun, run_output_dir: Path) -> str:
+        ds = self.dataset.load()
+        X_train_valid, y_train_valid, X_test, y_test = maybe_limit(
+            ds.X_train(), ds.y_train(), ds.X_test(), ds.y_test(), self.dataset_limit
+        )
+        X_embed = X_train_valid + X_test
+        labels = y_train_valid + y_test
+
+        assert_in("preprocess_func", run.preprocess_func, PREPROCESS_FUNCS)
+        preprocess_func = PREPROCESS_FUNCS[run.preprocess_func]
+        X_embed_preprocessed = preprocess_func(X_embed)
+
+        assert_valid_model(run.model_name)
+        model_cls = getattr(gobbli.model, run.model_name)
+
+        stdout_catcher = StdoutCatcher()
+        with stdout_catcher:
+            use_gpu = os.getenv("GOBBLI_USE_GPU") is not None
+            model = model_cls(
+                use_gpu=use_gpu,
+                nvidia_visible_devices=os.getenv("NVIDIA_VISIBLE_DEVICES", ""),
+                **run.model_params,
+            )
+
+            embed_input = EmbedInput(
+                X=X_embed_preprocessed, embed_batch_size=run.batch_size
+            )
+            embed_output = model.embed(embed_input)
+
+        X_embedded = pd.DataFrame(embed_output.X_embedded)
+        umap = UMAP(random_state=1)
+        umap_data = umap.fit_transform(X_embedded)
+        umap_df = pd.DataFrame(
+            umap_data, columns=["UMAP Component 1", "UMAP Component 2"]
+        )
+        umap_df["Label"] = labels
+        groups = umap_df.groupby("Label")
+
+        fig = plt.figure(figsize=(15, 15))
+        ax = fig.add_subplot()
+        cmap = plt.cm.get_cmap("tab20")
+
+        for (name, group), c in zip(groups, cmap.colors):
+            ax.plot(
+                group["UMAP Component 1"],
+                group["UMAP Component 2"],
+                marker="o",
+                linestyle="",
+                ms=6,
+                label=name,
+                color=c,
+            )
+        ax.legend()
+        ax.axis("off")
+        ax.set_title(f"Embeddings by Label - {run.key}")
+        plot_path = run_output_dir / "plot.png"
+        fig.savefig(plot_path)
+
+        md = f"# Results: {run.key}\n"
+        md += f"```\n{stdout_catcher.get_logs()}\n```\n"
+        md += f"\n![Results]({self.get_markdown_relative_path(plot_path)})\n---"
+
+        return md
+
+
+@dataclass
+class NewsgroupsEmbeddingScenario(DatasetEmbeddingScenario):
+    """
+    Benchmarking model embedding performance on the 20 Newsgroups dataset.
+    """
+
+    @property
+    def name(self):
+        return "newsgroups_embed"
+
+    @property
+    def dataset(self):
+        return NewsgroupsDataset
+
+
+@dataclass
+class IMDBEmbeddingScenario(DatasetEmbeddingScenario):
+    """
+    Benchmarking model embedding performance on the IMDB dataset.
+    """
+
+    @property
+    def name(self):
+        return "imdb_embed"
+
+    @property
+    def dataset(self):
+        return IMDBDataset
+
+
+@dataclass
+class ClassImbalanceScenario(ModelClassificationScenario):
     """
     Benchmarking model performance when classes are imbalanced to various degrees.
     """
@@ -379,7 +518,7 @@ class ClassImbalanceScenario(ModelScenario):
         )
         return majority_df, minority_df
 
-    def _do_run(self, run: ModelRun, run_output_dir: Path) -> str:
+    def _do_run(self, run: ModelClassificationRun, run_output_dir: Path) -> str:
         ds = IMDBDataset.load()
         X_train_valid, y_train_valid, X_test, y_test = maybe_limit(
             ds.X_train(), ds.y_train(), ds.X_test(), ds.y_test(), self.dataset_limit
@@ -481,7 +620,7 @@ class ClassImbalanceScenario(ModelScenario):
         return md
 
 
-class LowResourceScenario(ModelScenario):
+class LowResourceScenario(ModelClassificationScenario):
     """
     Benchmarking model performance when only a small amount of data is available for
     training and evaluation.
@@ -499,7 +638,7 @@ class LowResourceScenario(ModelScenario):
             assert_type("data_proportion", p, float)
             assert_proportion("data_proportion", p)
 
-    def _do_run(self, run: ModelRun, run_output_dir: Path) -> str:
+    def _do_run(self, run: ModelClassificationRun, run_output_dir: Path) -> str:
         ds = IMDBDataset.load()
         X_train_valid, y_train_valid, X_test, y_test = maybe_limit(
             ds.X_train(), ds.y_train(), ds.X_test(), ds.y_test(), self.dataset_limit
@@ -680,7 +819,7 @@ class DataAugmentationScenario(AugmentScenario):
         return md
 
 
-class DocumentWindowingScenario(ModelScenario):
+class DocumentWindowingScenario(ModelClassificationScenario):
     @property
     def name(self):
         return "data_augmentation"
@@ -701,7 +840,7 @@ class DocumentWindowingScenario(ModelScenario):
             # This raises an exception if p isn't a valid pooling method
             WindowPooling(p)
 
-    def _do_run(self, run: ModelRun, run_output_dir: Path) -> str:
+    def _do_run(self, run: ModelClassificationRun, run_output_dir: Path) -> str:
         ds = IMDBDataset.load()
         X_train_valid, y_train_valid, X_test, y_test = maybe_limit(
             ds.X_train(), ds.y_train(), ds.X_test(), ds.y_test(), self.dataset_limit
@@ -802,8 +941,10 @@ def load_scenario(
     force: bool = False,
     dataset_limit: Optional[int] = None,
 ) -> BaseScenario:
-    if issubclass(scenario_cls, ModelScenario):
-        run_cls: Any = ModelRun
+    if issubclass(scenario_cls, ModelClassificationScenario):
+        run_cls: Any = ModelClassificationRun
+    elif issubclass(scenario_cls, ModelEmbeddingScenario):
+        run_cls = ModelEmbeddingRun
     elif issubclass(scenario_cls, AugmentScenario):
         run_cls = AugmentRun
     else:

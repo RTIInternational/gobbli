@@ -9,9 +9,11 @@ from scenario import (
     ClassImbalanceScenario,
     DataAugmentationScenario,
     DocumentWindowingScenario,
-    IMDBScenario,
+    IMDBClassificationScenario,
+    IMDBEmbeddingScenario,
     LowResourceScenario,
-    NewsgroupsScenario,
+    NewsgroupsClassificationScenario,
+    NewsgroupsEmbeddingScenario,
     load_scenario,
 )
 
@@ -26,8 +28,10 @@ BENCHMARK_DEBUG_OUTPUT_DIR = BENCHMARK_DIR / "benchmark_output_debug"
 BENCHMARK_DEBUG_SPECS_FILE = BENCHMARK_DIR / "BENCHMARK_SPECS_DEBUG.yml"
 
 ALL_SCENARIOS: Dict[str, Any] = {
-    "newsgroups": NewsgroupsScenario,
-    "imdb": IMDBScenario,
+    "newsgroups": NewsgroupsClassificationScenario,
+    "newsgroups_embed": NewsgroupsEmbeddingScenario,
+    "imdb": IMDBClassificationScenario,
+    "imdb_embed": IMDBEmbeddingScenario,
     "class_imbalance": ClassImbalanceScenario,
     "low_resource": LowResourceScenario,
     "data_augmentation": DataAugmentationScenario,
