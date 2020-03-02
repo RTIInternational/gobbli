@@ -173,7 +173,7 @@ def get_topics(
     max_proportion: float = 0.5,
 ) -> List[Tuple[List[Tuple[float, str]], float]]:
     """
-    Calculate topics for the given tokens.
+    Calculate topics and topic assignments for the given tokens.
 
     Args:
       tokens: Tokenized documents.
@@ -190,7 +190,8 @@ def get_topics(
         included in the vocabulary.
 
     Returns:
-      The calculated topic structure as returned by gensim.
+      2-tuple: The calculated topic structure as returned by gensim and a list containing,
+      for each document, the predicted topic ID for that document.
     """
     try:
         import gensim
@@ -227,14 +228,52 @@ def get_topics(
         eval_every=None,
     )
 
-    return model.top_topics(corpus)
+    topic_assignments = []
+    for doc_bow in corpus:
+        topic_probs = model.get_document_topics(doc_bow)
+        assigned_topic, _ = max(topic_probs, key=lambda t: t[1])
+        topic_assignments.append(assigned_topic)
+
+    return model.top_topics(corpus), topic_assignments
 
 
-def show_topic_model(tokens: List[List[str]], label: Optional[str], **model_kwargs):
-    topics = get_topics(tokens, **model_kwargs)
+def corr_df_to_heatmap_df(
+    corr_df: pd.DataFrame, index_col_name: str, columns_col_name: str
+) -> pd.DataFrame:
+    """
+    Convert a dataframe consisting of a correlation matrix (index values x column values)
+    into a long dataframe which can drive an Altair heatmap.
+    """
+    heatmap_df = corr_df.copy()
+    heatmap_df.index.name = index_col_name
+    heatmap_df = heatmap_df.reset_index()
+    return heatmap_df.melt(
+        id_vars=index_col_name, var_name=columns_col_name, value_name="Correlation"
+    )
 
-    if label is not None:
-        st.subheader(f"Label: {label}")
+
+def st_heatmap(
+    heatmap_df: pd.DataFrame, x_col_name: str, y_col_name: str, color_col_name: str
+):
+    print(heatmap_df)
+    heatmap = (
+        alt.Chart(heatmap_df, height=700, width=700)
+        .mark_rect()
+        .encode(alt.X(x_col_name), alt.Y(y_col_name), alt.Color(color_col_name))
+    )
+    st.altair_chart(heatmap)
+
+
+def show_topic_model(
+    tokens: List[List[str]],
+    labels: Optional[List[str]],
+    filter_label: Optional[str],
+    **model_kwargs,
+):
+    topics, topic_assignments = get_topics(tokens, **model_kwargs)
+
+    if filter_label is not None:
+        st.subheader(f"Label: {filter_label}")
 
     topic_df_data = []
     for i, (topic, coherence) in enumerate(topics):
@@ -251,6 +290,42 @@ def show_topic_model(tokens: List[List[str]], label: Optional[str], **model_kwar
     # This is enough to show the full df, but streamlit renders it with a scrollbar still,
     # so there's still a little bit of scroll
     st.dataframe(topic_df, height=750)
+
+    # Combine all topics and labels together to get topic-label, topic-topic, and
+    # label-label correlations
+    topic_onehot = pd.get_dummies([str(t) for t in topic_assignments])
+    label_onehot = pd.get_dummies(labels)
+    heatmap_data = pd.concat(
+        # Convert topic IDs to strings so Altair doesn't try to make them numeric
+        [topic_onehot, label_onehot],
+        axis=1,
+    )
+    heatmap_corr = heatmap_data.corr()
+
+    # Pull out topic-topic correlations and display
+    all_topics = topic_onehot.columns
+    topic_topic_matrix = heatmap_corr.loc[all_topics, all_topics]
+
+    st.subheader("Topic - Topic Correlation")
+    st_heatmap(
+        corr_df_to_heatmap_df(topic_topic_matrix, "Topic 1", "Topic 2"),
+        "Topic 1",
+        "Topic 2",
+        "Correlation",
+    )
+
+    if labels is not None:
+        # Pull out topic-label correlations and display
+        all_labels = label_onehot.columns
+        topic_label_matrix = heatmap_corr.loc[all_topics, all_labels]
+
+        st.subheader("Topic - Label Correlation")
+        st_heatmap(
+            corr_df_to_heatmap_df(topic_label_matrix, "Topic", "Label"),
+            "Topic",
+            "Label",
+            "Correlation",
+        )
 
 
 @st.cache(show_spinner=True)
@@ -697,6 +772,7 @@ def run(
         try:
             show_topic_model(
                 tokens,
+                sampled_labels,
                 filter_label,
                 num_topics=num_topics,
                 train_chunksize=train_chunksize,
