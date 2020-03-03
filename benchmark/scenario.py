@@ -437,6 +437,7 @@ class DatasetEmbeddingScenario(ModelEmbeddingScenario):  # type: ignore
                 ms=6,
                 label=name,
                 color=c,
+                alpha=0.5,
             )
         ax.legend()
         ax.axis("off")

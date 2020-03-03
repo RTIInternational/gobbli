@@ -89,13 +89,6 @@
         bert_model: "bert-base-uncased"
         max_seq_length: 128
       preprocess_func: "bert_preprocess"
-    - name: "MTDNN"
-      model_name: "MTDNN"
-      model_params:
-        mtdnn_model: "mt-dnn-base"
-        max_seq_length: 128
-      preprocess_func: "bert_preprocess"
-      batch_size: 16
     - name: "XLM"
       model_name: "Transformer"
       model_params:
@@ -268,13 +261,6 @@
         bert_model: "bert-base-uncased"
         max_seq_length: 128
       preprocess_func: "bert_preprocess"
-    - name: "MTDNN"
-      model_name: "MTDNN"
-      model_params:
-        mtdnn_model: "mt-dnn-base"
-        max_seq_length: 128
-      preprocess_func: "bert_preprocess"
-      batch_size: 16
     - name: "XLM"
       model_name: "Transformer"
       model_params:
