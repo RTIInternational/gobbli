@@ -38,7 +38,7 @@ Use this app to explore the characteristics of a dataset and perform unsupervise
  - `.csv`: Comma-delimited file containing a `text` column and optional `label` column
  - `.tsv`: Tab-delimited file containing a `text` column and optional `label` column
  
-You can optionally pass a trained gobbli model to use for embedding generation.  To do so, use the `--model-data-dir` command line argument.  The model data directory is obtained by calling the `.data_dir()` method on a trained model.
+You can optionally pass a trained gobbli model to use for embedding generation.  To do so, use the `--model-data-dir` command line argument.  The model data directory can be obtained by calling the `.data_dir()` method on a trained model.  It's also logged at INFO level when a model is constructed, so you may be able to find it in printed output or logs.
 
 Run `gobbli explore --help` to see additional available options, including GPU usage.
 

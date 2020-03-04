@@ -76,6 +76,10 @@ class BaseModel(ABC):
           logger: If passed, use this logger for logging instead of the default module-level logger.
           **kwargs: Additional model-specific parameters to be passed to the model's :meth:`init` method.
         """
+        self._logger = LOGGER
+        if logger is not None:
+            self._logger = logger
+
         if data_dir is None:
             self._data_dir = self.model_class_dir() / generate_uuid()
         else:
@@ -126,13 +130,13 @@ class BaseModel(ABC):
         self.use_gpu = use_gpu
         self.nvidia_visible_devices = nvidia_visible_devices
 
-        self._logger = LOGGER
-        if logger is not None:
-            self._logger = logger
-
         self.docker_client = docker.from_env()
 
         self.init(params)
+
+        self._logger.info(
+            f"{class_name} initialized with data directory '{self._data_dir}'"
+        )
 
     @property
     def logger(self) -> logging.Logger:
