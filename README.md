@@ -22,8 +22,6 @@ You may also want to check out the [benchmarks](./benchmark) to see some compari
 
 ### Interactive
 
-**UNDER DEVELOPMENT**
-
 gobbli provides [streamlit](https://www.streamlit.io/) apps to perform some interactive tasks in a web browser, such as data exploration and model evaluation.  Once you've installed the library, you can run the bundled apps using the `gobbli` command line application.  Run `gobbli --help` for more info.
 
 #### gobbli explore
