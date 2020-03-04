@@ -65,7 +65,7 @@ Run `gobbli explain --help` to see additional available options, including GPU u
 
 Assuming you have all prerequisites noted above, you need to install the package and all required + optional dependencies in development mode:
 
-    pip install -e ".[augment,tokenize]"
+    pip install -e ".[augment,tokenize,interactive]"
     
 Install additional dev dependencies:
 
