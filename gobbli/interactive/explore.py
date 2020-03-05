@@ -106,16 +106,13 @@ def show_label_distribution(
 
         if all_labels is None:
             label_chart = (
-                alt.Chart(label_counts, height=500)
+                alt.Chart(label_counts, height=500, width=700)
                 .mark_bar()
                 .encode(
                     alt.X("Label", type="nominal"),
                     alt.Y("Proportion", type="quantitative"),
                 )
             )
-            # Hack needed to get streamlit to set the chart height
-            # https://github.com/streamlit/streamlit/issues/542
-            label_chart += label_chart
         else:
             label_counts["Label Set"] = "Sample"
             all_label_counts = _collect_label_counts(all_labels)
@@ -148,16 +145,15 @@ def show_document_length_distribution(tokens: List[List[str]]):
     document_lengths = get_document_lengths(tokens)
     doc_lengths = pd.DataFrame({"Token Count": document_lengths})
     doc_length_chart = (
-        alt.Chart(doc_lengths, height=500)
+        alt.Chart(doc_lengths, height=500, width=700)
         .mark_bar()
         .encode(
             alt.X("Token Count", bin=alt.Bin(maxbins=30)),
             alt.Y("count()", type="quantitative"),
         )
     )
-    # Hack needed to get streamlit to set the chart height
-    # https://github.com/streamlit/streamlit/issues/542
-    st.altair_chart(doc_length_chart + doc_length_chart)
+
+    st.altair_chart(doc_length_chart)
 
 
 @st.cache(show_spinner=True)
@@ -437,7 +433,7 @@ def show_embeddings(
     umap_df["Text"] = texts
 
     umap_chart = (
-        alt.Chart(umap_df, height=700)
+        alt.Chart(umap_df, height=700, width=700)
         .mark_circle(size=60)
         .encode(
             alt.X("UMAP Component 1", scale=alt.Scale(zero=False), axis=None),
@@ -445,13 +441,10 @@ def show_embeddings(
             tooltip=alt.Tooltip(tooltip_attrs),
         )
     )
-
     if color_attr is not None:
         umap_chart = umap_chart.encode(alt.Color(color_attr))
 
-    # Hack needed to get streamlit to set the chart height
-    # https://github.com/streamlit/streamlit/issues/542
-    st.altair_chart(umap_chart + umap_chart)
+    st.altair_chart(umap_chart)
 
     if show_vocab_overlap:
         missing_token_counts = defaultdict(int)

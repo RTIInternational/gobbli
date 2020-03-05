@@ -161,14 +161,10 @@ class ClassificationEvaluation:
         plot_df["Belongs to Class"] = plot_df["True Class"] == plot_df["Class"]
 
         charts = []
-        # Ideally, we'd use alt.Row to create a faceted chart, but streamlit doesn't
-        # respect an Altair chart's height unless it's layered, and you can't layer
-        # faceted charts.  So we manually concatenate a bunch of layered charts.
         uniq_cls = plot_df["Class"].unique()
         uniq_cls.sort()
         for cls in uniq_cls:
             charts.append(
-                # Layer needed to get streamlit to set chart height
                 alt.layer(
                     alt.Chart(
                         plot_df[plot_df["True Class"] == cls], title=cls, height=40
