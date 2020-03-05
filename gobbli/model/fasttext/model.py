@@ -231,8 +231,7 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         Returns:
           A fastText checkpoint.
         """
-        # TODO this is broken
-        candidates = list(weights_dir.glob("*.vec")) + list(weights_dir.glob("*.bin"))
+        candidates = list(weights_dir.glob("*.vec"))
         if len(candidates) == 0:
             raise ValueError(f"No weights files found in '{weights_dir}'.")
         elif len(candidates) > 1:
