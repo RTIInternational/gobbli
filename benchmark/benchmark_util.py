@@ -19,13 +19,13 @@ from gobbli.model.fasttext import FastText
 
 LOGGER = logging.getLogger(__name__)
 
-# Main gobbli data directory
-BENCHMARK_GOBBLI_DIR = Path("./benchmark_gobbli")
-
 # Directory storing experiment metadata
 BENCHMARK_META_DIR = Path("./benchmark_meta")
 
 # Directory storing model data from worker processes in experiments
+# and all other model data (weights, etc)
+# Use the same data directory for workers and the main gobbli directory
+# so downloaded weights can be reused between the two
 BENCHMARK_DATA_DIR = Path("./benchmark_data")
 
 
@@ -62,7 +62,7 @@ def init_benchmark_env():
     """
     Initialize the environment for a benchmark experiment.
     """
-    os.environ["GOBBLI_DIR"] = str(BENCHMARK_GOBBLI_DIR)
+    os.environ["GOBBLI_DIR"] = str(BENCHMARK_DATA_DIR)
 
 
 def assert_param_required(name: str, params: Dict[str, Any]):
