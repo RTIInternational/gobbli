@@ -122,8 +122,9 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         Returns:
           The directory containing pretrained weights for this instance.
         """
+        # Weights won't be used if we don't have a model to use
         if self.fasttext_model is None:
-            raise ValueError("No pretrained weights available for this instance.")
+            return self.class_weights_dir
         return self.class_weights_dir / self.fasttext_model
 
     def init(self, params: Dict[str, Any]):
