@@ -1,5 +1,6 @@
 import json
 import shutil
+import tempfile
 from collections import OrderedDict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -167,6 +168,14 @@ class BERT(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
                 raise ValueError(f"Unknown param '{name}'")
 
     @property
+    def weights_dir(self) -> Path:
+        """
+        Returns:
+          Directory containing pretrained weights for this instance.
+        """
+        return self.class_weights_dir / self.bert_model
+
+    @property
     def image_tag(self) -> str:
         """
         Returns:
@@ -185,21 +194,20 @@ class BERT(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
 
     def _build(self):
         # Download data if we don't already have it
+        # Download into a temp dir and move the result into the destination dir
+        # to ensure partial downloads don't leave corrupted state
         if not self.weights_dir.exists():
-            self.weights_dir.mkdir(parents=True)
-            try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                tmp_weights_dir = Path(tmpdir) / self.weights_dir.name
+                tmp_weights_dir.mkdir()
                 self.logger.info("Downloading pre-trained weights.")
                 download_archive(
                     BERT_MODEL_ARCHIVES[self.bert_model],
-                    self.weights_dir,
+                    tmp_weights_dir,
                     junk_paths=True,
                 )
+                shutil.move(tmp_weights_dir, self.weights_dir)
                 self.logger.info("Weights downloaded.")
-            except Exception:
-                # Don't leave the weights directory in a partially downloaded state
-                if self.weights_dir.exists():
-                    shutil.rmtree(self.weights_dir)
-                raise
 
         # Build the docker image
         self.docker_client.images.build(

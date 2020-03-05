@@ -242,18 +242,34 @@ class BaseModel(ABC):
         return model_dir() / cls.__name__
 
     @property
-    def weights_dir(self) -> Path:
+    def class_weights_dir(self) -> Path:
         """
-        The directory used to store initial model weights (before fine-tuning).
+        The root directory used to store initial model weights (before fine-tuning).
         These should generally be some pretrained weights made available by model
         developers.  This directory will NOT be created by default; models should
         download their weights and remove the weights directory if the download doesn't
         finish properly.
 
+        Most models making use of this directory will have multiple sets of weights and
+        will need to store those in subdirectories under this directory.
+
         Returns:
-            The path to the weights directory.
+            The path to the class-wide weights directory.
         """
         return self.model_class_dir() / BaseModel._WEIGHTS_DIR_NAME
+
+    @property
+    def weights_dir(self) -> Path:
+        """
+        The directory containing weights for a specific instance of the model.
+        This is the class weights directory by default, but subclasses might
+        define this property to return a subdirectory based on a set of pretrained
+        model weights.
+
+        Returns:
+          The instance-specific weights directory.
+        """
+        return self.class_weights_dir
 
     def build(self):
         """

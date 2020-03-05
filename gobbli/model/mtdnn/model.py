@@ -1,5 +1,6 @@
 import json
 import shutil
+import tempfile
 import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -98,6 +99,14 @@ class MTDNN(BaseModel, TrainMixin, PredictMixin):
                 raise ValueError(f"Unknown param '{name}'")
 
     @property
+    def weights_dir(self) -> Path:
+        """
+        Returns:
+          The directory containing pretrained weights for this instance.
+        """
+        return self.class_weights_dir / self.mtdnn_model
+
+    @property
     def image_tag(self) -> str:
         """
         Returns:
@@ -108,17 +117,14 @@ class MTDNN(BaseModel, TrainMixin, PredictMixin):
     def _build(self):
         # Download data if we don't already have it
         if not self.weights_dir.exists():
-            self.weights_dir.mkdir(parents=True)
-            try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                tmp_weights_dir = Path(tmpdir) / self.weights_dir.name
+                tmp_weights_dir.mkdir()
                 self.logger.info("Downloading pre-trained weights.")
                 downloaded_file = download_file(MTDNN_MODEL_FILES[self.mtdnn_model])
-                copy_file(downloaded_file, self.weights_dir / MTDNN._WEIGHTS_FILE_NAME)
+                copy_file(downloaded_file, tmp_weights_dir / MTDNN._WEIGHTS_FILE_NAME)
+                shutil.move(tmp_weights_dir, self.weights_dir)
                 self.logger.info("Weights downloaded.")
-            except Exception:
-                # Don't leave the weights directory in a partially downloaded state
-                if self.weights_dir.exists():
-                    shutil.rmtree(self.weights_dir)
-                raise
 
         # Build the docker image
         self.docker_client.images.build(

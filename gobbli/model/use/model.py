@@ -1,5 +1,6 @@
 import json
 import shutil
+import tempfile
 from pathlib import Path
 from typing import Any, Dict
 
@@ -72,23 +73,28 @@ class USE(BaseModel, EmbedMixin):
         device = "gpu" if self.use_gpu else "cpu"
         return f"gobbli-use-embeddings-{device}"
 
+    @property
+    def weights_dir(self) -> Path:
+        """
+        Returns:
+          Directory containing pretrained weights for this instance.
+        """
+        return self.class_weights_dir / self.use_model
+
     def _build(self):
         # Download data if we don't already have it
         if not self.weights_dir.exists():
-            self.weights_dir.mkdir(parents=True)
-            try:
-                self.logger.info("Downloading model.")
+            with tempfile.TemporaryDirectory() as tmpdir:
+                tmp_weights_dir = Path(tmpdir) / self.weights_dir.name
+                tmp_weights_dir.mkdir()
+                self.logger.info("Downloading pre-trained weights.")
                 download_archive(
                     USE_MODEL_ARCHIVES[self.use_model],
-                    self.weights_dir,
+                    tmp_weights_dir,
                     filename=f"{self.use_model}.tar.gz",
                 )
+                shutil.move(tmp_weights_dir, self.weights_dir)
                 self.logger.info("Weights downloaded.")
-            except Exception:
-                # Don't leave the weights directory in a partially downloaded state
-                if self.weights_dir.exists():
-                    shutil.rmtree(self.weights_dir)
-                raise
 
         # Build the docker image
         self.docker_client.images.build(

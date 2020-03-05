@@ -1,5 +1,6 @@
 import re
 import shutil
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -115,6 +116,16 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         """
         return "gobbli-fasttext"
 
+    @property
+    def weights_dir(self) -> Path:
+        """
+        Returns:
+          The directory containing pretrained weights for this instance.
+        """
+        if self.fasttext_model is None:
+            raise ValueError("No pretrained weights available for this instance.")
+        return self.class_weights_dir / self.fasttext_model
+
     def init(self, params: Dict[str, Any]):
         """
         See :meth: `gobbli.model.base.BaseModel.init`.
@@ -187,19 +198,19 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
 
     def _build(self):
         # Download data if we need it and don't already have it
-        if self.fasttext_model is not None and not self.weights_dir.exists():
-            self.weights_dir.mkdir(parents=True)
-            try:
+        if (
+            self.fasttext_model is not None
+            and not (self.weights_dir / self.fasttext_model).exists()
+        ):
+            with tempfile.TemporaryDirectory() as tmpdir:
+                tmp_weights_dir = Path(tmpdir) / self.weights_dir.name
+                tmp_weights_dir.mkdir()
                 self.logger.info("Downloading pre-trained weights.")
                 download_archive(
-                    FASTTEXT_VECTOR_ARCHIVES[self.fasttext_model], self.weights_dir
+                    FASTTEXT_VECTOR_ARCHIVES[self.fasttext_model], tmp_weights_dir
                 )
+                shutil.move(tmp_weights_dir, self.weights_dir)
                 self.logger.info("Weights downloaded.")
-            except Exception:
-                # Don't leave the weights directory in a partially downloaded state
-                if self.weights_dir.exists():
-                    shutil.rmtree(self.weights_dir)
-                raise
 
         # Build the custom docker image
         self.docker_client.images.build(
@@ -220,12 +231,13 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         Returns:
           A fastText checkpoint.
         """
-        candidates = list(weights_dir.glob("*.vec"))
+        # TODO this is broken
+        candidates = list(weights_dir.glob("*.vec")) + list(weights_dir.glob("*.bin"))
         if len(candidates) == 0:
-            raise ValueError(f"No .vec files found in '{weights_dir}'.")
+            raise ValueError(f"No weights files found in '{weights_dir}'.")
         elif len(candidates) > 1:
             raise ValueError(
-                f"Multiple .vec files found in '{weights_dir}': {candidates}"
+                f"Multiple weights files found in '{weights_dir}': {candidates}"
             )
 
         return FastTextCheckpoint(path=candidates[0].parent / candidates[0].stem)
