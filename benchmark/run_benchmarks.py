@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 import click
 import yaml
 
+import gobbli
 from scenario import (
     ClassImbalanceScenario,
     DataAugmentationScenario,
@@ -147,6 +148,10 @@ def run(
         LOGGER.info(f"Running scenario: {scenario_name}")
         scenario.run(raise_exceptions=raise_exceptions)
         LOGGER.info(f"Scenario complete: {scenario_name}")
+
+    # Remove task input/output saved to disk, but keep model weights in case
+    # future runs can re-use them
+    gobbli.util.cleanup(force=True)
 
 
 if __name__ == "__main__":

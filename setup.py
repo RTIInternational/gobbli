@@ -34,6 +34,7 @@ setup(
         "ray >= 0.7.3",
         "altair >= 3.2.0",
         "click >= 7.0",
+        "humanize >= 1.1.0",
     ],
     extras_require={
         "augment": ["nltk>=3.4.4", "gensim>=3.8.0", "spacy>=2.1.4"],

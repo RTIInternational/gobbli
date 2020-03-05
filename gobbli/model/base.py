@@ -11,18 +11,14 @@ from gobbli.model.context import ContainerTaskContext
 from gobbli.util import (
     format_duration,
     generate_uuid,
-    gobbli_dir,
     gobbli_version,
     is_dir_empty,
+    model_dir,
     read_metadata,
     write_metadata,
 )
 
 LOGGER = logging.getLogger(__name__)
-
-
-def model_dir() -> Path:
-    return gobbli_dir() / "model"
 
 
 _WEIGHTS_DIR_NAME = "weights"

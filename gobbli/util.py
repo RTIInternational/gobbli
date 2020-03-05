@@ -12,9 +12,11 @@ import tempfile
 import uuid
 import warnings
 import zipfile
+from distutils.util import strtobool
 from pathlib import Path
 from typing import Any, Container, Dict, Iterator, List, Optional, TypeVar
 
+import humanize
 import pandas as pd
 import pkg_resources
 import requests
@@ -42,12 +44,70 @@ def gobbli_dir() -> Path:
     return gobbli_dir
 
 
+def model_dir() -> Path:
+    """
+    Returns:
+      The subdirectory storing all model data and task run input/output.
+    """
+    return gobbli_dir() / "model"
+
+
 def gobbli_version() -> str:
     """
     Returns:
       The version of gobbli installed.
     """
     return pkg_resources.get_distribution("gobbli").version
+
+
+def disk_usage() -> int:
+    """
+    Returns:
+      Disk usage (in bytes) of all gobbli data in the current gobbli directory.
+    """
+    return sum(f.stat().st_size for f in gobbli_dir().glob("**/*") if f.is_file())
+
+
+def human_disk_usage() -> str:
+    """
+    Returns:
+      Human-readable string representing disk usage of all gobbli data in the current gobbli
+      directory.
+    """
+    return humanize.naturalsize(disk_usage())
+
+
+def cleanup(force: bool = False, full: bool = False):
+    """
+    Cleans up the gobbli directory, removing files and directories.  By default, removes
+    only task input/output.  If the ``full`` argument is True, removes all data,
+    including downloaded model weights and datasets.
+
+    Args:
+      force: If True, don't prompt for user confirmation before cleaning up.
+      full: If True, remove all data (including downloaded model weights and datasets).
+    """
+    if not force:
+        msg = "Cleanup will remove all task input/output, including trained models.  Are you sure? [Y/n]"
+        confirmation = bool(strtobool(input(msg)))
+        if not confirmation:
+            return
+
+        if full:
+            full_msg = "Full cleanup will additionally remove all downloaded model weights; they'll need to be redownloaded to be used again.  Are you sure? [Y/n]"
+            confirmation = bool(strtobool(input(full_msg)))
+            if not confirmation:
+                return
+
+    if full:
+        shutil.rmtree(gobbli_dir())
+    else:
+        for model_dir in (gobbli_dir() / "model").iterdir():
+            for instance_dir in model_dir.iterdir():
+                # Special directories containing cached weights or models
+                # which are reusable -- don't delete them here
+                if instance_dir.name not in ("cache", "weights"):
+                    shutil.rmtree(instance_dir)
 
 
 def pred_prob_to_pred_label(y_pred_proba: pd.DataFrame) -> List[str]:
