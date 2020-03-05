@@ -573,6 +573,7 @@
       - [125, "min"]
       - [250, "min"]
   runs:
-    - model_name: "BERT"
+    - name: "BERT"
+      model_name: "BERT"
       param_grid: {}
       preprocess_func: "bert_preprocess"

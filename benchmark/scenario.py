@@ -409,6 +409,7 @@ class DatasetEmbeddingScenario(ModelEmbeddingScenario):  # type: ignore
                 nvidia_visible_devices=os.getenv("NVIDIA_VISIBLE_DEVICES", ""),
                 **run.model_params,
             )
+            model.build()
 
             embed_input = EmbedInput(
                 X=X_embed_preprocessed, embed_batch_size=run.batch_size
