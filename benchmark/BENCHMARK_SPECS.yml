@@ -136,7 +136,7 @@
     - name: "GPT2"
       model_name: "Transformer"
       model_params:
-        transformer_weights: "gpt2-large"
+        transformer_weights: "gpt2-medium"
         transformer_model: "GPT2"
       batch_size: 16
     - name: "TransformerXL"
@@ -308,7 +308,7 @@
     - name: "GPT2"
       model_name: "Transformer"
       model_params:
-        transformer_weights: "gpt2-large"
+        transformer_weights: "gpt2-medium"
         transformer_model: "GPT2"
       batch_size: 16
     - name: "TransformerXL"
