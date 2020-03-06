@@ -9,7 +9,7 @@ Since deep learning models can take a long time to train, gobbli provides trivia
 - Majority classifier (:class:`gobbli.model.majority.MajorityClassifier`): Classifies each example as the most frequent class in the training set.  Supports training and prediction.
 - Random embedder (:class:`gobbli.model.random.RandomEmbedder`): Generates a fixed-size random length vector for each document.  Supports embedding generation.
 
-We recommend scaffolding your code using one of these techniques before switching to a real model.  Here are the currently implemented deep learning models:
+We recommend scaffolding your code using one of these techniques before switching to a real model.  Here are the currently implemented models:
 
 - `Google's BERT <https://github.com/google-research/bert>`__: (:class:`gobbli.model.bert.BERT`) Supports training, prediction, and embedding generation.
 - `Microsoft's MT-DNN <https://github.com/namisan/mt-dnn>`__: (:class:`gobbli.model.mtdnn.MTDNN`) Supports training and prediction.
@@ -36,7 +36,7 @@ High-Level API -- Experiments
 
 gobbli's high-level API supports canned experimentation workflows based on a couple of tasks.  It's easiest to start out with an Experiment and drop down to the lower-level Task API if you need more flexibility.
 
-A high-level overview of each type of experiment follows.  For an overview of more detailed configuration options, including parameter tuning, parallel/distributed experiments, and using GPUs in experiments, see :ref:`advanced-experimentation`.  For example experiments on benchmark datasets, see the Jupyter notebooks in the ``benchmark/`` directory of the repository.
+A high-level overview of each type of experiment follows.  For an overview of more detailed configuration options, including parameter tuning, parallel/distributed experiments, and using GPUs in experiments, see :ref:`advanced-experimentation`.  For example experiments on benchmark datasets, see the Markdown documents in the ``benchmark/`` directory of the repository.
 
 Classification Experiment
 -------------------------
