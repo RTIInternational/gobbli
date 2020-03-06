@@ -9,11 +9,9 @@ def read_texts(input_file):
         return f.readlines()
 
 
-def write_embeddings(embeddings, output_file):
-    with open(output_file, "w") as f:
-        for embedding in embeddings.tolist():
-            json.dump(embedding, f)
-            f.write("\n")
+def make_batches(l, batch_size):
+    for i in range(0, len(l), batch_size):
+        yield l[i : i + batch_size]
 
 
 if __name__ == "__main__":
@@ -34,11 +32,21 @@ if __name__ == "__main__":
         required=True,
         help="Path to the downloaded/extracted TFHub Module for USE.",
     )
+    parser.add_argument(
+        "--batch-size",
+        default=32,
+        type=int,
+        help="Number of texts to embed at once. Default: %(default)s",
+    )
 
     args = parser.parse_args()
 
     embed = hub.load(args.module_dir)
     texts = read_texts(args.input_file)
 
-    embeddings = embed(texts).numpy()
-    write_embeddings(embeddings, args.output_file)
+    with open(args.output_file, "w") as f:
+        for batch in make_batches(texts, args.batch_size):
+            embeddings = embed(batch).numpy()
+            for embedding in embeddings.tolist():
+                json.dump(embedding, f)
+                f.write("\n")

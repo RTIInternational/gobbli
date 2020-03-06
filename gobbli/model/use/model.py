@@ -121,6 +121,7 @@ class USE(BaseModel, EmbedMixin):
             f" --input-file={context.container_input_dir / USE._INPUT_FILE}"
             f" --output-file={context.container_output_dir / USE._OUTPUT_FILE}"
             f" --module-dir={BaseModel._CONTAINER_WEIGHTS_PATH}"
+            f" --batch-size={embed_input.embed_batch_size}"
         )
 
         container_logs = run_container(
