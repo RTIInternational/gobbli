@@ -11,7 +11,7 @@ This indicates something's wrong with the training process.  Some things to chec
 - Do you have a very imbalanced dataset?  You may need to raise the batch size, if possible, or try downsampling/upsampling to ensure you don't get many batches composed of only one class.
 - Is your dataset ordered by label?  The model needs to have a mix of classes in each batch to learn effectively.  Ensure your training dataset is shuffled.  gobbli :class:`Datasets <gobbli.dataset.base.BaseDataset>` take care of this with the :meth:`train_input <gobbli.dataset.base.BaseDataset.train_input>` method.
 
-I'm running out of CPU memory
+I'm running out of memory
 -----------------------------
 
 Your dataset might be too big to fit in memory.  gobbli currently doesn't support lazily loading datasets from disk, so anything you use to train has to fit in memory.  You can try:
@@ -25,9 +25,16 @@ I'm running out of GPU memory
 
 Some models are larger than others.  You can try:
 
- - Decreasing the :paramref:`train_batch_size <gobbli.io.TrainInput.params.train_batch_size>` if you're training; this is the biggest driver of GPU memory usage.  Beware of making the batch size so small that the model can't update gradients accurately, though. The :class:`gobbli.model.transformer.Transformer` model implements gradient accumulation, which can be used to counteract the detrimental effect of a smaller batch size.
+ - Decreasing the :paramref:`train_batch_size <gobbli.io.TrainInput.params.train_batch_size>` if you're training; this is the biggest driver of GPU memory usage.  Beware of making the batch size so small that the model can't update gradients accurately, though. The :class:`gobbli.model.transformer.Transformer` model supports gradient accumulation, which can be used to counteract the detrimental effect of a smaller batch size.
  - Decreasing the ``max_seq_len`` parameter of your model, if it has one.  Consider using :ref:`document-windowing` if you do this to account for the truncation of your texts.
  - Using a smaller set of pretrained weights (ex. instead of ``bert-large-uncased``, try ``bert-base-uncased``).
+
+
+My disk is filling up
+---------------------
+
+gobbli saves a ton of data to disk, especially if you have a large dataset, and won't automatically remove any of it in case you need to access it later.  If you need to free up some space, see :ref:`housekeeping`.
+
 
 A gobbli function appears to be hanging
 ---------------------------------------

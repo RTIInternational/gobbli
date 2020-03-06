@@ -35,6 +35,19 @@ For example:
 
    GOBBLI_DIR/model/BERT/my_bert/train/train_batch_128/{input,output}/
 
+.. _housekeeping:
+
+Housekeeping
+------------
+
+If you've run a lot of tasks, you may start to fill up your disk.  gobbli provides a couple of utilities to manage disk usage in the default gobbli directory hierarchy.  You can use :func:`gobbli.util.human_disk_usage` to print the current disk usage of the gobbli directory and :func:`gobbli.util.cleanup` to remove unused files.  The cleanup function removes only task input and output by default, leaving downloaded model weights and datasets.  If you want to erase all gobbli data, you can use the :paramref:`full <gobbli.util.cleanup.params.full>` argument.
+
+>>> gobbli.util.human_disk_usage()
+'21.3 GB'
+>>> gobbli.util.cleanup()
+Cleanup will remove all task input/output, including trained models.  Are you sure? [Y/n]y
+>>> gobbli.util.human_disk_usage()
+'8.8 GB'
 
 
 .. _advanced-experimentation:
