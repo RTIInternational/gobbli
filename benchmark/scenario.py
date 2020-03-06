@@ -403,12 +403,15 @@ class DatasetEmbeddingScenario(ModelEmbeddingScenario):  # type: ignore
 
         stdout_catcher = StdoutCatcher()
         with stdout_catcher:
-            use_gpu = os.getenv("GOBBLI_USE_GPU") is not None
-            model = model_cls(
-                use_gpu=use_gpu,
-                nvidia_visible_devices=os.getenv("NVIDIA_VISIBLE_DEVICES", ""),
+            # Construct the dict of kwargs up-front so each run can override the "use_gpu"
+            # option if necessary -- ex. for models like spaCy which have trouble controlling
+            # memory usage on the GPU and don't gain much benefit from it
+            model_kwargs = {
+                "user_gpu": os.getenv("GOBBLI_USE_GPU") is not None,
+                "nvidia_visible_devices": os.getenv("NVIDIA_VISIBLE_DEVICES", ""),
                 **run.model_params,
-            )
+            }
+            model = model_cls(**model_kwargs)
             model.build()
 
             embed_input = EmbedInput(
@@ -872,7 +875,11 @@ class DocumentWindowingScenario(ModelClassificationScenario):
                         vocab_size=self.params["vocab_size"],
                         model_path=tokenizer_path,
                     )
-                    X_test_windowed, X_test_windowed_indices, y_test_windowed = make_document_windows(
+                    (
+                        X_test_windowed,
+                        X_test_windowed_indices,
+                        y_test_windowed,
+                    ) = make_document_windows(
                         X_test_preprocessed,
                         window_len=window_len,
                         y=y_test,
