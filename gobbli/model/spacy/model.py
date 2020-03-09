@@ -331,11 +331,6 @@ class SpaCyModel(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             context.host_input_dir / SpaCyModel._EMBEDDING_INPUT_FILE,
         )
 
-        if embed_input.embed_batch_size != gobbli.io.EmbedInput.embed_batch_size:
-            warnings.warn(
-                "The spaCy model doesn't batch embedding data, so the embedding "
-                "batch size parameter will be ignored."
-            )
         if embed_input.checkpoint is not None:
             warnings.warn(
                 "The spaCy model vectors can't be fine-tuned, so custom "
