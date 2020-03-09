@@ -152,6 +152,9 @@
         transformer_model: "T5"
       preprocess_func: "bert_preprocess"
       batch_size: 16
+    - name: "sklearn_TF-IDF"
+      model_name: "TfidfEmbedder"
+      preprocess_func: "fasttext_preprocess"
     - name: "spaCy"
       model_name: "SpaCyModel"
       model_params:
@@ -324,6 +327,10 @@
         transformer_model: "T5"
       preprocess_func: "bert_preprocess"
       batch_size: 16
+    # Dataset is too big -- this case runs out of memory
+    # - name: "sklearn_TF-IDF"
+    #   model_name: "TfidfEmbedder"
+    #   preprocess_func: "fasttext_preprocess"
     - name: "spaCy"
       model_name: "SpaCyModel"
       model_params:
