@@ -840,7 +840,7 @@ class DocumentWindowingScenario(ModelClassificationScenario):
         window_len_poolings = self.params["window_len_poolings"]
         assert_type("window_len_poolings", window_len_poolings, list)
         for w, p in window_len_poolings:
-            assert_type("window_len", w, int)
+            assert_type("window_len", w, (int, None))
             assert_type("pooling", p, str)
             # This raises an exception if p isn't a valid pooling method
             WindowPooling(p)
