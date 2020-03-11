@@ -143,10 +143,10 @@ def assert_type(name: str, val: Any, cls: Any):
     Args:
       name: User-friendly name of the value to be printed in an exception if raised.
       val: The value to check type of.
-      cls: The type to compare the value's type against.
+      cls: The type or tuple of types to compare the value's type against.
     """
     if not isinstance(val, cls):
-        raise TypeError(f"{name} must be type '{cls.__name__}'; got '{type(val)}'")
+        raise TypeError(f"{name} must be of type(s) '{cls}'; got '{type(val)}'")
 
 
 def assert_in(name: str, val: Any, container: Container):

@@ -840,10 +840,12 @@ class DocumentWindowingScenario(ModelClassificationScenario):
         window_len_poolings = self.params["window_len_poolings"]
         assert_type("window_len_poolings", window_len_poolings, list)
         for w, p in window_len_poolings:
-            assert_type("window_len", w, (int, None))
-            assert_type("pooling", p, str)
-            # This raises an exception if p isn't a valid pooling method
-            WindowPooling(p)
+            assert_type("window_len", w, (int, type(None)))
+            assert_type("pooling", p, (str, type(None)))
+
+            if p is not None:
+                # This raises an exception if p isn't a valid pooling method
+                WindowPooling(p)
 
     def _do_run(self, run: ModelClassificationRun, run_output_dir: Path) -> str:
         ds = IMDBDataset.load()
@@ -863,7 +865,7 @@ class DocumentWindowingScenario(ModelClassificationScenario):
 
         for window_len, pooling in self.params["window_len_poolings"]:
 
-            if window_len is not None:
+            if window_len is not None and pooling is not None:
                 with tempfile.TemporaryDirectory() as tmpdir:
                     tokenizer_path = Path(tmpdir) / "tokenizer"
 
