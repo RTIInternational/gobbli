@@ -1,0 +1,1 @@
+{"name": "FastText", "model_name": "FastText", "param_grid": {"word_ngrams": [1, 2], "dim": [100, 300], "lr": [0.5, 1.0]}, "preprocess_func": "fasttext_preprocess", "run_kwargs": {}}

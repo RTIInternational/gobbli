@@ -1,0 +1,1 @@
+{"vocab_size": 2000, "sample_size": 0.1, "window_len_poolings": [[null, null], [50, "mean"], [125, "mean"], [250, "mean"], [50, "max"], [125, "max"], [250, "max"], [50, "min"], [125, "min"], [250, "min"]], "name": "BERT", "model_name": "BERT", "param_grid": {}, "preprocess_func": "bert_preprocess", "run_kwargs": {}}

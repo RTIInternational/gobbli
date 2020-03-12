@@ -1,0 +1,1 @@
+{"name": "TransformerXL", "model_name": "Transformer", "model_params": {"transformer_weights": "transfo-xl-wt103", "transformer_model": "TransfoXL"}, "preprocess_func": null, "batch_size": 16}

@@ -1,0 +1,1 @@
+{"name": "RoBERTa", "model_name": "Transformer", "model_params": {"transformer_weights": "roberta-base", "transformer_model": "Roberta"}, "preprocess_func": "bert_preprocess", "batch_size": 16}

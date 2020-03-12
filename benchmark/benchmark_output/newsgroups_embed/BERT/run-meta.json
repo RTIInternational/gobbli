@@ -1,0 +1,1 @@
+{"name": "BERT", "model_name": "BERT", "model_params": {"bert_model": "bert-base-uncased", "max_seq_length": 128}, "preprocess_func": "bert_preprocess", "batch_size": 32}

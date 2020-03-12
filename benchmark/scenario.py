@@ -827,7 +827,7 @@ class DataAugmentationScenario(AugmentScenario):
 class DocumentWindowingScenario(ModelClassificationScenario):
     @property
     def name(self):
-        return "data_augmentation"
+        return "document_windowing"
 
     def _validate_params(self):
         assert_param_required("vocab_size", self.params)

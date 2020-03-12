@@ -1,0 +1,1 @@
+{"name": "GPT", "model_name": "Transformer", "param_grid": {"transformer_weights": ["openai-gpt"], "transformer_model": ["GPT"]}, "preprocess_func": "bert_preprocess", "run_kwargs": {}}

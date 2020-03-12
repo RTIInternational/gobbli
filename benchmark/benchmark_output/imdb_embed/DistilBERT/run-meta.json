@@ -1,0 +1,1 @@
+{"name": "DistilBERT", "model_name": "Transformer", "model_params": {"transformer_weights": "distilbert-base-uncased", "transformer_model": "DistilBert"}, "preprocess_func": "bert_preprocess", "batch_size": 32}

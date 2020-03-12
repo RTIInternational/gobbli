@@ -1,0 +1,1 @@
+{"name": "spacy-transformers", "model_name": "SpaCyModel", "model_params": {"model": "en_trf_robertabase_lg"}, "preprocess_func": "bert_preprocess", "batch_size": 16}

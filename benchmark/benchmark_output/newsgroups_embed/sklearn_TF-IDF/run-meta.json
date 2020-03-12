@@ -1,0 +1,1 @@
+{"name": "sklearn_TF-IDF", "model_name": "TfidfEmbedder", "model_params": {}, "preprocess_func": "fasttext_preprocess", "batch_size": 32}

@@ -1,0 +1,1 @@
+{"name": "ALBERT", "model_name": "Transformer", "param_grid": {"transformer_weights": ["albert-base-v1", "albert-base-v2"], "transformer_model": ["Albert"]}, "preprocess_func": "bert_preprocess", "run_kwargs": {}}

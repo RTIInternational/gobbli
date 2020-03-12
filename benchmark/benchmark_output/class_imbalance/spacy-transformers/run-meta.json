@@ -1,0 +1,1 @@
+{"imbalance_proportions": [0.01, 0.05, 0.1, 0.25, 0.33, 0.5], "name": "spacy-transformers", "model_name": "SpaCyModel", "param_grid": {"model": ["en_trf_bertbaseuncased_lg", "en_trf_xlnetbasecased_lg", "en_trf_robertabase_lg", "en_trf_distilbertbaseuncased_lg"]}, "preprocess_func": "bert_preprocess", "run_kwargs": {"train_batch_size": 16}}
