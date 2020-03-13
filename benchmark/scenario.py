@@ -620,7 +620,7 @@ class ClassImbalanceScenario(ModelClassificationScenario):
 
         md = f"# Results: {run.key}\n"
         md += tabulate(all_metrics, tablefmt="pipe", headers="keys")
-        md += f"\n![Results]({self.get_markdown_relative_path(plot_path)})\n---"
+        md += f"\n\n![Results]({self.get_markdown_relative_path(plot_path)})\n---"
 
         return md
 
@@ -711,7 +711,7 @@ class LowResourceScenario(ModelClassificationScenario):
 
         md = f"# Results: {run.key}\n"
         md += tabulate(all_metrics, tablefmt="pipe", headers="keys")
-        md += f"\n![Results]({self.get_markdown_relative_path(plot_path)})\n---"
+        md += f"\n\n![Results]({self.get_markdown_relative_path(plot_path)})\n---"
 
         return md
 
@@ -819,7 +819,7 @@ class DataAugmentationScenario(AugmentScenario):
 
         md = f"# Results: {run.key}\n"
         md += tabulate(all_metrics, tablefmt="pipe", headers="keys")
-        md += f"\n![Results]({self.get_markdown_relative_path(plot_path)})\n---"
+        md += f"\n\n![Results]({self.get_markdown_relative_path(plot_path)})\n---"
 
         return md
 
@@ -939,7 +939,7 @@ class DocumentWindowingScenario(ModelClassificationScenario):
 
         md = f"# Results: {run.key}\n"
         md += tabulate(all_metrics, tablefmt="pipe", headers="keys")
-        md += f"\n![Results]({self.get_markdown_relative_path(plot_path)})\n---"
+        md += f"\n\n![Results]({self.get_markdown_relative_path(plot_path)})\n---"
 
         return md
 
