@@ -22,44 +22,7 @@ You may also want to check out the [benchmarks](./benchmark) to see some compari
 
 ### Interactive
 
-gobbli provides [streamlit](https://www.streamlit.io/) apps to perform some interactive tasks in a web browser, such as data exploration and model evaluation.  Once you've installed the library, you can run the bundled apps using the `gobbli` command line application.  Run `gobbli --help` for more info.
-
-#### gobbli explore
-
-Use this app to explore the characteristics of a dataset and perform unsupervised tasks, such as topic modeling or plotting embeddings.  Use the following command to run this app:
-
-    gobbli explore <data>
-    
-`<data>` can be the name of a built-in gobbli `Dataset` (ex. `NewsgroupsDataset` or `IMDBDataset`) or a path to a data file.  Supported data file formats are:
-
- - `.txt`: Line-delimited texts without labels
- - `.csv`: Comma-delimited file containing a `text` column and optional `label` column
- - `.tsv`: Tab-delimited file containing a `text` column and optional `label` column
- 
-You can optionally pass a trained gobbli model to use for embedding generation.  To do so, use the `--model-data-dir` command line argument.  The model data directory can be obtained by calling the `.data_dir()` method on a trained model.  It's also logged at INFO level when a model is constructed, so you may be able to find it in printed output or logs.
-
-Run `gobbli explore --help` to see additional available options, including GPU usage.
-
-#### gobbli evaluate
-
-Use this app to evaluate performance of a trained model on a dataset.  Run the following command:
-
-    gobbli evaluate <model_data_dir> <data>
-    
-The `<data>` and `<model_data_dir>`arguments behave exactly as described above under `gobbli explore`, except the model data directory is now mandatory.
-
-Run `gobbli evaluate --help` to see additional available options, including GPU usage.
-
-
-#### gobbli explain
-
-Use this app to generate local explanations for model predictions on a single observation at a time.  Run the following command:
-
-    gobbli explain <model_data_dir> <data>
-    
-The `<data>` and `<model_data_dir>`arguments behave exactly as described above under `gobbli explore`, except the model data directory is now mandatory.
-
-Run `gobbli explain --help` to see additional available options, including GPU usage.
+gobbli provides [streamlit](https://www.streamlit.io/) apps to perform some interactive tasks in a web browser, such as data exploration and model evaluation.  Once you've installed the library, you can run the bundled apps using the `gobbli` command line application.  Check [the docs](https://gobbli.readthedocs.io/en/latest/interactive_apps.html) for more information.
 
 ## Development
 
@@ -107,6 +70,8 @@ gobbli wouldn't exist without the public release of several state-of-the-art mod
 - [Universal Sentence Encoder](https://tfhub.dev/google/universal-sentence-encoder/2), released by Google
 - [fastText](https://github.com/facebookresearch/fastText), released by Facebook
 - [transformers](https://github.com/huggingface/transformers), released by Hugging Face
+- [spaCy](https://spacy.io/), by Explosion
+- [scikit-learn](https://scikit-learn.org/stable/)
 
 Original work on the library was funded by [RTI International](https://www.rti.org/).
 
