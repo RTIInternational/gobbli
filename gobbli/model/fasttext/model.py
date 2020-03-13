@@ -129,7 +129,7 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
 
     def init(self, params: Dict[str, Any]):
         """
-        See :meth: `gobbli.model.base.BaseModel.init`.
+        See :meth:`gobbli.model.base.BaseModel.init`.
 
         For more info on fastText parameter semantics, see
         `the docs <https://fasttext.cc/docs/en/options.html>`__.  The fastText
