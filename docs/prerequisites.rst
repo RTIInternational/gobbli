@@ -22,4 +22,12 @@ Additionally, :ref:`document-windowing` with the `SentencePiece <https://github.
 
     pip install gobbli[tokenize]
 
+.. _interactive-app-prereqs:
+
+The `Streamlit <https://streamlit.io>`__-based :ref:`interactive-apps` require their own set of dependencies:
+
+.. code-block:: bash
+
+   pip install gobbli[interactive]
+
 If you want to train models using a GPU, you will additionally need an NVIDIA graphics card and `nvidia-docker <https://github.com/NVIDIA/nvidia-docker>`__.

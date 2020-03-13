@@ -39,7 +39,7 @@ gobbli's high-level API supports canned experimentation workflows based on a cou
 A high-level overview of each type of experiment follows.  For an overview of more detailed configuration options, including parameter tuning, parallel/distributed experiments, and using GPUs in experiments, see :ref:`advanced-experimentation`.  For example experiments on benchmark datasets, see the Markdown documents in the ``benchmark/`` directory of the repository.
 
 Classification Experiment
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This type of experiment is useful when you have a classification problem, or a set of documents with associated labels.  A :class:`gobbli.experiment.classification.ClassificationExperiment` requires a model and dataset.  The dataset can be either a :class:`gobbli.dataset.base.BaseDataset` derived class instance or an (X, y) tuple, where X is a list of strings, and y is a corresponding list of labels.  The dataset will be split into train, validation, and test sets.  Training will be run on the train set, evaluated on the validation set, and results on the test set will be reporting.
 
@@ -87,7 +87,7 @@ Low-Level API - Tasks
 If you require more specialized workflows, you can use the lower-level Task API.  Experiments run a canned set of tasks with some sensible default parameters.  See the following sections for more information on the individual tasks each experiment is composed of.
 
 Training
---------
+^^^^^^^^
 
 Deep learning models can generally be fine-tuned on a user's specific problem after having been pretrained on a large, general dataset.  Training enables the model to develop an internal representation more suited to the nuances of a given problem.  We generally train models in a classification paradigm, encouraging them to learn to predict a set of labels.
 
@@ -128,8 +128,8 @@ Finally, train the model and inspect the output, if you want. See :class:`gobbli
 
 Training is generally used to enhance performance on other tasks, such as classification or generating embeddings, rather than being the end product itself.
 
-Classification
---------------
+Predicting
+^^^^^^^^^^^
 
 Classification models predict whether the input falls into one of several predetermined classes.
 
@@ -153,8 +153,8 @@ With a trained model, we can make predictions. ::
 See :class:`gobbli.io.PredictOutput` for the output structure.
     
 
-Embeddings
-----------
+Generating Embeddings
+^^^^^^^^^^^^^^^^^^^^^
 
 A document embedding is a numeric vector representing the semantic meaning of a document.  Embeddings can be used in place of simpler word counts/TF-IDF vectorization methods to account for problems like synonyms having similar meanings despite using different words.  The resulting vectors can be used for applications like determining similarity between documents and/or clustering.
 
@@ -183,10 +183,22 @@ An example of generating embeddings: ::
     
 See :class:`gobbli.io.EmbedOutput` for the output structure.
 
+Interactive Apps
+----------------
+
+Now that you understand the basics of how gobbli works, you might want to try out some of gobbli’s :ref:`interactive-apps` to perform some common tasks without writing any code.
+
+
+Extras
+------
+
+gobbli provides some additional functionality that can be used with or independently of its models. If you want to use gobbli to augment your dataset and transfer the dataset to another modeling framework, feel free.
+
+
 .. _data-augmentation:
 
 Data Augmentation
------------------
+^^^^^^^^^^^^^^^^^
 
 gobbli provides some helper functions to perform data augmentation.  If you only have a small set of labeled data, generating new data can help your model perform better.  Generated data will be similar but not exactly equal to the original data (similarity can generally be tweaked using some parameters), so you can apply your existing labels to the new data.
 
@@ -212,7 +224,7 @@ An example of augmenting a dataset: ::
 .. _document-windowing:
 
 Document Windowing
-------------------
+^^^^^^^^^^^^^^^^^^
 
 Many advanced deep learning models have a fixed max sequence length to limit memory usage for long documents.  If you don't have enough memory available to raise the sequence length to fit all your documents, you can use gobbli's "document windowing" helpers.
 

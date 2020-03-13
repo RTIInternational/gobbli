@@ -13,6 +13,7 @@ gobbli is *not* designed to provide deep learning models in a production context
 .. toctree::
    prerequisites
    quickstart
+   interactive_apps
    troubleshooting
    advanced_usage
    api
