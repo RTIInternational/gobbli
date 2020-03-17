@@ -14,7 +14,7 @@ import warnings
 import zipfile
 from distutils.util import strtobool
 from pathlib import Path
-from typing import Any, Container, Dict, Iterator, List, Optional, TypeVar
+from typing import Any, Container, Dict, Iterator, List, Optional, TypeVar, Union
 
 import humanize
 import pandas as pd
@@ -116,6 +116,16 @@ def pred_prob_to_pred_label(y_pred_proba: pd.DataFrame) -> List[str]:
     a list of predicted classes.
     """
     return y_pred_proba.idxmax(axis=1).tolist()
+
+
+def pred_prob_to_pred_multilabel(
+    y_pred_proba: pd.DataFrame, threshold: float = 0.5
+) -> pd.DataFrame:
+    """
+    Convert a dataframe of predicted probabilities (shape (n_samples, n_classes)) to
+    a dataframe of predicted label indicators (shape (n_samples, n_classes)).
+    """
+    return y_pred_proba > threshold
 
 
 def truncate_text(text: str, length: int) -> str:
@@ -537,6 +547,31 @@ def shuffle_together(l1: List[T1], l2: List[T2], seed: Optional[int] = None):
         random.seed(seed)
     random.shuffle(zipped)
     l1[:], l2[:] = zip(*zipped)
+
+
+def collect_multilabel_labels(y: Union[List[str], List[List[str]]]) -> List[List[str]]:
+    """
+    Given a list of labels which could be either multiclass (one label per row) or multilabel
+    (a list of labels per row), generalize the list to the multilabel context by ensuring
+    each row is a list of labels (even if it's only a single label).
+
+    Args:
+      y: List of either multiclass or multilabel labels
+
+    Returns:
+      List of multilabel labels
+    """
+    multilabel_y: List[List[str]] = []
+    for obj in y:
+        if isinstance(obj, str):
+            multilabel_y.append([obj])
+        elif isinstance(obj, list):
+            multilabel_y.append(obj)
+        else:
+            raise TypeError(
+                f"Unexpected label type: {type(obj)}.  Should be a string or list of strings."
+            )
+    return multilabel_y
 
 
 def _train_sentencepiece(spm: Any, texts: List[str], model_path: Path, vocab_size: int):

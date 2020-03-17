@@ -1,14 +1,22 @@
 import enum
+import itertools
 import tempfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Union
 
 import numpy as np
 import pandas as pd
 
-from gobbli.util import TokenizeMethod, detokenize, pred_prob_to_pred_label, tokenize
+from gobbli.util import (
+    TokenizeMethod,
+    collect_multilabel_labels,
+    detokenize,
+    pred_prob_to_pred_label,
+    pred_prob_to_pred_multilabel,
+    tokenize,
+)
 
 
 def _check_string_list(obj: Any):
@@ -19,6 +27,20 @@ def _check_string_list(obj: Any):
         raise TypeError(f"obj must be a list, got '{type(obj)}'")
     if len(obj) > 0 and not isinstance(obj[0], str):
         raise TypeError(f"obj must contain strings, got '{type(obj[0])}'")
+
+
+def _check_multilabel_list(obj: Any):
+    """
+    Verify a given object is a list containing lists of strings (labels).
+    """
+    if not isinstance(obj, list):
+        raise TypeError(f"obj must be a list, got '{type(obj)}'")
+    if len(obj) > 0 and not isinstance(obj[0], list):
+        raise TypeError(f"obj must contain lists, got '{type(obj[0])}'")
+    if len(obj[0]) > 0 and not isinstance(obj[0][0], str):
+        raise TypeError(
+            f"obj must contain lists of strings, got lists of '{type(obj[0][0])}'"
+        )
 
 
 def validate_X(X: List[str]):
@@ -39,7 +61,7 @@ def validate_y(y: List[str]):
     Args:
       y: Something that should be valid model output.
     """
-    _check_string_list(y)
+    _check_multilabel_list(y)
 
 
 def validate_X_y(X: List[str], y: List[Any]):
@@ -93,9 +115,9 @@ class TrainInput(TaskIO):
     """
 
     X_train: List[str]
-    y_train: List[str]
+    y_train: Union[List[str], List[List[str]]]
     X_valid: List[str]
-    y_valid: List[str]
+    y_valid: Union[List[str], List[List[str]]]
     train_batch_size: int = 32
     valid_batch_size: int = 8
     num_train_epochs: int = 3
@@ -107,16 +129,25 @@ class TrainInput(TaskIO):
           The set of unique labels in the data.
           Sort and return a list for consistent ordering, in case that matters.
         """
-        return sorted(list(set(self.y_train) | set(self.y_valid)))
+        label_set: Set[str] = set()
+        for labels in itertools.chain(self.y_train_multilabel, self.y_valid_multilabel):
+            label_set.update(labels)
+        return sorted(list(label_set))
 
     def __post_init__(self):
+        self.y_train_multilabel = collect_multilabel_labels(self.y_train)
+        self.y_valid_multilabel = collect_multilabel_labels(self.y_valid)
+
         for X in (self.X_train, self.X_valid):
             validate_X(X)
 
-        for y in self.y_train, self.y_valid:
+        for y in self.y_train_multilabel, self.y_valid_multilabel:
             validate_y(y)
 
-        for X, y in ((self.X_train, self.y_train), (self.X_valid, self.y_valid)):
+        for X, y in (
+            (self.X_train, self.y_train_multilabel),
+            (self.X_valid, self.y_valid_multilabel),
+        ):
             validate_X_y(X, y)
 
     def metadata(self) -> Dict[str, Any]:
@@ -215,9 +246,17 @@ class PredictOutput(TaskIO):
     def y_pred(self) -> List[str]:
         """
         Returns:
-          The predicted class for each observation.
+          The most likely predicted label for each observation.
         """
         return pred_prob_to_pred_label(self.y_pred_proba)
+
+    def y_pred_multilabel(self, threshold: float = 0.5) -> pd.DataFrame:
+        """
+        Returns:
+          Indicator matrix representing the predicted labels for each observation
+          using the given (optional) threshold.
+        """
+        return pred_prob_to_pred_multilabel(self.y_pred_proba, threshold)
 
     def __post_init__(self):
         validate_y(self.y_pred)

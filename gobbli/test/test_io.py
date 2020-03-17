@@ -15,7 +15,6 @@ from gobbli.io import (
 )
 
 
-@pytest.mark.parametrize("val_func", [validate_X, validate_y])
 @pytest.mark.parametrize(
     "obj,err_class",
     [
@@ -33,12 +32,41 @@ from gobbli.io import (
         ([], None),
     ],
 )
-def test_validate_input(obj, err_class, val_func):
+def test_validate_X(obj, err_class):
     if err_class is None:
-        val_func(obj)
+        validate_X(obj)
     else:
         with pytest.raises(err_class):
-            val_func(obj)
+            validate_X(obj)
+
+
+@pytest.mark.parametrize(
+    "obj,err_class",
+    [
+        # Wrong collection type (series)
+        (pd.Series(["a"]), TypeError),
+        # Wrong collection type (numpy array)
+        (np.array([["a"]]), TypeError),
+        # Wrong type (float)
+        ([1.0], TypeError),
+        # Wrong type (str)
+        (["1"], TypeError),
+        # Wrong type (list of float)
+        ([[1.0]], TypeError),
+        # Correct type (list of str)
+        ([["a"]], None),
+        # Empty label
+        ([[]], None),
+        # Empty
+        ([], None),
+    ],
+)
+def test_validate_y(obj, err_class):
+    if err_class is None:
+        validate_y(obj)
+    else:
+        with pytest.raises(err_class):
+            validate_y(obj)
 
 
 @pytest.mark.parametrize(
