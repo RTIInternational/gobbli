@@ -155,8 +155,12 @@ class BaseDataset(ABC):
         if limit is not None:
             X_test = X_test[:limit]
 
+        label_set = set()
+        for labels in y_train_valid:
+            label_set.update(labels)
+
         return gobbli.io.PredictInput(
             X=X_test,
             predict_batch_size=predict_batch_size,
-            labels=sorted(list(set(y_train_valid))),
+            labels=sorted(list(label_set)),
         )

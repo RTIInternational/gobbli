@@ -55,11 +55,22 @@ def validate_X(X: List[str]):
 
 def validate_y(y: List[str]):
     """
-    Confirm a given array matches the expected type and length for model output
+    Confirm a given array matches the expected type for multiclass model output
     (expected or predicted).
 
     Args:
-      y: Something that should be valid model output.
+      y: Something that should be valid multiclass model output.
+    """
+    _check_string_list(y)
+
+
+def validate_y_multilabel(y: List[List[str]]):
+    """
+    Confirm a given array matches the expected type and length for a multilabel
+    target.
+
+    Args:
+      y: Something that should be a valid multilabel target.
     """
     _check_multilabel_list(y)
 
@@ -142,7 +153,7 @@ class TrainInput(TaskIO):
             validate_X(X)
 
         for y in self.y_train_multilabel, self.y_valid_multilabel:
-            validate_y(y)
+            validate_y_multilabel(y)
 
         for X, y in (
             (self.X_train, self.y_train_multilabel),
@@ -250,6 +261,7 @@ class PredictOutput(TaskIO):
         """
         return pred_prob_to_pred_label(self.y_pred_proba)
 
+    @property
     def y_pred_multilabel(self, threshold: float = 0.5) -> pd.DataFrame:
         """
         Returns:

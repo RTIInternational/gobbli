@@ -7,7 +7,7 @@ from gobbli.dataset.base import BaseDataset
 from gobbli.util import download_archive
 
 
-class CMUMovieSummary(BaseDataset):
+class MovieSummaryDataset(BaseDataset):
     """
     gobbli Dataset for the CMU Movie Summary dataset, framed as a multilabel
     classification problem predicting movie genres from plot summaries.
@@ -33,15 +33,15 @@ class CMUMovieSummary(BaseDataset):
 
     def _is_built(self) -> bool:
         data_dir = self.data_dir()
-        return (data_dir / CMUMovieSummary.PLOT_SUMMARIES_FILE).exists() and (
-            data_dir / CMUMovieSummary.METADATA_FILE
+        return (data_dir / MovieSummaryDataset.PLOT_SUMMARIES_FILE).exists() and (
+            data_dir / MovieSummaryDataset.METADATA_FILE
         ).exists()
 
     def _get_source_df_split(self) -> Tuple[pd.DataFrame, int]:
         if not hasattr(self, "_source_df"):
             data_dir = self.data_dir()
             plot_df = pd.read_csv(
-                data_dir / CMUMovieSummary.PLOT_SUMMARIES_FILE,
+                data_dir / MovieSummaryDataset.PLOT_SUMMARIES_FILE,
                 delimiter="\t",
                 index_col=0,
                 header=None,
@@ -49,7 +49,7 @@ class CMUMovieSummary(BaseDataset):
             )
 
             meta_df = pd.read_csv(
-                data_dir / CMUMovieSummary.METADATA_FILE,
+                data_dir / MovieSummaryDataset.METADATA_FILE,
                 delimiter="\t",
                 index_col=0,
                 header=None,
@@ -70,7 +70,10 @@ class CMUMovieSummary(BaseDataset):
                 ["plot", "genres"]
             ].sort_index()
 
-        return self._source_df, int(len(self._source_df) * CMUMovieSummary.TRAIN_PCT)
+        return (
+            self._source_df,
+            int(len(self._source_df) * MovieSummaryDataset.TRAIN_PCT),
+        )
 
     def X_train(self):
         source_df, split_ndx = self._get_source_df_split()
@@ -78,7 +81,7 @@ class CMUMovieSummary(BaseDataset):
 
     def y_train(self):
         source_df, split_ndx = self._get_source_df_split()
-        return CMUMovieSummary._make_multilabels(source_df["genres"][:split_ndx])
+        return MovieSummaryDataset._make_multilabels(source_df["genres"][:split_ndx])
 
     def X_test(self):
         source_df, split_ndx = self._get_source_df_split()
@@ -86,4 +89,4 @@ class CMUMovieSummary(BaseDataset):
 
     def y_test(self):
         source_df, split_ndx = self._get_source_df_split()
-        return CMUMovieSummary._make_multilabels(source_df["genres"][split_ndx:])
+        return MovieSummaryDataset._make_multilabels(source_df["genres"][split_ndx:])

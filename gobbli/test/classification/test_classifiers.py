@@ -1,5 +1,6 @@
 import pytest
 
+from gobbli.dataset.cmu_movie_summary import MovieSummaryDataset
 from gobbli.dataset.newsgroups import NewsgroupsDataset
 from gobbli.dataset.trivial import TrivialDataset
 from gobbli.model.bert import BERT
@@ -29,6 +30,7 @@ def check_predict_output(train_output, predict_input, predict_output):
     [
         (MajorityClassifier, TrivialDataset, {}, {}, {}),
         (MajorityClassifier, NewsgroupsDataset, {}, {}, {}),
+        (MajorityClassifier, MovieSummaryDataset, {}, {}, {}),
         (SKLearnClassifier, TrivialDataset, {}, {}, {}),
         (SKLearnClassifier, NewsgroupsDataset, {}, {}, {}),
         (

@@ -1,8 +1,8 @@
-from gobbli.dataset.cmu_movie_summary import CMUMovieSummary
+from gobbli.dataset.cmu_movie_summary import MovieSummaryDataset
 
 
 def test_load_cmu_movie_summary(tmp_gobbli_dir):
-    ds = CMUMovieSummary.load()
+    ds = MovieSummaryDataset.load()
 
     X_train = ds.X_train()
     X_test = ds.X_test()

@@ -118,6 +118,27 @@ def pred_prob_to_pred_label(y_pred_proba: pd.DataFrame) -> List[str]:
     return y_pred_proba.idxmax(axis=1).tolist()
 
 
+def multilabel_to_indicator_df(y: List[List[str]], labels: List[str]) -> pd.DataFrame:
+    """
+    Convert a list of label lists to a 0/1 indicator dataframe.
+
+    Args:
+      y: List of label lists
+      labels: List of all unique labels found in y
+
+    Returns:
+      The dataframe will have a column for each label and a row for each observation,
+      with a 1 if the observation has that label or a 0 if not.
+    """
+    indicator_data = []
+    for row in y:
+        row_data = {label: 0 for label in labels}
+        for row_label in row:
+            row_data[row_label] = 1
+        indicator_data.append(row_data)
+    return pd.DataFrame(indicator_data)
+
+
 def pred_prob_to_pred_multilabel(
     y_pred_proba: pd.DataFrame, threshold: float = 0.5
 ) -> pd.DataFrame:
