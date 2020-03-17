@@ -6,7 +6,10 @@ services:
     image: gobbli-ci:latest
     # Travis only gives us ~7.5GB of memory, so we need to run tests in
     # low resource mode
-    command: ./run_ci.sh --low-resource
+    # The test environment won't be shared across runs, but we'd like to reuse
+    # artifacts between tests where possible to reduce runtime, so add the
+    # switch to persist data as well
+    command: ./run_ci.sh --low-resource --persist-data
     working_dir: $PWD/..
     volumes:
       # Needed for CI to be able to spawn containers
