@@ -9,9 +9,9 @@ from gobbli.io import (
     WindowPooling,
     make_document_windows,
     pool_document_windows,
+    validate_multilabel_y,
     validate_X,
     validate_X_y,
-    validate_y,
 )
 
 
@@ -41,32 +41,48 @@ def test_validate_X(obj, err_class):
 
 
 @pytest.mark.parametrize(
-    "obj,err_class",
+    "multilabel,obj,err_class",
     [
         # Wrong collection type (series)
-        (pd.Series(["a"]), TypeError),
+        (False, pd.Series(["a"]), TypeError),
         # Wrong collection type (numpy array)
-        (np.array([["a"]]), TypeError),
+        (False, np.array([["a"]]), TypeError),
+        # Wrong type (list of str)
+        (False, [["a"]], TypeError),
         # Wrong type (float)
-        ([1.0], TypeError),
-        # Wrong type (str)
-        (["1"], TypeError),
+        (False, [1.0], TypeError),
         # Wrong type (list of float)
-        ([[1.0]], TypeError),
-        # Correct type (list of str)
-        ([["a"]], None),
-        # Empty label
-        ([[]], None),
+        (False, [[1.0]], TypeError),
+        # Wrong type (empty list)
+        (False, [[]], TypeError),
+        # Correct type (str)
+        (False, ["1"], None),
         # Empty
-        ([], None),
+        (False, [], None),
+        # Wrong collection type (series)
+        (True, pd.Series(["a"]), TypeError),
+        # Wrong collection type (numpy array)
+        (True, np.array([["a"]]), TypeError),
+        # Wrong type (float)
+        (True, [1.0], TypeError),
+        # Wrong type (str)
+        (True, ["1"], TypeError),
+        # Wrong type (list of float)
+        (True, [[1.0]], TypeError),
+        # Correct type (list of str)
+        (True, [["a"]], None),
+        # Empty label
+        (True, [[]], None),
+        # Empty
+        (True, [], None),
     ],
 )
-def test_validate_y(obj, err_class):
+def test_validate_multilabel_y(multilabel, obj, err_class):
     if err_class is None:
-        validate_y(obj)
+        validate_multilabel_y(obj, multilabel)
     else:
         with pytest.raises(err_class):
-            validate_y(obj)
+            validate_multilabel_y(obj, multilabel)
 
 
 @pytest.mark.parametrize(

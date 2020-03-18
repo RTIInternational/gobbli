@@ -118,6 +118,15 @@ def pred_prob_to_pred_label(y_pred_proba: pd.DataFrame) -> List[str]:
     return y_pred_proba.idxmax(axis=1).tolist()
 
 
+def is_multilabel(y: Union[List[str], List[List[str]]]) -> bool:
+    """
+    Returns:
+      True if the passed dataset is formatted as a multilabel problem, otherwise false
+      (it's multiclass).
+    """
+    return len(y) > 0 and isinstance(y[0], list)
+
+
 def multilabel_to_indicator_df(y: List[List[str]], labels: List[str]) -> pd.DataFrame:
     """
     Convert a list of label lists to a 0/1 indicator dataframe.

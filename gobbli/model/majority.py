@@ -39,30 +39,45 @@ class MajorityClassifier(BaseModel, TrainMixin, PredictMixin):
         """
         Determine the majority class.
         """
-        unique_values, value_counts = np.unique(
-            list(itertools.chain(train_input.y_train_multilabel)), return_counts=True
-        )
+        if train_input.multilabel:
+            train_labels = list(itertools.chain(train_input.y_train))
+        else:
+            train_labels = train_input.y_train
+
+        unique_values, value_counts = np.unique(train_labels, return_counts=True)
         self.majority_class = unique_values[value_counts.argmax(axis=0)]
 
         labels = train_input.labels()
-        y_train_pred = self._make_pred_df(labels, len(train_input.y_train))
-        y_train_indicator = multilabel_to_indicator_df(
-            train_input.y_train_multilabel, labels
-        )
-        train_loss = (y_train_pred.subtract(y_train_indicator)).abs().to_numpy().sum()
+        y_train_pred_proba = self._make_pred_df(labels, len(train_input.y_train))
+        y_valid_pred_proba = self._make_pred_df(labels, len(train_input.y_valid))
 
-        y_valid_pred = self._make_pred_df(labels, len(train_input.y_valid))
-        y_valid_indicator = multilabel_to_indicator_df(
-            train_input.y_valid_multilabel, labels
-        )
-        valid_loss = (y_valid_pred.subtract(y_valid_indicator)).abs().to_numpy().sum()
-        valid_accuracy = valid_loss / (y_valid_pred.shape[0] * y_valid_pred.shape[1])
+        if train_input.multilabel:
+            y_train_indicator = multilabel_to_indicator_df(train_input.y_train, labels)
+            train_loss = (
+                (y_train_pred_proba.subtract(y_train_indicator)).abs().to_numpy().sum()
+            )
+
+            y_valid_indicator = multilabel_to_indicator_df(train_input.y_valid, labels)
+            valid_loss = (
+                (y_valid_pred_proba.subtract(y_valid_indicator)).abs().to_numpy().sum()
+            )
+            valid_accuracy = valid_loss / (
+                y_valid_pred_proba.shape[0] * y_valid_pred_proba.shape[1]
+            )
+        else:
+            y_train_pred = pred_prob_to_pred_label(y_train_pred_proba)
+            train_loss = np.sum(y_train_pred != train_input.y_train)
+
+            y_valid_pred = pred_prob_to_pred_label(y_valid_pred_proba)
+            valid_loss = np.sum(y_valid_pred != train_input.y_valid)
+            valid_accuracy = valid_loss / y_valid_pred.shape[0]
 
         return gobbli.io.TrainOutput(
             valid_loss=valid_loss,
             valid_accuracy=valid_accuracy,
             train_loss=train_loss,
             labels=train_input.labels(),
+            multilabel=train_input.multilabel,
         )
 
     def _predict(

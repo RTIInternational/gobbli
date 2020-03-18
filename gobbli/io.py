@@ -35,12 +35,33 @@ def _check_multilabel_list(obj: Any):
     """
     if not isinstance(obj, list):
         raise TypeError(f"obj must be a list, got '{type(obj)}'")
-    if len(obj) > 0 and not isinstance(obj[0], list):
-        raise TypeError(f"obj must contain lists, got '{type(obj[0])}'")
-    if len(obj[0]) > 0 and not isinstance(obj[0][0], str):
-        raise TypeError(
-            f"obj must contain lists of strings, got lists of '{type(obj[0][0])}'"
-        )
+
+    if len(obj) > 0:
+        if not isinstance(obj[0], list):
+            raise TypeError(f"obj must contain lists, got '{type(obj[0])}'")
+
+        if len(obj[0]) > 0:
+            if not isinstance(obj[0][0], str):
+                raise TypeError(
+                    f"obj must contain lists of strings, got lists of '{type(obj[0][0])}'"
+                )
+
+
+def infer_multilabel(y: Union[List[str], List[List[str]]]) -> bool:
+    """
+    Infer from the types of a given input dataset whether it's formulated for
+    a multilabel problem or not (multiclass).
+
+    Args:
+      y: A valid type of model output (multilabel or multiclass)
+
+    Returns:
+      True if y is a multilabel target, else False for a multiclass target.
+    """
+    if len(y) > 0 and isinstance(y[0], list):
+        return True
+    else:
+        return False
 
 
 def validate_X(X: List[str]):
@@ -53,26 +74,19 @@ def validate_X(X: List[str]):
     _check_string_list(X)
 
 
-def validate_y(y: List[str]):
+def validate_multilabel_y(y: Union[List[str], List[List[str]]], multilabel: bool):
     """
-    Confirm a given array matches the expected type for multiclass model output
-    (expected or predicted).
+    Confirm an array is typed appropriately for the value of ``multilabel``.
 
     Args:
-      y: Something that should be valid multiclass model output.
+      y: Something that should be valid multiclass or multilabel output.
+      multilabel: True if y should be formatted for a multilabel problem
+        and False otherwise (for a multiclass problem).
     """
-    _check_string_list(y)
-
-
-def validate_y_multilabel(y: List[List[str]]):
-    """
-    Confirm a given array matches the expected type and length for a multilabel
-    target.
-
-    Args:
-      y: Something that should be a valid multilabel target.
-    """
-    _check_multilabel_list(y)
+    if multilabel:
+        _check_multilabel_list(y)
+    else:
+        _check_string_list(y)
 
 
 def validate_X_y(X: List[str], y: List[Any]):
@@ -140,25 +154,25 @@ class TrainInput(TaskIO):
           The set of unique labels in the data.
           Sort and return a list for consistent ordering, in case that matters.
         """
-        label_set: Set[str] = set()
-        for labels in itertools.chain(self.y_train_multilabel, self.y_valid_multilabel):
-            label_set.update(labels)
+        if self.multilabel:
+            label_set: Set[str] = set()
+            for labels in itertools.chain(self.y_train, self.y_valid):
+                label_set.update(labels)
+        else:
+            label_set = set(list(itertools.chain(self.y_train, self.y_valid)))
+
         return sorted(list(label_set))
 
     def __post_init__(self):
-        self.y_train_multilabel = collect_multilabel_labels(self.y_train)
-        self.y_valid_multilabel = collect_multilabel_labels(self.y_valid)
+        self.multilabel = infer_multilabel(self.y_train)
 
         for X in (self.X_train, self.X_valid):
             validate_X(X)
 
-        for y in self.y_train_multilabel, self.y_valid_multilabel:
-            validate_y_multilabel(y)
+        for y in self.y_train, self.y_valid:
+            validate_multilabel_y(y, self.multilabel)
 
-        for X, y in (
-            (self.X_train, self.y_train_multilabel),
-            (self.X_valid, self.y_valid_multilabel),
-        ):
+        for X, y in ((self.X_train, self.y_train), (self.X_valid, self.y_valid)):
             validate_X_y(X, y)
 
     def metadata(self) -> Dict[str, Any]:
@@ -170,6 +184,7 @@ class TrainInput(TaskIO):
             "len_y_train": len(self.y_train),
             "len_X_valid": len(self.X_valid),
             "len_y_valid": len(self.y_valid),
+            "multilabel": self.multilabel,
             "checkpoint": self.checkpoint,
         }
 
@@ -185,6 +200,8 @@ class TrainOutput(TaskIO):
       train_loss:  Loss on the training dataset.
       labels: List of labels present in the training data.
         Used to initialize the model for prediction.
+      multilabel: True if the model was trained in a multilabel context,
+        otherwise False (indicating a multiclass context).
       checkpoint: Path to the best checkpoint from training.
         This may not be a literal filepath in the case of ex. TensorFlow,
         but it should give the user everything they need to run prediction
@@ -196,6 +213,7 @@ class TrainOutput(TaskIO):
     valid_accuracy: float
     train_loss: float
     labels: List[str]
+    multilabel: bool = False
     checkpoint: Optional[Path] = None
     _console_output: str = ""
 
@@ -204,6 +222,7 @@ class TrainOutput(TaskIO):
             "valid_loss": float(self.valid_loss),
             "valid_accuracy": float(self.valid_accuracy),
             "train_loss": float(self.train_loss),
+            "multilabel": self.multilabel,
             "labels": self.labels,
             "checkpoint": str(self.checkpoint),
         }
@@ -217,6 +236,8 @@ class PredictInput(TaskIO):
     Args:
       X: Documents to have labels predicted for.
       labels: See :paramref:`TrainOutput.params.labels`.
+      multilabel: True if the model was trained in a multilabel context,
+        otherwise False (indicating a multiclass context).
       predict_batch_size: Number of documents to predict in each batch.
       checkpoint: Checkpoint containing trained weights for the model.
         See :paramref:`TrainOutput.params.checkpoint`.
@@ -224,6 +245,7 @@ class PredictInput(TaskIO):
 
     X: List[str]
     labels: List[str]
+    multilabel: bool = False
     predict_batch_size: int = 32
     checkpoint: Optional[Path] = None
 
@@ -235,6 +257,7 @@ class PredictInput(TaskIO):
             "predict_batch_size": self.predict_batch_size,
             "labels": self.labels,
             "checkpoint": str(self.checkpoint),
+            "multilabel": self.multilabel,
             "len_X": len(self.X),
         }
 
@@ -271,7 +294,7 @@ class PredictOutput(TaskIO):
         return pred_prob_to_pred_multilabel(self.y_pred_proba, threshold)
 
     def __post_init__(self):
-        validate_y(self.y_pred)
+        validate_multilabel_y(self.y_pred, False)
 
     def metadata(self) -> Dict[str, Any]:
         return {"len_y_pred": self.y_pred_proba.shape[0]}

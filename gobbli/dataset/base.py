@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
 from timeit import default_timer as timer
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional, Set, Tuple
 
 from sklearn.model_selection import train_test_split
 
@@ -155,7 +155,7 @@ class BaseDataset(ABC):
         if limit is not None:
             X_test = X_test[:limit]
 
-        label_set = set()
+        label_set: Set[str] = set()
         for labels in y_train_valid:
             label_set.update(labels)
 
