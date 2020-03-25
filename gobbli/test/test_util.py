@@ -10,7 +10,6 @@ import pytest
 from gobbli.util import (
     TokenizeMethod,
     blob_to_dir,
-    collect_multilabel_labels,
     detokenize,
     dir_to_blob,
     extract_archive,
@@ -175,27 +174,6 @@ def test_shuffle_together(l1, l2, err):
         shuffle_together(l1, l2, seed=seed)
         for row in zip(l1, l2):
             assert tuple(row) in original_rows
-
-
-@pytest.mark.parametrize(
-    "y,y_multilabel_expected,err",
-    [
-        ([], [], None),
-        ([["a"]], [["a"]], None),
-        (["a"], [["a"]], None),
-        ([["a", "b"]], [["a", "b"]], None),
-        (["a", "b"], [["a"], ["b"]], None),
-        ([["a", "b"], ["c", "d"]], [["a", "b"], ["c", "d"]], None),
-        ([1], None, TypeError),
-    ],
-)
-def test_collect_multilabel_labels(y, y_multilabel_expected, err):
-    if err is not None:
-        with pytest.raises(err):
-            collect_multilabel_labels(y)
-    else:
-        y_multilabel = collect_multilabel_labels(y)
-        assert y_multilabel == y_multilabel_expected
 
 
 @pytest.mark.parametrize(

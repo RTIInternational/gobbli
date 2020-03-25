@@ -33,6 +33,7 @@ def check_predict_output(train_output, predict_input, predict_output):
         (MajorityClassifier, MovieSummaryDataset, {}, {}, {}),
         (SKLearnClassifier, TrivialDataset, {}, {}, {}),
         (SKLearnClassifier, NewsgroupsDataset, {}, {}, {}),
+        (SKLearnClassifier, MovieSummaryDataset, {}, {}, {}),
         (
             BERT,
             TrivialDataset,

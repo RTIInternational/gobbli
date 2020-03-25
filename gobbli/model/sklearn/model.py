@@ -10,7 +10,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import GridSearchCV
+from sklearn.multiclass import OneVsRestClassifier
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MultiLabelBinarizer
 
 import gobbli.io
 from gobbli.model.base import BaseModel
@@ -111,7 +113,8 @@ class _SafeEstimator(BaseEstimator, ClassifierMixin):
             if _AT_LEAST_TWO_CLASSES_ERR_MSG not in str(e):
                 raise
         finally:
-            self.classes_ = self.base_estimator.classes_
+            if hasattr(self.base_estimator, "classes_"):
+                self.classes_ = self.base_estimator.classes_
 
     def predict_proba(self, X):
         if self.classes_ is None:
@@ -145,6 +148,9 @@ class SKLearnClassifier(BaseModel, TrainMixin, PredictMixin):
     to vectorize text) and an estimator (e.g. logistic regression).  See the helper functions
     in this module for some examples.  You may also consider wrapping the pipeline with
     :class:`sklearn.model_selection.GridSearchCV` to tune hyperparameters.
+
+    For multilabel classification, the passed estimator will be automatically wrapped in a
+    :class:`sklearn.multiclass.OneVsRestClassifier`.
     """
 
     _TRAIN_OUTPUT_CHECKPOINT = "estimator.joblib"
@@ -220,18 +226,46 @@ class SKLearnClassifier(BaseModel, TrainMixin, PredictMixin):
                 "SKLearnClassifier does not support training from an existing "
                 "checkpoint, so the passed checkpoint will be ignored."
             )
-        self.estimator.fit(train_input.X_train, train_input.y_train)
 
-        y_train_pred = self.estimator.predict(train_input.X_train)
+        # Input must be a numpy array for OneVsRestClassifier case
+        X_train = np.array(train_input.X_train)
+        X_valid = np.array(train_input.X_valid)
+
+        y_train = train_input.y_train
+        y_valid = train_input.y_valid
+        labels = train_input.labels()
+        if train_input.multilabel:
+            self.estimator.base_estimator = OneVsRestClassifier(
+                self.estimator.base_estimator
+            )
+            mlb = MultiLabelBinarizer(classes=labels)
+            y_train = pd.DataFrame(mlb.fit_transform(y_train), columns=mlb.classes_)
+            y_valid = pd.DataFrame(mlb.transform(y_valid), columns=mlb.classes_)
+
+        self.estimator.fit(X_train, y_train)
+
+        if train_input.multilabel:
+            # The fit method for OneVsRestClassifier uses LabelBinarizer to determine the
+            # classes, which doesn't take string column names from a pandas DataFrame,
+            # so the classes will come back as integer indexes.  Fix that manually here.
+            # Use a numpy array to ensure compatilibity with the automatically-created classes.
+            np_labels = np.array(labels)
+            self.estimator.classes_ = np_labels
+            self.estimator.base_estimator.classes_ = np_labels
+            self.estimator.base_estimator.label_binarizer_.classes_ = np_labels
+
+        y_train_pred = self.estimator.predict(X_train)
+        y_valid_pred = self.estimator.predict(X_valid)
+
         train_loss = -f1_score(
-            train_input.y_train, y_train_pred, zero_division="warn", average="weighted"
+            y_train, y_train_pred, zero_division="warn", average="weighted"
         )
 
-        y_valid_pred = self.estimator.predict(train_input.X_valid)
         valid_loss = -f1_score(
-            train_input.y_valid, y_valid_pred, zero_division="warn", average="weighted"
+            y_valid, y_valid_pred, zero_division="warn", average="weighted"
         )
-        valid_accuracy = accuracy_score(train_input.y_valid, y_valid_pred)
+
+        valid_accuracy = accuracy_score(y_valid, y_valid_pred)
 
         checkpoint_path = (
             context.host_output_dir / SKLearnClassifier._TRAIN_OUTPUT_CHECKPOINT
@@ -242,7 +276,8 @@ class SKLearnClassifier(BaseModel, TrainMixin, PredictMixin):
             valid_loss=valid_loss,
             valid_accuracy=valid_accuracy,
             train_loss=train_loss,
-            labels=train_input.labels(),
+            labels=labels,
+            multilabel=train_input.multilabel,
             checkpoint=checkpoint_path,
         )
 
@@ -254,8 +289,20 @@ class SKLearnClassifier(BaseModel, TrainMixin, PredictMixin):
             self.estimator = _SafeEstimator(
                 self._load_estimator(predict_input.checkpoint)
             )
+        elif predict_input.multilabel:
+            # A trained checkpoint on a multilabel problem will already
+            # be wrapped with OneVsRestClassifier, so only need to do it
+            # if we're predicting without a checkpoint for whatever reason
+            self.estimator.base_estimator = OneVsRestClassifier(
+                self.estimator.base_estimator
+            )
 
-        pred_proba_df = pd.DataFrame(self.estimator.predict_proba(predict_input.X))
+        # Input must be a numpy array for OneVsRestClassifier case
+        X = np.array(predict_input.X)
+        pred_proba_df = pd.DataFrame(self.estimator.predict_proba(X))
+        # if predict_input.multilabel:
+        # The model will have been trained to generate binarized classes as output --
+
         if self.estimator.classes_ is None:
             raise ValueError(
                 "Can't determine column names for predicted probabilities."

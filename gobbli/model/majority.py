@@ -8,7 +8,7 @@ import gobbli.io
 from gobbli.model.base import BaseModel
 from gobbli.model.context import ContainerTaskContext
 from gobbli.model.mixin import PredictMixin, TrainMixin
-from gobbli.util import multilabel_to_indicator_df
+from gobbli.util import multilabel_to_indicator_df, pred_prob_to_pred_label
 
 
 class MajorityClassifier(BaseModel, TrainMixin, PredictMixin):
@@ -70,7 +70,7 @@ class MajorityClassifier(BaseModel, TrainMixin, PredictMixin):
 
             y_valid_pred = pred_prob_to_pred_label(y_valid_pred_proba)
             valid_loss = np.sum(y_valid_pred != train_input.y_valid)
-            valid_accuracy = valid_loss / y_valid_pred.shape[0]
+            valid_accuracy = valid_loss / len(y_valid_pred)
 
         return gobbli.io.TrainOutput(
             valid_loss=valid_loss,

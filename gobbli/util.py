@@ -14,7 +14,7 @@ import warnings
 import zipfile
 from distutils.util import strtobool
 from pathlib import Path
-from typing import Any, Container, Dict, Iterator, List, Optional, TypeVar, Union
+from typing import Any, Container, Dict, Iterator, List, Optional, Set, TypeVar, Union
 
 import humanize
 import pandas as pd
@@ -146,6 +146,27 @@ def multilabel_to_indicator_df(y: List[List[str]], labels: List[str]) -> pd.Data
             row_data[row_label] = 1
         indicator_data.append(row_data)
     return pd.DataFrame(indicator_data)
+
+
+def collect_labels(y: Any) -> List[str]:
+    """
+    Collect the unique labels in the given target variable, which could be in
+    multiclass or multilabel format.
+
+    Args:
+      y: Target variable
+
+    Returns:
+      An ordered list of all labels in y.
+    """
+    if is_multilabel(y):
+        label_set: Set[str] = set()
+        for labels in y:
+            label_set.update(labels)
+    else:
+        label_set = set(y)
+
+    return list(sorted(label_set))
 
 
 def pred_prob_to_pred_multilabel(
@@ -577,31 +598,6 @@ def shuffle_together(l1: List[T1], l2: List[T2], seed: Optional[int] = None):
         random.seed(seed)
     random.shuffle(zipped)
     l1[:], l2[:] = zip(*zipped)
-
-
-def collect_multilabel_labels(y: Union[List[str], List[List[str]]]) -> List[List[str]]:
-    """
-    Given a list of labels which could be either multiclass (one label per row) or multilabel
-    (a list of labels per row), generalize the list to the multilabel context by ensuring
-    each row is a list of labels (even if it's only a single label).
-
-    Args:
-      y: List of either multiclass or multilabel labels
-
-    Returns:
-      List of multilabel labels
-    """
-    multilabel_y: List[List[str]] = []
-    for obj in y:
-        if isinstance(obj, str):
-            multilabel_y.append([obj])
-        elif isinstance(obj, list):
-            multilabel_y.append(obj)
-        else:
-            raise TypeError(
-                f"Unexpected label type: {type(obj)}.  Should be a string or list of strings."
-            )
-    return multilabel_y
 
 
 def _train_sentencepiece(spm: Any, texts: List[str], model_path: Path, vocab_size: int):

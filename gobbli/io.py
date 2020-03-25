@@ -1,18 +1,18 @@
 import enum
-import itertools
 import tempfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, TypeVar, Union
 
 import numpy as np
 import pandas as pd
 
 from gobbli.util import (
     TokenizeMethod,
-    collect_multilabel_labels,
+    collect_labels,
     detokenize,
+    is_multilabel,
     pred_prob_to_pred_label,
     pred_prob_to_pred_multilabel,
     tokenize,
@@ -45,23 +45,6 @@ def _check_multilabel_list(obj: Any):
                 raise TypeError(
                     f"obj must contain lists of strings, got lists of '{type(obj[0][0])}'"
                 )
-
-
-def infer_multilabel(y: Union[List[str], List[List[str]]]) -> bool:
-    """
-    Infer from the types of a given input dataset whether it's formulated for
-    a multilabel problem or not (multiclass).
-
-    Args:
-      y: A valid type of model output (multilabel or multiclass)
-
-    Returns:
-      True if y is a multilabel target, else False for a multiclass target.
-    """
-    if len(y) > 0 and isinstance(y[0], list):
-        return True
-    else:
-        return False
 
 
 def validate_X(X: List[str]):
@@ -121,8 +104,11 @@ class TaskIO(ABC):
         raise NotImplementedError
 
 
+ClassificationTarget = TypeVar("ClassificationTarget", List[str], List[List[str]])
+
+
 @dataclass
-class TrainInput(TaskIO):
+class TrainInput(TaskIO, Generic[ClassificationTarget]):
     """
     Input for training a model.  See :meth:`gobbli.model.mixin.TrainMixin.train`.
 
@@ -140,9 +126,9 @@ class TrainInput(TaskIO):
     """
 
     X_train: List[str]
-    y_train: Union[List[str], List[List[str]]]
+    y_train: ClassificationTarget
     X_valid: List[str]
-    y_valid: Union[List[str], List[List[str]]]
+    y_valid: ClassificationTarget
     train_batch_size: int = 32
     valid_batch_size: int = 8
     num_train_epochs: int = 3
@@ -154,17 +140,10 @@ class TrainInput(TaskIO):
           The set of unique labels in the data.
           Sort and return a list for consistent ordering, in case that matters.
         """
-        if self.multilabel:
-            label_set: Set[str] = set()
-            for labels in itertools.chain(self.y_train, self.y_valid):
-                label_set.update(labels)
-        else:
-            label_set = set(list(itertools.chain(self.y_train, self.y_valid)))
-
-        return sorted(list(label_set))
+        return collect_labels(self.y_train + self.y_valid)
 
     def __post_init__(self):
-        self.multilabel = infer_multilabel(self.y_train)
+        self.multilabel = is_multilabel(self.y_train)
 
         for X in (self.X_train, self.X_valid):
             validate_X(X)
@@ -284,7 +263,6 @@ class PredictOutput(TaskIO):
         """
         return pred_prob_to_pred_label(self.y_pred_proba)
 
-    @property
     def y_pred_multilabel(self, threshold: float = 0.5) -> pd.DataFrame:
         """
         Returns:
