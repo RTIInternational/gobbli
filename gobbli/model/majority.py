@@ -40,9 +40,11 @@ class MajorityClassifier(BaseModel, TrainMixin, PredictMixin):
         Determine the majority class.
         """
         if train_input.multilabel:
-            train_labels = list(itertools.chain(train_input.y_train))
+            train_labels: List[str] = list(
+                itertools.chain.from_iterable(train_input.y_train_multilabel)
+            )
         else:
-            train_labels = train_input.y_train
+            train_labels = train_input.y_train_multiclass
 
         unique_values, value_counts = np.unique(train_labels, return_counts=True)
         self.majority_class = unique_values[value_counts.argmax(axis=0)]
@@ -52,12 +54,16 @@ class MajorityClassifier(BaseModel, TrainMixin, PredictMixin):
         y_valid_pred_proba = self._make_pred_df(labels, len(train_input.y_valid))
 
         if train_input.multilabel:
-            y_train_indicator = multilabel_to_indicator_df(train_input.y_train, labels)
+            y_train_indicator = multilabel_to_indicator_df(
+                train_input.y_train_multilabel, labels
+            )
             train_loss = (
                 (y_train_pred_proba.subtract(y_train_indicator)).abs().to_numpy().sum()
             )
 
-            y_valid_indicator = multilabel_to_indicator_df(train_input.y_valid, labels)
+            y_valid_indicator = multilabel_to_indicator_df(
+                train_input.y_valid_multilabel, labels
+            )
             valid_loss = (
                 (y_valid_pred_proba.subtract(y_valid_indicator)).abs().to_numpy().sum()
             )
@@ -66,10 +72,10 @@ class MajorityClassifier(BaseModel, TrainMixin, PredictMixin):
             )
         else:
             y_train_pred = pred_prob_to_pred_label(y_train_pred_proba)
-            train_loss = np.sum(y_train_pred != train_input.y_train)
+            train_loss = np.sum(y_train_pred != train_input.y_train_multiclass)
 
             y_valid_pred = pred_prob_to_pred_label(y_valid_pred_proba)
-            valid_loss = np.sum(y_valid_pred != train_input.y_valid)
+            valid_loss = np.sum(y_valid_pred != train_input.y_valid_multiclass)
             valid_accuracy = valid_loss / len(y_valid_pred)
 
         return gobbli.io.TrainOutput(

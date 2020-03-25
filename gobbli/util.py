@@ -127,6 +127,17 @@ def is_multilabel(y: Union[List[str], List[List[str]]]) -> bool:
     return len(y) > 0 and isinstance(y[0], list)
 
 
+def multiclass_to_multilabel_target(y: List[str]) -> List[List[str]]:
+    """
+    Args:
+      y: Multiclass-formatted target variable
+
+    Returns:
+      The multiclass-formatted variable generalized to a multilabel context
+    """
+    return [[l] for l in y]
+
+
 def multilabel_to_indicator_df(y: List[List[str]], labels: List[str]) -> pd.DataFrame:
     """
     Convert a list of label lists to a 0/1 indicator dataframe.

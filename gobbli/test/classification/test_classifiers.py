@@ -104,6 +104,13 @@ def check_predict_output(train_output, predict_input, predict_output):
             {"num_train_epochs": 1, "train_batch_size": 32},
             {},
         ),
+        (
+            SpaCyModel,
+            MovieSummaryDataset,
+            {"model": "en_core_web_sm", "architecture": "bow"},
+            {"num_train_epochs": 1, "train_batch_size": 32},
+            {},
+        ),
     ],
 )
 def test_classifier(

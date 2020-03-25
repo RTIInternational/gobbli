@@ -3,7 +3,7 @@ import tempfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, TypeVar, Union
+from typing import Any, Dict, Generic, Iterator, List, Optional, Tuple, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -13,6 +13,7 @@ from gobbli.util import (
     collect_labels,
     detokenize,
     is_multilabel,
+    multiclass_to_multilabel_target,
     pred_prob_to_pred_label,
     pred_prob_to_pred_multilabel,
     tokenize,
@@ -104,13 +105,14 @@ class TaskIO(ABC):
         raise NotImplementedError
 
 
-ClassificationTarget = TypeVar("ClassificationTarget", List[str], List[List[str]])
-
-
 @dataclass
-class TrainInput(TaskIO, Generic[ClassificationTarget]):
+class TrainInput(TaskIO):
     """
     Input for training a model.  See :meth:`gobbli.model.mixin.TrainMixin.train`.
+
+    For usage specific to a multiclass or multilabel paradigm, consider using the
+    more specifically checked and typed properties: ``y_{train,valid}_{multiclass,multilabel}``
+    as opposed to the more generically typed ``y_{train,valid}`` attributes.
 
     Args:
       X_train: Documents used for training.
@@ -126,13 +128,41 @@ class TrainInput(TaskIO, Generic[ClassificationTarget]):
     """
 
     X_train: List[str]
-    y_train: ClassificationTarget
+    y_train: Union[List[str], List[List[str]]]
     X_valid: List[str]
-    y_valid: ClassificationTarget
+    y_valid: Union[List[str], List[List[str]]]
     train_batch_size: int = 32
     valid_batch_size: int = 8
     num_train_epochs: int = 3
     checkpoint: Optional[Path] = None
+
+    @property
+    def y_train_multiclass(self) -> List[str]:
+        if self.multilabel:
+            raise ValueError(
+                "Multilabel training input can't be converted to multiclass."
+            )
+        return cast(List[str], self.y_train)
+
+    @property
+    def y_train_multilabel(self) -> List[List[str]]:
+        if self.multilabel:
+            return cast(List[List[str]], self.y_train)
+        return multiclass_to_multilabel_target(cast(List[str], self.y_train))
+
+    @property
+    def y_valid_multiclass(self) -> List[str]:
+        if self.multilabel:
+            raise ValueError(
+                "Multilabel training input can't be converted to multiclass."
+            )
+        return cast(List[str], self.y_valid)
+
+    @property
+    def y_valid_multilabel(self) -> List[List[str]]:
+        if self.multilabel:
+            return cast(List[List[str]], self.y_valid)
+        return multiclass_to_multilabel_target(cast(List[str], self.y_valid))
 
     def labels(self) -> List[str]:
         """
@@ -140,7 +170,9 @@ class TrainInput(TaskIO, Generic[ClassificationTarget]):
           The set of unique labels in the data.
           Sort and return a list for consistent ordering, in case that matters.
         """
-        return collect_labels(self.y_train + self.y_valid)
+        # We verify these types are compatible during initialization, so ignore
+        # mypy warning about a possible mismatch due to the Union
+        return collect_labels(self.y_train + self.y_valid)  # type: ignore
 
     def __post_init__(self):
         self.multilabel = is_multilabel(self.y_train)

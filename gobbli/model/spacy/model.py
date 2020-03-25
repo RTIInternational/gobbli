@@ -147,7 +147,9 @@ class SpaCyModel(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         cache_dir.mkdir(exist_ok=True, parents=True)
         return cache_dir
 
-    def _write_input(self, X: List[str], labels: Optional[List[str]], input_path: Path):
+    def _write_input(
+        self, X: List[str], labels: Optional[List[List[str]]], input_path: Path
+    ):
         """
         Write the given input texts and (optionally) labels to the file pointed to by
         ``input_path``.
@@ -177,12 +179,12 @@ class SpaCyModel(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
 
         self._write_input(
             train_input.X_train,
-            train_input.y_train,
+            train_input.y_train_multilabel,
             context.host_input_dir / SpaCyModel._TRAIN_INPUT_FILE,
         )
         self._write_input(
             train_input.X_valid,
-            train_input.y_valid,
+            train_input.y_valid_multilabel,
             context.host_input_dir / SpaCyModel._VALID_INPUT_FILE,
         )
 
@@ -211,6 +213,8 @@ class SpaCyModel(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
 
         if self.full_pipeline:
             cmd += " --full-pipeline"
+        if train_input.multilabel:
+            cmd += " --multilabel"
 
         run_kwargs = self._base_docker_run_kwargs(context)
 
