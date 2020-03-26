@@ -70,6 +70,13 @@ def check_predict_output(train_output, predict_input, predict_output):
             {"predict_batch_size": 32},
         ),
         (
+            MTDNN,
+            MovieSummaryDataset,
+            {},
+            {"num_train_epochs": 1, "train_batch_size": 32, "valid_batch_size": 32},
+            {"predict_batch_size": 32},
+        ),
+        (
             FastText,
             TrivialDataset,
             {"autotune_duration": 10, "word_ngrams": 1, "dim": 50, "ws": 5},
@@ -147,12 +154,6 @@ def test_classifier(
     ):
         skip_if_low_resource(request.config)
 
-    # These models don't support multilabel classification
-    if model_cls in (BERT,) and dataset_cls is MovieSummaryDataset:
-        pytest.xfail(
-            f"model {model_cls.__name__} doesn't support multilabel classification"
-        )
-
     model = model_cls(
         data_dir=model_test_dir(model_cls),
         load_existing=True,
@@ -163,8 +164,14 @@ def test_classifier(
     model.build()
     ds = dataset_cls.load()
 
+    train_input = ds.train_input(limit=50, **train_kwargs)
+    if train_input.multilabel and model_cls in (BERT, MTDNN):
+        pytest.xfail(
+            f"model {model_cls.__name__} doesn't support multilabel classification"
+        )
+
     # Verify training runs, results are sensible
-    train_output = model.train(ds.train_input(limit=50, **train_kwargs))
+    train_output = model.train()
     assert train_output.valid_loss is not None
     assert train_output.train_loss is not None
     assert 0 <= train_output.valid_accuracy <= 1
