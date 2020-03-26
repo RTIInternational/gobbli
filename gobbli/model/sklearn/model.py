@@ -12,13 +12,12 @@ from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import MultiLabelBinarizer
 
 import gobbli.io
 from gobbli.model.base import BaseModel
 from gobbli.model.context import ContainerTaskContext
 from gobbli.model.mixin import EmbedMixin, PredictMixin, TrainMixin
-from gobbli.util import assert_type, generate_uuid
+from gobbli.util import assert_type, generate_uuid, multilabel_to_indicator_df
 
 
 def persist_estimator(estimator: BaseEstimator) -> Path:
@@ -238,9 +237,9 @@ class SKLearnClassifier(BaseModel, TrainMixin, PredictMixin):
             self.estimator.base_estimator = OneVsRestClassifier(
                 self.estimator.base_estimator
             )
-            mlb = MultiLabelBinarizer(classes=labels)
-            y_train = pd.DataFrame(mlb.fit_transform(y_train), columns=mlb.classes_)
-            y_valid = pd.DataFrame(mlb.transform(y_valid), columns=mlb.classes_)
+
+            y_train = multilabel_to_indicator_df(train_input.y_train_multilabel, labels)
+            y_valid = multilabel_to_indicator_df(train_input.y_valid_multilabel, labels)
 
         self.estimator.fit(X_train, y_train)
 

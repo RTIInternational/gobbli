@@ -20,6 +20,7 @@ import humanize
 import pandas as pd
 import pkg_resources
 import requests
+from sklearn.preprocessing import MultiLabelBinarizer
 
 LOGGER = logging.getLogger(__name__)
 
@@ -118,6 +119,16 @@ def pred_prob_to_pred_label(y_pred_proba: pd.DataFrame) -> List[str]:
     return y_pred_proba.idxmax(axis=1).tolist()
 
 
+def pred_prob_to_pred_multilabel(
+    y_pred_proba: pd.DataFrame, threshold: float = 0.5
+) -> pd.DataFrame:
+    """
+    Convert a dataframe of predicted probabilities (shape (n_samples, n_classes)) to
+    a dataframe of predicted label indicators (shape (n_samples, n_classes)).
+    """
+    return y_pred_proba > threshold
+
+
 def is_multilabel(y: Union[List[str], List[List[str]]]) -> bool:
     """
     Returns:
@@ -150,13 +161,8 @@ def multilabel_to_indicator_df(y: List[List[str]], labels: List[str]) -> pd.Data
       The dataframe will have a column for each label and a row for each observation,
       with a 1 if the observation has that label or a 0 if not.
     """
-    indicator_data = []
-    for row in y:
-        row_data = {label: 0 for label in labels}
-        for row_label in row:
-            row_data[row_label] = 1
-        indicator_data.append(row_data)
-    return pd.DataFrame(indicator_data)
+    mlb = MultiLabelBinarizer(classes=labels)
+    return pd.DataFrame(mlb.fit_transform(y), columns=mlb.classes_)
 
 
 def collect_labels(y: Any) -> List[str]:
@@ -178,16 +184,6 @@ def collect_labels(y: Any) -> List[str]:
         label_set = set(y)
 
     return list(sorted(label_set))
-
-
-def pred_prob_to_pred_multilabel(
-    y_pred_proba: pd.DataFrame, threshold: float = 0.5
-) -> pd.DataFrame:
-    """
-    Convert a dataframe of predicted probabilities (shape (n_samples, n_classes)) to
-    a dataframe of predicted label indicators (shape (n_samples, n_classes)).
-    """
-    return y_pred_proba > threshold
 
 
 def truncate_text(text: str, length: int) -> str:
