@@ -283,10 +283,15 @@ def train(
     tokenizer.save_pretrained(checkpoint_dir)
     config.save_pretrained(checkpoint_dir)
 
+    if multilabel:
+        valid_accuracy = valid_correct / (valid_count * num_labels)
+    else:
+        valid_accuracy = valid_correct / valid_count
+
     return {
         "mean_train_loss": train_loss / train_count,
         "mean_valid_loss": valid_loss / valid_count,
-        "valid_accuracy": valid_correct / valid_count,
+        "valid_accuracy": valid_accuracy,
     }
 
 
