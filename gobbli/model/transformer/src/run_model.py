@@ -1,4 +1,5 @@
 import argparse
+import ast
 import itertools
 import json
 from pathlib import Path
@@ -7,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 import torch
+import torch.nn.functional as F
 import transformers
 from transformers import AdamW, get_linear_schedule_with_warmup
 
@@ -18,7 +20,7 @@ def read_unique_labels(labels_path):
     return labels_path.read_text().split("\n")
 
 
-def read_data(file_path, has_labels):
+def read_data(file_path, labels, multilabel):
     """
     Read some text data with optional labels from the given path.
     Return a 2-tuple of texts and labels (if any).
@@ -26,8 +28,20 @@ def read_data(file_path, has_labels):
     df = pd.read_csv(file_path, sep="\t", dtype="str", keep_default_na=False)
     X = df["Text"].tolist()
     y = None
-    if has_labels:
-        y = df["Label"].tolist()
+    if labels is not None:
+        if multilabel:
+            y = (
+                df["Label"]
+                .apply(
+                    lambda str_labels: [
+                        1 if l in set(ast.literal_eval(str_labels)) else 0
+                        for l in labels
+                    ]
+                )
+                .tolist()
+            )
+        else:
+            y = df["Label"].tolist()
     return X, y
 
 
@@ -62,12 +76,16 @@ def encode_batch(batch, tokenizer, max_seq_length, return_tokens=False):
         return (encoded_batch,)
 
 
-def encode_labels(y, labels):
+def encode_labels(y, labels, multilabel):
     """
     Convert string labels to autoincrementing integers.
     """
-    mapping = {l: i for i, l in enumerate(labels)}
-    return torch.as_tensor([mapping[l] for l in y])
+    if multilabel:
+        # Float type needed for proper loss computation
+        return torch.as_tensor(y).float()
+    else:
+        mapping = {l: i for i, l in enumerate(labels)}
+        return torch.as_tensor([mapping[l] for l in y])
 
 
 def decode_labels(y_encoded, labels):
@@ -78,7 +96,13 @@ def decode_labels(y_encoded, labels):
 
 
 def tsv_to_encoded_batches(
-    input_path, tokenizer, labels, batch_size, max_seq_length, return_tokens=False
+    input_path,
+    tokenizer,
+    labels,
+    batch_size,
+    max_seq_length,
+    multilabel,
+    return_tokens=False,
 ):
     """
     Convert data in a csv file with optional labels to a list
@@ -91,7 +115,7 @@ def tsv_to_encoded_batches(
     else also return encoded labels.
     """
     has_labels = labels is not None
-    X, y = read_data(input_path, has_labels)
+    X, y = read_data(input_path, labels, multilabel)
 
     if y is None:
         y_batch_gen = itertools.repeat(None)
@@ -104,7 +128,7 @@ def tsv_to_encoded_batches(
         )
 
         if has_labels:
-            y_encoded_batch = encode_labels(y_batch, labels)
+            y_encoded_batch = encode_labels(y_batch, labels, multilabel)
             yield (*X_encoded_batch, y_encoded_batch)
         else:
             yield X_encoded_batch
@@ -115,8 +139,30 @@ def num_batches(data_path, batch_size):
     Count the number of batches contained in the given TSV data file assuming
     the given batch size.
     """
-    X, _ = read_data(data_path, False)
+    X, _ = read_data(data_path, False, False)
     return (len(X) - 1) // batch_size + 1
+
+
+def get_loss_preds(model, X, y, num_labels, multilabel):
+    """
+    Return the loss and predicted class(es) for each observation in the passed
+    dataset.  The multilabel boolean determines how loss will be calculated and
+    whether multiple predicted classes can be returned for each input observation.
+    """
+    if multilabel:
+        outputs = model(input_ids=X)
+        logits = outputs[0].view(-1, num_labels)
+        loss = F.binary_cross_entropy_with_logits(logits, y)
+        preds = F.sigmoid(logits.detach())
+    else:
+        outputs = model(input_ids=X, labels=y)
+        loss = outputs[0]
+        logits = outputs[1]
+        # Keep preds on the device rather than moving to CPU, since we'll compare to y,
+        # which is on the device
+        preds = torch.argmax(logits.detach(), 1)
+
+    return loss, preds
 
 
 def train(
@@ -136,6 +182,7 @@ def train(
     lr,
     adam_eps,
     gradient_accumulation_steps,
+    multilabel,
 ):
     """
     Train the passed model on the given data.  Return training/validation metrics
@@ -153,6 +200,7 @@ def train(
     )
 
     model.zero_grad()
+    num_labels = len(labels)
 
     for epoch in range(num_train_epochs):
         print(f"Start epoch {epoch}")
@@ -167,12 +215,14 @@ def train(
                 labels,
                 train_batch_size,
                 max_seq_length,
+                multilabel,
             )
         ):
             X = X.to(device)
             y = y.to(device)
-            outputs = model(input_ids=X, labels=y)
-            loss = outputs[0]
+
+            loss, _ = get_loss_preds(model, X, y, num_labels, multilabel)
+
             if gradient_accumulation_steps > 1:
                 loss /= gradient_accumulation_steps
 
@@ -198,18 +248,18 @@ def train(
         valid_correct = 0
 
         for X, y in tsv_to_encoded_batches(
-            input_dir / "dev.tsv", tokenizer, labels, valid_batch_size, max_seq_length
+            input_dir / "dev.tsv",
+            tokenizer,
+            labels,
+            valid_batch_size,
+            max_seq_length,
+            multilabel,
         ):
             X = X.to(device)
             y = y.to(device)
 
             with torch.no_grad():
-                outputs = model(input_ids=X, labels=y)
-                loss = outputs[0]
-                logits = outputs[1]
-                # Keep preds on the device rather than moving to CPU, since we'll compare to y,
-                # which is on the device
-                preds = torch.argmax(logits.detach(), 1)
+                loss, preds = get_loss_preds(model, X, y, num_labels, multilabel)
 
             if n_gpu > 1:
                 loss = loss.mean()  # average loss on parallel training
@@ -250,19 +300,29 @@ def predict(
     device,
     max_seq_length,
     labels,
+    multilabel,
 ):
 
     pred_probas = []
 
     for (X,) in tsv_to_encoded_batches(
-        input_dir / "test.tsv", tokenizer, None, predict_batch_size, max_seq_length
+        input_dir / "test.tsv",
+        tokenizer,
+        None,
+        predict_batch_size,
+        max_seq_length,
+        multilabel,
     ):
         X = X.to(device)
 
         with torch.no_grad():
             outputs = model(input_ids=X)
-            logits = outputs[0]
-            pred_probas.append(torch.softmax(logits.detach().cpu(), 1).numpy())
+            logits = outputs[0].detach().cpu()
+            if multilabel:
+                pred_proba = F.sigmoid(logits)
+            else:
+                pred_proba = torch.softmax(logits, 1)
+            pred_probas.append(pred_proba.numpy())
 
     df = pd.DataFrame(np.vstack(pred_probas))
     df.columns = labels
@@ -290,6 +350,7 @@ def embed(
             None,
             embed_batch_size,
             max_seq_length,
+            False,
             return_tokens=True,
         ):
             X = X.to(device)
@@ -360,6 +421,12 @@ if __name__ == "__main__":
         help="Name of the pretrained weights to use or path to a file containing "
         "pretrained weights.  If a name, must correspond to a valid weights name "
         "for the chosen model.",
+    )
+    parser.add_argument(
+        "--multilabel",
+        action="store_true",
+        help="If True, model will train in a multilabel context (i.e. it's allowed to make multiple "
+        "class predictions for each observation).",
     )
     parser.add_argument(
         "--train-batch-size",
@@ -540,6 +607,7 @@ if __name__ == "__main__":
             lr=args.lr,
             adam_eps=args.adam_eps,
             gradient_accumulation_steps=args.gradient_accumulation_steps,
+            multilabel=args.multilabel,
         )
         with open(output_dir / "valid_results.json", "w") as f:
             json.dump(metrics, f)
@@ -554,6 +622,7 @@ if __name__ == "__main__":
             device=device,
             max_seq_length=args.max_seq_length,
             labels=labels,
+            multilabel=args.multilabel,
         )
     elif args.mode == "embed":
         embed(

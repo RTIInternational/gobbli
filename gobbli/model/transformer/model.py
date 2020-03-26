@@ -169,7 +169,12 @@ class Transformer(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         cache_dir.mkdir(exist_ok=True, parents=True)
         return cache_dir
 
-    def _write_input(self, X: List[str], labels: Optional[List[str]], input_path: Path):
+    def _write_input(
+        self,
+        X: List[str],
+        labels: Optional[Union[List[str], List[List[str]]]],
+        input_path: Path,
+    ):
         """
         Write the given input texts and (optionally) labels to the file pointed to by
         ``input_path``.
@@ -238,6 +243,9 @@ class Transformer(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             f" --gradient-accumulation-steps {self.gradient_accumulation_steps}"
         )
 
+        if train_input.multilabel:
+            cmd += " --multilabel"
+
         run_kwargs = self._base_docker_run_kwargs(context)
 
         # Mount the checkpoint in the container if needed
@@ -300,6 +308,9 @@ class Transformer(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             f" --max-seq-length {self.max_seq_length}"
             f" --predict-batch-size {predict_input.predict_batch_size}"
         )
+
+        if predict_input.multilabel:
+            cmd += " --multilabel"
 
         run_kwargs = self._base_docker_run_kwargs(context)
 

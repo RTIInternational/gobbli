@@ -112,6 +112,13 @@ def check_predict_output(train_output, predict_input, predict_output):
             {"predict_batch_size": 32},
         ),
         (
+            Transformer,
+            MovieSummaryDataset,
+            {"max_seq_length": 128},
+            {"num_train_epochs": 1, "train_batch_size": 16, "valid_batch_size": 32},
+            {"predict_batch_size": 32},
+        ),
+        (
             SpaCyModel,
             TrivialDataset,
             {"model": "en_core_web_sm", "architecture": "bow"},
@@ -171,7 +178,7 @@ def test_classifier(
         )
 
     # Verify training runs, results are sensible
-    train_output = model.train()
+    train_output = model.train(train_input)
     assert train_output.valid_loss is not None
     assert train_output.train_loss is not None
     assert 0 <= train_output.valid_accuracy <= 1
