@@ -255,10 +255,10 @@ class BERT(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         valid_path = input_dir / BERT._VALID_INPUT_FILE
 
         train_df = pd.DataFrame(
-            {"Text": train_input.X_train, "Label": train_input.y_train}
+            {"Text": train_input.X_train, "Label": train_input.y_train_multiclass}
         )
         valid_df = pd.DataFrame(
-            {"Text": train_input.X_valid, "Label": train_input.y_valid}
+            {"Text": train_input.X_valid, "Label": train_input.y_valid_multiclass}
         )
 
         _df_to_train_tsv(train_df, train_path)
@@ -270,6 +270,11 @@ class BERT(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
     def _train(
         self, train_input: gobbli.io.TrainInput, context: ContainerTaskContext
     ) -> gobbli.io.TrainOutput:
+
+        if train_input.multilabel:
+            raise ValueError(
+                "gobbli BERT model doesn't support multilabel classification."
+            )
 
         self._write_train_input(train_input, context.host_input_dir)
 

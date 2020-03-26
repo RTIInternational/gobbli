@@ -49,6 +49,13 @@ def check_predict_output(train_output, predict_input, predict_output):
             {"predict_batch_size": 32},
         ),
         (
+            BERT,
+            MovieSummaryDataset,
+            {},
+            {"num_train_epochs": 1, "train_batch_size": 32, "valid_batch_size": 8},
+            {"predict_batch_size": 32},
+        ),
+        (
             MTDNN,
             TrivialDataset,
             {},
@@ -134,8 +141,17 @@ def test_classifier(
     Ensure classifiers train and predict appropriately across a few example datasets.
     """
     # These combinations of model and dataset require a lot of memory
-    if model_cls in (BERT, MTDNN, Transformer) and dataset_cls in (NewsgroupsDataset,):
+    if model_cls in (BERT, MTDNN, Transformer) and dataset_cls in (
+        NewsgroupsDataset,
+        MovieSummaryDataset,
+    ):
         skip_if_low_resource(request.config)
+
+    # These models don't support multilabel classification
+    if model_cls in (BERT,) and dataset_cls is MovieSummaryDataset:
+        pytest.xfail(
+            f"model {model_cls.__name__} doesn't support multilabel classification"
+        )
 
     model = model_cls(
         data_dir=model_test_dir(model_cls),
