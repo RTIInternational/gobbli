@@ -68,24 +68,19 @@ def evaluate(tokenizer, nlp, valid_data, labels):
     num_correct = 0
     for i, doc in enumerate(nlp.pipe(texts)):
         gold_cats = cats[i]["cats"]
-        gold_prediction = max(gold_cats, key=lambda label: gold_cats[label])
-        doc_prediction = None
-        max_score = -1
         for j, (label, score) in enumerate(doc.cats.items()):
             if label not in gold_cats:
                 raise ValueError(f"Prediction for unexpected label: {label}")
-            if score > max_score:
-                max_score = score
-                doc_prediction = label
 
             scores[i, j] = score
 
-        if doc_prediction == gold_prediction:
-            num_correct += 1
+            doc_prediction = score > 0.5
+            if doc_prediction == bool(gold_cats[label]):
+                num_correct += 1
 
         golds.append(GoldParse(doc, cats=gold_cats))
 
-    accuracy = num_correct / (len(texts) + 1e-8)
+    accuracy = num_correct / ((len(texts) * len(labels)) + 1e-8)
     loss, _ = textcat.get_loss(texts, golds, scores)
 
     return accuracy, loss
