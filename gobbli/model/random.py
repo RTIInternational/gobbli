@@ -42,7 +42,7 @@ class RandomEmbedder(BaseModel, TrainMixin, EmbedMixin):
         No training needed -- stubbed for API uniformity.
         """
         return gobbli.io.TrainOutput(
-            valid_loss=0, valid_accuracy=0, train_loss=0, labels=[]
+            valid_loss=0, valid_accuracy=0, train_loss=0, labels=[], multilabel=False
         )
 
     def _embed(

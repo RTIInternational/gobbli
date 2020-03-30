@@ -270,6 +270,7 @@ class Transformer(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             valid_loss=results["mean_valid_loss"],
             valid_accuracy=results["valid_accuracy"],
             train_loss=results["mean_train_loss"],
+            multilabel=train_input.multilabel,
             labels=labels,
             checkpoint=context.host_output_dir / Transformer._TRAIN_OUTPUT_CHECKPOINT,
             _console_output=container_logs,

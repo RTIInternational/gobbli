@@ -220,7 +220,7 @@ class TrainOutput(TaskIO):
     valid_accuracy: float
     train_loss: float
     labels: List[str]
-    multilabel: bool = False
+    multilabel: bool
     checkpoint: Optional[Path] = None
     _console_output: str = ""
 

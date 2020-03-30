@@ -14,6 +14,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
+from tabulate import tabulate
 from umap import UMAP
 
 import gobbli.model
@@ -30,6 +31,7 @@ from benchmark_util import (
     run_benchmark_experiment,
 )
 from gobbli.dataset.base import BaseDataset
+from gobbli.dataset.cmu_movie_summary import MovieSummaryDataset
 from gobbli.dataset.imdb import IMDBDataset
 from gobbli.dataset.newsgroups import NewsgroupsDataset
 from gobbli.io import (
@@ -40,7 +42,6 @@ from gobbli.io import (
     pool_document_windows,
 )
 from gobbli.util import TokenizeMethod, assert_in, assert_type, pred_prob_to_pred_label
-from tabulate import tabulate
 
 LOGGER = logging.getLogger(__name__)
 
@@ -320,11 +321,9 @@ class DatasetClassificationScenario(ModelClassificationScenario):  # type: ignor
             # Sleep a few seconds to let logs from the worker catch up
             time.sleep(3)
 
-        fig = plt.figure(figsize=(15, 15))
-        ax = fig.add_subplot()
-        ax = results.plot(ax=ax)
+        chart = results.plot()
         plot_path = run_output_dir / "plot.png"
-        fig.savefig(plot_path)
+        chart.save(str(plot_path))
 
         md = f"# Results: {run.key}\n"
         md += f"```\n{stdout_catcher.get_logs()}\n```\n"
@@ -365,6 +364,22 @@ class IMDBClassificationScenario(DatasetClassificationScenario):
     @property
     def dataset(self):
         return IMDBDataset
+
+
+@dataclass
+class MovieSummaryClassificationScenario(DatasetClassificationScenario):
+    """
+    Benchmarking model classification performance on the CMU Movie Summary multilabel
+    classification dataset.
+    """
+
+    @property
+    def name(self):
+        return "moviesummary"
+
+    @property
+    def dataset(self):
+        return MovieSummaryDataset
 
 
 @dataclass

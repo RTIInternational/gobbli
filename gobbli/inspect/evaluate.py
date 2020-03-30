@@ -185,7 +185,7 @@ class ClassificationEvaluation:
             f"{metric_string}\n\n"
             "Classification Report:\n"
             "----------------------\n"
-            f"{classification_report(y_true, y_pred)}\n"
+            f"{classification_report(y_true, y_pred, target_names=self.labels)}\n"
         )
 
     def plot(self) -> alt.Chart:
@@ -201,13 +201,20 @@ class ClassificationEvaluation:
         true_df = self.y_true_multilabel
         charts = []
 
+        if self.multilabel:
+            legend_label = "Has Label"
+        else:
+            legend_label = "Belongs to Class"
+
         for label in self.labels:
             # Plot the predicted probabilities for given label for all observations
             plot_df = (
                 pred_prob_df[[label]]
                 .rename({label: "Predicted Probability"}, axis="columns")
                 .join(
-                    true_df[[label]].rename({label: "Belongs to Class"}, axis="columns")
+                    true_df[[label]]
+                    .astype("bool")
+                    .rename({label: legend_label}, axis="columns")
                 )
             )
 
@@ -217,7 +224,10 @@ class ClassificationEvaluation:
                     .mark_circle(size=8)
                     .encode(
                         x=alt.X(
-                            "Predicted Probability", type="quantitative", title=None
+                            "Predicted Probability",
+                            type="quantitative",
+                            title=None,
+                            scale=alt.Scale(domain=(0.0, 1.0)),
                         ),
                         y=alt.Y(
                             "jitter",
@@ -228,7 +238,7 @@ class ClassificationEvaluation:
                             ),
                             scale=alt.Scale(),
                         ),
-                        color=alt.Color("Belongs to Class", type="nominal"),
+                        color=alt.Color(legend_label, type="nominal"),
                     )
                     .transform_calculate(
                         # Generate Gaussian jitter with a Box-Muller transform

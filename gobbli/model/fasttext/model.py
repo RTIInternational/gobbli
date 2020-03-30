@@ -526,8 +526,6 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         )
 
         if train_input.multilabel:
-            print(pred_prob_df)
-            print(len(labels), labels)
             pred_labels = pred_prob_to_pred_multilabel(pred_prob_df)
             gold_labels = multilabel_to_indicator_df(
                 train_input.y_valid_multilabel, labels
@@ -547,6 +545,7 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             valid_loss=valid_loss,
             valid_accuracy=valid_accuracy,
             labels=labels,
+            multilabel=train_input.multilabel,
             checkpoint=host_checkpoint_path,
             _console_output="\n".join((train_logs, predict_logs)),
         )

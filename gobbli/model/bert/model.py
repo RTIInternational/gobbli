@@ -331,6 +331,7 @@ class BERT(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             valid_accuracy=eval_results["eval_accuracy"],
             train_loss=eval_results["loss"],
             labels=labels,
+            multilabel=False,
             checkpoint=context.host_output_dir
             / f"model.ckpt-{eval_results['global_step']}",
             _console_output=container_logs,

@@ -114,12 +114,14 @@ def cleanup(force: bool = False, full: bool = False):
     if full:
         shutil.rmtree(gobbli_dir())
     else:
-        for model_dir in (gobbli_dir() / "model").iterdir():
-            for instance_dir in model_dir.iterdir():
-                # Special directories containing cached weights or models
-                # which are reusable -- don't delete them here
-                if instance_dir.name not in ("cache", "weights"):
-                    shutil.rmtree(instance_dir)
+        base_model_dir = gobbli_dir() / "model"
+        if base_model_dir.exists():
+            for model_dir in (gobbli_dir() / "model").iterdir():
+                for instance_dir in model_dir.iterdir():
+                    # Special directories containing cached weights or models
+                    # which are reusable -- don't delete them here
+                    if instance_dir.name not in ("cache", "weights"):
+                        shutil.rmtree(instance_dir)
 
 
 def pred_prob_to_pred_label(y_pred_proba: pd.DataFrame) -> List[str]:

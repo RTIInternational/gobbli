@@ -241,6 +241,7 @@ class SpaCyModel(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             valid_accuracy=results["valid_accuracy"],
             train_loss=results["mean_train_loss"],
             labels=labels,
+            multilabel=train_input.multilabel,
             checkpoint=context.host_output_dir / SpaCyModel._TRAIN_OUTPUT_CHECKPOINT,
             _console_output=container_logs,
         )

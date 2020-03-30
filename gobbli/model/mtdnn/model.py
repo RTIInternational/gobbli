@@ -258,6 +258,7 @@ class MTDNN(BaseModel, TrainMixin, PredictMixin):
             valid_accuracy=eval_results["valid_metrics"]["accuracy"] / 100,
             train_loss=eval_results["train_metrics"]["loss"],
             labels=labels,
+            multilabel=False,
             checkpoint=context.host_output_dir / f"model_{final_epoch}.pt",
             _console_output=container_logs,
         )
