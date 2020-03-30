@@ -215,7 +215,7 @@ def test_pool_document_windows_validation():
 
     # Train output is unsupported
     train_output = TrainOutput(
-        valid_loss=0.0, valid_accuracy=0.0, train_loss=0.0, labels=[]
+        valid_loss=0.0, valid_accuracy=0.0, train_loss=0.0, labels=[], multilabel=False
     )
     with pytest.raises(TypeError):
         pool_document_windows(train_output, [])

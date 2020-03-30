@@ -185,7 +185,7 @@ class ClassificationEvaluation:
             f"{metric_string}\n\n"
             "Classification Report:\n"
             "----------------------\n"
-            f"{classification_report(y_true, y_pred, target_names=self.labels)}\n"
+            f"{classification_report(y_true, y_pred, labels=self.labels, target_names=self.labels)}\n"
         )
 
     def plot(self) -> alt.Chart:
