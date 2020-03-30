@@ -14,7 +14,18 @@ import warnings
 import zipfile
 from distutils.util import strtobool
 from pathlib import Path
-from typing import Any, Container, Dict, Iterator, List, Optional, Set, TypeVar, Union
+from typing import (
+    Any,
+    Container,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    TypeVar,
+    Union,
+    cast,
+)
 
 import humanize
 import pandas as pd
@@ -116,6 +127,9 @@ def pred_prob_to_pred_label(y_pred_proba: pd.DataFrame) -> List[str]:
     Convert a dataframe of predicted probabilities (shape (n_samples, n_classes)) to
     a list of predicted classes.
     """
+    if len(y_pred_proba) == 0:
+        return []
+
     return y_pred_proba.idxmax(axis=1).tolist()
 
 
@@ -136,6 +150,32 @@ def is_multilabel(y: Union[List[str], List[List[str]]]) -> bool:
       (it's multiclass).
     """
     return len(y) > 0 and isinstance(y[0], list)
+
+
+def as_multilabel(
+    y: Union[List[str], List[List[str]]], is_multilabel: bool
+) -> List[List[str]]:
+    """
+    Returns:
+      Labels in multilabel format, validated against
+      possible mismatch between the multilabel attribute and data format.
+    """
+    if is_multilabel:
+        return cast(List[List[str]], y)
+    return multiclass_to_multilabel_target(cast(List[str], y))
+
+
+def as_multiclass(
+    y: Union[List[str], List[List[str]]], is_multilabel: bool
+) -> List[str]:
+    """
+    Returns:
+      Labels in multiclass format, validated against
+      possible mismatch between the multilabel attribute and data format.
+    """
+    if is_multilabel:
+        raise ValueError("Multilabel training input can't be converted to multiclass.")
+    return cast(List[str], y)
 
 
 def multiclass_to_multilabel_target(y: List[str]) -> List[List[str]]:

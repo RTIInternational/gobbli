@@ -22,7 +22,7 @@ from gobbli.experiment.base import (
 )
 from gobbli.inspect.evaluate import ClassificationError, ClassificationEvaluation
 from gobbli.model.mixin import PredictMixin, TrainMixin
-from gobbli.util import blob_to_dir, dir_to_blob
+from gobbli.util import blob_to_dir, dir_to_blob, is_multilabel
 
 
 @dataclass
@@ -52,7 +52,7 @@ class ClassificationExperimentResults:
     training_results: List[Dict[str, Any]]
     labels: List[str]
     X: List[str]
-    y_true: List[str]
+    y_true: Union[List[str], List[List[str]]]
     y_pred_proba: pd.DataFrame
     best_model_checkpoint: Union[bytes, Path]
     best_model_checkpoint_name: str
@@ -66,6 +66,7 @@ class ClassificationExperimentResults:
             y_pred_proba=self.y_pred_proba,
             metric_funcs=self.metric_funcs,
         )
+        self.multilabel = is_multilabel(self.y_true)
 
     def get_checkpoint(self, base_path: Optional[Path] = None) -> Path:
         """

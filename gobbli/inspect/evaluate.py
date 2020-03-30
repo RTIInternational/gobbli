@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Sequence, Tuple
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 import altair as alt
 import pandas as pd
@@ -12,8 +12,13 @@ from sklearn.metrics import (
 )
 
 from gobbli.util import (
+    as_multiclass,
+    as_multilabel,
     escape_line_delimited_text,
+    is_multilabel,
+    multilabel_to_indicator_df,
     pred_prob_to_pred_label,
+    pred_prob_to_pred_multilabel,
     truncate_text,
 )
 
@@ -26,21 +31,35 @@ class ClassificationError:
 
     Args:
       X: The original text.
-      y_true: The true label.
+      y_true: The true label(s).
       y_pred_proba: The model predicted probability for each class.
     """
 
     X: str
-    y_true: str
+    y_true: Union[str, List[str]]
     y_pred_proba: Dict[str, float]
 
     @property
     def y_pred(self) -> str:
         """
+        Args:
+          threshold: Predicted probability to be used for multilabel prediction, if
+          applicable.  Unused if doing multiclass prediction.
         Returns:
-          The predicted class for this observation.
+          The class with the highest predicted probability for this observation.
         """
         return max(self.y_pred_proba, key=lambda k: self.y_pred_proba[k])
+
+    def y_pred_multilabel(self, threshold: float = 0.5) -> List[str]:
+        """
+        Args:
+          threshold: The predicted probability threshold for predictions
+
+        Returns:
+          The predicted labels for this observation (predicted probability greater than
+          the given threshold)
+        """
+        return pred_prob_to_pred_multilabel(self.y_pred_proba, threshold)
 
 
 MetricFunc = Callable[[Sequence[str], pd.DataFrame], float]
@@ -52,18 +71,16 @@ output a real number.
 
 
 DEFAULT_METRICS: Dict[str, MetricFunc] = {
-    "Weighted F1 Score": lambda y_true, y_pred_proba: f1_score(
-        y_true, pred_prob_to_pred_label(y_pred_proba), average="weighted"
+    "Weighted F1 Score": lambda y_true, y_pred: f1_score(
+        y_true, y_pred, average="weighted"
     ),
-    "Weighted Precision Score": lambda y_true, y_pred_proba: precision_score(
-        y_true, pred_prob_to_pred_label(y_pred_proba), average="weighted"
+    "Weighted Precision Score": lambda y_true, y_pred: precision_score(
+        y_true, y_pred, average="weighted"
     ),
-    "Weighted Recall Score": lambda y_true, y_pred_proba: recall_score(
-        y_true, pred_prob_to_pred_label(y_pred_proba), average="weighted"
+    "Weighted Recall Score": lambda y_true, y_pred: recall_score(
+        y_true, y_pred, average="weighted"
     ),
-    "Accuracy": lambda y_true, y_pred_proba: accuracy_score(
-        y_true, pred_prob_to_pred_label(y_pred_proba)
-    ),
+    "Accuracy": lambda y_true, y_pred: accuracy_score(y_true, y_pred),
 }
 """
 The default set of metrics to evaluate classification models with.  Users may want to extend
@@ -86,7 +103,7 @@ class ClassificationEvaluation:
 
     labels: List[str]
     X: List[str]
-    y_true: List[str]
+    y_true: Union[List[str], List[List[str]]]
     y_pred_proba: pd.DataFrame
     metric_funcs: Optional[Dict[str, Callable[[Sequence, Sequence], float]]] = None
 
@@ -96,23 +113,33 @@ class ClassificationEvaluation:
                 "y_true and y_pred_proba must have the same number of observations"
             )
 
-        self.y_pred_series = pd.Series(self.y_pred)
-        self.y_true_series = pd.Series(self.y_true)
-
-        self.error_pred_prob = self.y_pred_proba[
-            self.y_pred_series != self.y_true_series
-        ]
+        self.multilabel = is_multilabel(self.y_true)
 
     @property
-    def y_pred(self) -> List[str]:
+    def y_true_multiclass(self) -> List[str]:
+        return as_multiclass(self.y_true, self.multilabel)
+
+    @property
+    def y_true_multilabel(self) -> pd.DataFrame:
+        return multilabel_to_indicator_df(
+            as_multilabel(self.y_true, self.multilabel), self.labels
+        )
+
+    @property
+    def y_pred_multiclass(self) -> List[str]:
         """
         Returns:
-          The predicted class for each observation.
+          Predicted class for each observation (assuming multiclass context).
         """
-        if len(self.y_pred_proba) == 0:
-            return []
-        else:
-            return pred_prob_to_pred_label(self.y_pred_proba)
+        return pred_prob_to_pred_label(self.y_pred_proba)
+
+    @property
+    def y_pred_multilabel(self) -> pd.DataFrame:
+        """
+        Returns:
+          Indicator dataframe containing the predicted labels for each observation.
+        """
+        return pred_prob_to_pred_multilabel(self.y_pred_proba)
 
     def metrics(self) -> Dict[str, float]:
         """
@@ -123,8 +150,15 @@ class ClassificationEvaluation:
         if metric_funcs is None:
             metric_funcs = DEFAULT_METRICS
 
+        if self.multilabel:
+            y_true: Union[List[str], pd.DataFrame] = self.y_true_multilabel
+            y_pred: Union[List[str], pd.DataFrame] = self.y_pred_multilabel
+        else:
+            y_true = self.y_true_multiclass
+            y_pred = self.y_pred_multiclass
+
         return {
-            name: metric_func(self.y_true, self.y_pred_proba)
+            name: metric_func(y_true, y_pred)
             for name, metric_func in metric_funcs.items()
         }
 
@@ -137,13 +171,21 @@ class ClassificationEvaluation:
         metric_string = "\n".join(
             f"{name}: {metric}" for name, metric in self.metrics().items()
         )
+
+        if self.multilabel:
+            y_true: Union[pd.DataFrame, List[str]] = self.y_true_multilabel
+            y_pred: Union[pd.DataFrame, List[str]] = self.y_pred_multilabel
+        else:
+            y_true = self.y_true_multiclass
+            y_pred = self.y_pred_multiclass
+
         return (
             "Metrics:\n"
             "--------\n"
             f"{metric_string}\n\n"
             "Classification Report:\n"
             "----------------------\n"
-            f"{classification_report(self.y_true, self.y_pred)}\n"
+            f"{classification_report(y_true, y_pred)}\n"
         )
 
     def plot(self) -> alt.Chart:
@@ -152,23 +194,26 @@ class ClassificationEvaluation:
           An Altair chart visualizing predicted probabilities and true classes to visually identify
           where errors are being made.
         """
-        pred_prob_df = self.y_pred_proba.copy()
-        pred_prob_df["True Class"] = self.y_true
-
-        plot_df = pred_prob_df.melt(
-            id_vars=["True Class"], var_name="Class", value_name="Predicted Probability"
-        )
-        plot_df["Belongs to Class"] = plot_df["True Class"] == plot_df["Class"]
-
+        # Since multilabel is a generalization of the multiclass paradigm, implement
+        # this visualization the same for multiclass and multilabel using the multilabel
+        # format
+        pred_prob_df = self.y_pred_multilabel
+        true_df = self.y_true_multilabel
         charts = []
-        uniq_cls = plot_df["Class"].unique()
-        uniq_cls.sort()
-        for cls in uniq_cls:
+
+        for label in self.labels:
+            # Plot the predicted probabilities for given label for all observations
+            plot_df = (
+                pred_prob_df[[label]]
+                .rename({label: "Predicted Probability"}, axis="columns")
+                .join(
+                    true_df[[label]].rename({label: "Belongs to Class"}, axis="columns")
+                )
+            )
+
             charts.append(
                 alt.layer(
-                    alt.Chart(
-                        plot_df[plot_df["True Class"] == cls], title=cls, height=40
-                    )
+                    alt.Chart(plot_df, title=label, height=40)
                     .mark_circle(size=8)
                     .encode(
                         x=alt.X(
@@ -196,7 +241,7 @@ class ClassificationEvaluation:
 
     def errors_for_label(self, label: str, k: int = 10):
         """
-        Output the biggest mistakes for the given class by the classifier.
+        Output the biggest mistakes for the given class by the classifier
 
         Args:
           label: The label to return errors for.
@@ -206,20 +251,21 @@ class ClassificationEvaluation:
           A 2-tuple.  The first element is a list of the top ``k`` false positives, and the
           second element is a list of the top ``k`` false negatives.
         """
-        pred_label = self.y_pred_series == label
-        true_label = self.y_true_series == label
+        pred_label = self.y_pred_multilabel[label]
+        true_label = self.y_true_multilabel[label]
 
         # Order false positives/false negatives by the degree of the error;
         # i.e. we want the false positives with highest predicted probability first
         # and false negatives with lowest predicted probability first
         # Take the top `k` of each
+        # TODO does this apply equally for multiclass and multilabel?
         false_positives = (
-            self.error_pred_prob.loc[pred_label & ~true_label]
+            self.y_pred_proba.loc[pred_label & ~true_label]
             .sort_values(by=label, ascending=False)
             .iloc[:k]
         )
         false_negatives = (
-            self.error_pred_prob.loc[~pred_label & true_label]
+            self.y_pred_proba.loc[~pred_label & true_label]
             .sort_values(by=label, ascending=True)
             .iloc[:k]
         )
@@ -278,14 +324,24 @@ class ClassificationEvaluation:
         for label, (false_positives, false_negatives) in errors.items():
 
             def make_errors_str(errors: List[ClassificationError]) -> str:
-                return "\n".join(
-                    (
-                        f"True Class: {e.y_true}\n"
-                        f"Predicted Class: {e.y_pred} (Probability: {e.y_pred_proba[e.y_pred]})\n"
-                        f"Text: {truncate_text(escape_line_delimited_text(e.X), 500)}\n"
+                if self.multilabel:
+                    return "\n".join(
+                        (
+                            f"Correct Value: {label in e.y_true}\n"
+                            f"Predicted Probability: {e.y_pred_proba[label]}"
+                            f"Text: {truncate_text(escape_line_delimited_text(e.X), 500)}\n"
+                        )
+                        for e in errors
                     )
-                    for e in errors
-                )
+                else:
+                    return "\n".join(
+                        (
+                            f"True Class: {e.y_true}\n"
+                            f"Predicted Class: {e.y_pred} (Probability: {e.y_pred_proba[e.y_pred]})\n"
+                            f"Text: {truncate_text(escape_line_delimited_text(e.X), 500)}\n"
+                        )
+                        for e in errors
+                    )
 
             false_positives_str = make_errors_str(false_positives)
             if len(false_positives_str) == 0:
@@ -294,9 +350,11 @@ class ClassificationEvaluation:
             if len(false_negatives_str) == 0:
                 false_negatives_str = "None"
 
+            header_name = "CLASS" if self.multilabel else "LABEL"
+
             output += (
                 " -------\n"
-                f"| CLASS: {label}\n"
+                f"| {header_name}: {label}\n"
                 " -------\n\n"
                 "False Positives\n"
                 "***************\n\n"

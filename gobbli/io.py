@@ -10,6 +10,8 @@ import pandas as pd
 
 from gobbli.util import (
     TokenizeMethod,
+    as_multiclass,
+    as_multilabel,
     collect_labels,
     detokenize,
     is_multilabel,
@@ -138,17 +140,11 @@ class TrainInput(TaskIO):
 
     @property
     def y_train_multiclass(self) -> List[str]:
-        if self.multilabel:
-            raise ValueError(
-                "Multilabel training input can't be converted to multiclass."
-            )
-        return cast(List[str], self.y_train)
+        return as_multiclass(self.y_train, self.multilabel)
 
     @property
     def y_train_multilabel(self) -> List[List[str]]:
-        if self.multilabel:
-            return cast(List[List[str]], self.y_train)
-        return multiclass_to_multilabel_target(cast(List[str], self.y_train))
+        return as_multilabel(self.y_train, self.multilabel)
 
     @property
     def y_valid_multiclass(self) -> List[str]:

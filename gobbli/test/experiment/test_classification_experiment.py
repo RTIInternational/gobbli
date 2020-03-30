@@ -5,6 +5,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from gobbli.dataset.cmu_movie_summary import MovieSummaryDataset
 from gobbli.dataset.newsgroups import NewsgroupsDataset
 from gobbli.experiment.classification import (
     ClassificationExperiment,
@@ -118,6 +119,14 @@ def test_classification_run_validation(bad_value):
         (
             FastText,
             NewsgroupsDataset,
+            {"lr": [0.1, 0.01], "autotune_duration": [5]},
+            200,
+            False,
+        ),
+        # "Real" model/multilabel dataset, use ray cluster
+        (
+            FastText,
+            MovieSummaryDataset,
             {"lr": [0.1, 0.01], "autotune_duration": [5]},
             200,
             False,
