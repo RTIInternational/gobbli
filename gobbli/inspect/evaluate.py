@@ -180,13 +180,14 @@ class ClassificationEvaluation:
             y_true = self.y_true_multiclass
             y_pred = self.y_pred_multiclass
 
+        label_indices = list(range(len(self.labels)))
         return (
             "Metrics:\n"
             "--------\n"
             f"{metric_string}\n\n"
             "Classification Report:\n"
             "----------------------\n"
-            f"{classification_report(y_true, y_pred, labels=self.labels, target_names=self.labels)}\n"
+            f"{classification_report(y_true, y_pred, labels=label_indices, target_names=self.labels)}\n"
         )
 
     def plot(self) -> alt.Chart:
