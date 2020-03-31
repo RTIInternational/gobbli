@@ -197,7 +197,7 @@ class ClassificationEvaluation:
         # Since multilabel is a generalization of the multiclass paradigm, implement
         # this visualization the same for multiclass and multilabel using the multilabel
         # format
-        pred_prob_df = self.y_pred_multilabel
+        pred_prob_df = self.y_pred_proba
         true_df = self.y_true_multilabel
         charts = []
 
