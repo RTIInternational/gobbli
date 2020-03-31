@@ -137,9 +137,10 @@ class ClassificationEvaluation:
     def y_pred_multilabel(self) -> pd.DataFrame:
         """
         Returns:
-          Indicator dataframe containing the predicted labels for each observation.
+          Indicator dataframe containing a 0 if each label wasn't predicted and 1 if
+          it was for each observation.
         """
-        return pred_prob_to_pred_multilabel(self.y_pred_proba)
+        return pred_prob_to_pred_multilabel(self.y_pred_proba).astype("int")
 
     def metrics(self) -> Dict[str, float]:
         """
@@ -261,14 +262,13 @@ class ClassificationEvaluation:
           A 2-tuple.  The first element is a list of the top ``k`` false positives, and the
           second element is a list of the top ``k`` false negatives.
         """
-        pred_label = self.y_pred_multilabel[label]
-        true_label = self.y_true_multilabel[label]
+        pred_label = self.y_pred_multilabel[label].astype("bool")
+        true_label = self.y_true_multilabel[label].astype("bool")
 
         # Order false positives/false negatives by the degree of the error;
         # i.e. we want the false positives with highest predicted probability first
         # and false negatives with lowest predicted probability first
         # Take the top `k` of each
-        # TODO does this apply equally for multiclass and multilabel?
         false_positives = (
             self.y_pred_proba.loc[pred_label & ~true_label]
             .sort_values(by=label, ascending=False)
