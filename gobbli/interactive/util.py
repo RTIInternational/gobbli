@@ -7,7 +7,7 @@ import os
 import random
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, TypeVar
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, TypeVar, Union
 
 import pandas as pd
 import streamlit as st
@@ -19,16 +19,21 @@ from gobbli.io import PredictInput, TaskIO
 from gobbli.model.base import BaseModel
 from gobbli.model.context import ContainerTaskContext
 from gobbli.model.mixin import TrainMixin
-from gobbli.util import read_metadata, truncate_text
+from gobbli.util import is_multilabel, read_metadata, truncate_text
 
 DEFAULT_PREDICT_BATCH_SIZE = PredictInput.predict_batch_size
 
 
 @st.cache
-def get_label_indices(labels: List[str]) -> Dict[str, List[int]]:
+def get_label_indices(y: Union[List[str], List[List[str]]]) -> Dict[str, List[int]]:
     label_indices = defaultdict(list)
-    for i, label in enumerate(labels):
-        label_indices[label].append(i)
+    if is_multilabel(y):
+        for i, labels in enumerate(y):
+            for label in labels:
+                label_indices[label].append(i)
+    else:
+        for i, cls in enumerate(y):
+            label_indices[cls].append(i)
     return label_indices
 
 
