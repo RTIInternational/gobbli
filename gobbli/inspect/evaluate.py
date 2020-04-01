@@ -190,8 +190,12 @@ class ClassificationEvaluation:
             f"{classification_report(y_true, y_pred, labels=label_indices, target_names=self.labels)}\n"
         )
 
-    def plot(self) -> alt.Chart:
+    def plot(self, sample_size: Optional[int] = None) -> alt.Chart:
         """
+        Args:
+          sample_size: Optional number of points to sample for the plot.  Unsampled
+            plots may be difficult to save due to their size.
+
         Returns:
           An Altair chart visualizing predicted probabilities and true classes to visually identify
           where errors are being made.
@@ -201,6 +205,15 @@ class ClassificationEvaluation:
         # format
         pred_prob_df = self.y_pred_proba
         true_df = self.y_true_multilabel
+
+        if sample_size is not None:
+            # Avoid errors due to sample being larger than the population if the number
+            # of observations is smaller than the sample size
+            pred_prob_df = pred_prob_df.sample(
+                n=min(sample_size, pred_prob_df.shape[0])
+            )
+            true_df = true_df.iloc[pred_prob_df.index]
+
         charts = []
 
         if self.multilabel:
