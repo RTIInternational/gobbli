@@ -17,7 +17,7 @@ def read_unique_labels(labels_path):
     """
     Read the list of unique labels from the given path.
     """
-    return labels_path.read_text().split("\n")
+    return labels_path.read_text(encoding="utf-8").split("\n")
 
 
 def read_data(file_path, labels, multilabel):
