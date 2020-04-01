@@ -323,7 +323,8 @@ class DatasetClassificationScenario(ModelClassificationScenario):  # type: ignor
 
         chart = results.plot()
         plot_path = run_output_dir / "plot.png"
-        chart.save(str(plot_path))
+        # Longer driver timeout needed since these images can be very big
+        chart.save(str(plot_path), driver_timeout=600)
 
         md = f"# Results: {run.key}\n"
         md += f"```\n{stdout_catcher.get_logs()}\n```\n"
