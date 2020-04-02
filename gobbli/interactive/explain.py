@@ -132,7 +132,11 @@ def run(
     if labels is None:
         header_text = "Example to Explain"
     else:
-        header_text = f"Example to Explain (label: {labels[example_ndx]})"
+        y_true = labels[example_ndx]
+        if isinstance(y_true, list):
+            header_text = f"Example to Explain (labels: {', '.join(y_true)})"
+        else:
+            header_text = f"Example to Explain (class: {y_true})"
     st.header(header_text)
     st.text(texts[example_ndx])
 
