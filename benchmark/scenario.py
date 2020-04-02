@@ -321,7 +321,13 @@ class DatasetClassificationScenario(ModelClassificationScenario):  # type: ignor
             # Sleep a few seconds to let logs from the worker catch up
             time.sleep(3)
 
-        chart = results.plot()
+        # Sample the observations if there are more than 1,000 in the test set, since we
+        # need to save the chart, and trying to save large charts can cause Selenium timeouts
+        # when they're rendered to PNG
+        sample_size = 1000
+        chart = results.plot(sample_size=sample_size).properties(
+            title=f"Predicted Probability (Sampled Test Set Observations, n={sample_size})"
+        )
         plot_path = run_output_dir / "plot.png"
         # Longer driver timeout needed since these images can be very big
         chart.save(str(plot_path), driver_timeout=600)
