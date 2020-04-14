@@ -38,8 +38,12 @@ def get_label_indices(y: Union[List[str], List[List[str]]]) -> Dict[str, List[in
 
 
 def _read_delimited(
-    data_file: Path, delimiter: str, n_rows: Optional[int] = None
-) -> Tuple[List[str], Optional[List[str]]]:
+    data_file: Path,
+    delimiter: str,
+    n_rows: Optional[int] = None,
+    multilabel: bool = False,
+    multilabel_sep: str = ",",
+) -> Tuple[List[str], Optional[Union[List[str], List[List[str]]]]]:
     """
     Read up to n_rows lines from the given delimited text file and return lists
     of the texts and labels.  Texts must be stored in a column named "text", and
@@ -49,6 +53,8 @@ def _read_delimited(
       data_file: Data file containing one text per line.
       delimiter: Field delimiter for the data file.
       n_rows: The maximum number of rows to read.
+      multilabel: If True, read multiple labels for each line.
+      multilabel_sep: The separator splitting multiple labels in each line.
 
     Returns:
       2-tuple: list of read texts and corresponding list of read labels.
@@ -69,7 +75,15 @@ def _read_delimited(
     for row in rows:
         texts.append(row["text"])
         if has_labels:
-            labels.append(row["label"])
+            label_str = row["label"]
+            if multilabel:
+                if len(row["label"]) == 0:
+                    row_labels = []
+                else:
+                    row_labels = label_str.split(multilabel_sep)
+                labels.append(row_labels)
+            else:
+                labels.append(label_str)
 
     return texts, labels if has_labels else None
 
@@ -90,13 +104,18 @@ def _read_lines(data_file: Path, n_rows: Optional[int] = None) -> List[str]:
 
 
 def read_data_file(
-    data_file: Path, n_rows: Optional[int] = None
-) -> Tuple[List[str], Optional[List[str]]]:
+    data_file: Path,
+    multilabel: bool,
+    multilabel_sep: str = ",",
+    n_rows: Optional[int] = None,
+) -> Tuple[List[str], Optional[Union[List[str], List[List[str]]]]]:
     """
     Read data to explore from a file.  Rows may be sampled using the n_rows argument.
 
     Args:
       data_file: Path to a data file to read.
+      multilabel: If True, read multiple labels for each line.
+      multilabel_sep: Separator for multiple labels on the same line.
       n_rows: The maximum number of rows to read.
 
     Returns:
@@ -104,9 +123,21 @@ def read_data_file(
     """
     extension = data_file.suffix
     if extension == ".tsv":
-        texts, labels = _read_delimited(data_file, "\t", n_rows=n_rows)
+        texts, labels = _read_delimited(
+            data_file,
+            "\t",
+            n_rows=n_rows,
+            multilabel=multilabel,
+            multilabel_sep=multilabel_sep,
+        )
     elif extension == ".csv":
-        texts, labels = _read_delimited(data_file, ",", n_rows=n_rows)
+        texts, labels = _read_delimited(
+            data_file,
+            ",",
+            n_rows=n_rows,
+            multilabel=multilabel,
+            multilabel_sep=multilabel_sep,
+        )
     elif extension == ".txt":
         labels = None
         texts = _read_lines(data_file, n_rows=n_rows)
