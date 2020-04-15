@@ -42,9 +42,6 @@ class ClassificationError:
     @property
     def y_pred(self) -> str:
         """
-        Args:
-          threshold: Predicted probability to be used for multilabel prediction, if
-          applicable.  Unused if doing multiclass prediction.
         Returns:
           The class with the highest predicted probability for this observation.
         """
