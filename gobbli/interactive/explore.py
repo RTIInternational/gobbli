@@ -1,7 +1,7 @@
 import copy
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import altair as alt
 import click
@@ -25,7 +25,7 @@ from gobbli.interactive.util import (
 from gobbli.io import EmbedInput, EmbedPooling
 from gobbli.model import FastText
 from gobbli.model.mixin import EmbedMixin
-from gobbli.util import TokenizeMethod, tokenize, truncate_text
+from gobbli.util import TokenizeMethod, is_multilabel, tokenize, truncate_text
 
 DEFAULT_EMBED_BATCH_SIZE = EmbedInput.embed_batch_size
 
@@ -49,17 +49,23 @@ def get_tokens(
 
 
 def _show_example_documents(
-    texts: List[str], labels: Optional[List[str]], truncate_len: int
+    texts: List[str],
+    labels: Optional[Union[List[str], List[List[str]]]],
+    truncate_len: int,
 ):
     df = pd.DataFrame({"Document": [truncate_text(t, truncate_len) for t in texts]})
     if labels is not None:
-        df["Label"] = labels
+        if is_multilabel(labels):
+            label_col = "Labels"
+        else:
+            label_col = "Label"
+        df[label_col] = labels
     st.table(df)
 
 
 def show_example_documents(
     texts: List[str],
-    labels: List[str],
+    labels: Union[List[str], List[List[str]]],
     filter_label: Optional[str],
     example_truncate_len: int,
     example_num_docs: int,
@@ -89,16 +95,23 @@ def get_document_lengths(tokens: List[List[str]]) -> List[int]:
     return [len(d) for d in tokens]
 
 
-def _collect_label_counts(labels: List[str]) -> pd.DataFrame:
-    label_counts = (
-        pd.Series(labels).value_counts(normalize=True).to_frame(name="Proportion")
-    )
+def _collect_label_counts(labels: Union[List[str], List[List[str]]]) -> pd.DataFrame:
+    if is_multilabel(labels):
+        counts = defaultdict(int)
+        for row_labels in labels:
+            for label in row_labels:
+                counts[label] += 1
+        label_counts = pd.Series(counts) / len(labels)
+    else:
+        label_counts = pd.Series(labels).value_counts(normalize=True)
+    label_counts = label_counts.to_frame(name="Proportion")
     label_counts.index.name = "Label"
     return label_counts.reset_index()
 
 
 def show_label_distribution(
-    sample_labels: List[str], all_labels: Optional[List[str]] = None
+    sample_labels: Union[List[str], List[List[str]]],
+    all_labels: Optional[Union[List[str], List[List[str]]]] = None,
 ):
     if sample_labels is not None:
         st.header("Label Distribution")
@@ -370,7 +383,7 @@ def show_embeddings(
     model_cls: Any,
     model_kwargs: Dict[str, Any],
     texts: List[str],
-    labels: Optional[List[str]],
+    labels: Optional[Union[List[str], List[List[str]]]],
     checkpoint_meta: Optional[Dict[str, Any]] = None,
     batch_size: int = DEFAULT_EMBED_BATCH_SIZE,
     umap_seed: int = 1,
@@ -414,17 +427,21 @@ def show_embeddings(
     umap_df = pd.DataFrame(umap_data, columns=["UMAP Component 1", "UMAP Component 2"])
     tooltip_attrs = ["Text"]
 
+    dataset_is_multilabel = labels is not None and is_multilabel(labels)
+    label_col_name = "Labels" if dataset_is_multilabel else "Label"
+
     if labels is not None:
-        tooltip_attrs.append("Label")
-        umap_df["Label"] = labels
+        tooltip_attrs.append(label_col_name)
+        umap_df[label_col_name] = labels
 
     if clusters is not None:
         color_attr = "Cluster"
         tooltip_attrs.append("Cluster")
         umap_df["Cluster"] = clusters
         umap_df["Cluster"] = umap_df["Cluster"].astype(str)
-    elif labels is not None:
-        color_attr = "Label"
+    elif labels is not None and not dataset_is_multilabel:
+        # Coloring by label doesn't make sense for a multilabel dataset
+        color_attr = label_col_name
     else:
         color_attr = None
 
@@ -517,6 +534,20 @@ def show_embeddings(
     default=None,
 )
 @click.option(
+    "--multilabel/--multiclass",
+    default=False,
+    help="Only applies when reading user data from a file.  If --multilabel, each "
+    "observation may have multiple associated labels.  If --multiclass, only one label "
+    "is allowed per observation.  Defaults to --multiclass.",
+)
+@click.option(
+    "--multilabel-sep",
+    default=",",
+    help="Determines how the labels in the label column are separated for a multilabel "
+    "dataset read from a file.",
+    show_default=True,
+)
+@click.option(
     "--use-gpu/--use-cpu",
     default=False,
     help="Which device to run the model on, if any. Defaults to CPU.",
@@ -532,11 +563,18 @@ def run(
     data: str,
     n_rows: int,
     model_data_dir: Optional[str],
+    multilabel: bool,
+    multilabel_sep: str,
     use_gpu: bool,
     nvidia_visible_devices: str,
 ):
     st.title(f"Exploring: {data}")
-    texts, labels = load_data(data, None if n_rows == -1 else n_rows)
+    texts, labels = load_data(
+        data,
+        multilabel,
+        None if n_rows == -1 else n_rows,
+        multilabel_sep=multilabel_sep,
+    )
     if labels is not None:
         label_indices = get_label_indices(labels)
 

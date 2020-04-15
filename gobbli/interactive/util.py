@@ -192,32 +192,44 @@ def read_data_file_cached(
     # Streamlit errors sometimes when hashing Path objects, so use a string.
     # https://github.com/streamlit/streamlit/issues/857
     data_file: str,
+    multilabel: bool,
     n_rows: Optional[int] = None,
+    multilabel_sep: str = ",",
 ) -> Tuple[List[str], Optional[List[str]]]:
     """
     Streamlit-cached wrapper around :func:`read_data_file` for performance.
     """
-    return read_data_file(Path(data_file), n_rows=n_rows)
+    return read_data_file(
+        Path(data_file),
+        n_rows=n_rows,
+        multilabel=multilabel,
+        multilabel_sep=multilabel_sep,
+    )
 
 
 def load_data(
-    data: str, n_rows: Optional[int]
+    data: str, multilabel: bool, n_rows: Optional[int], multilabel_sep: str = ","
 ) -> Tuple[List[str], Optional[List[str]]]:
     """
     Load data according to the given 'data' string and row limit.
 
     Args:
       data: Could be either the name of a gobbli dataset class or a path
-      to a data file in a supported format.
+        to a data file in a supported format.
       n_rows: Optional limit on number of rows read from the data.
+      multilabel: If the dataset is a file and the file has labels, this determines
+        whether the labels are interpreted as multiclass (one label per row) or multilabel
+        (multiple labels per row).
+      multilabel_sep: Determines how the labels in the label column are separated for
+        a multilabel dataset read from a file.
 
     Returns:
-      2-tuple: List of texts and list of labels.
+      2-tuple: List of texts and optional list of targets.
     """
     if os.path.exists(data):
         data_path = Path(data)
         texts, labels = read_data_file_cached(
-            str(data_path), n_rows=None if n_rows == -1 else n_rows
+            str(data_path), multilabel, n_rows=None if n_rows == -1 else n_rows
         )
     elif data in gobbli.dataset.__all__:
         dataset = getattr(gobbli.dataset, data).load()

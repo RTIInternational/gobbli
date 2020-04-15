@@ -96,6 +96,20 @@ def st_lime_explanation(
     help="Which device to run the model on. Defaults to CPU.",
 )
 @click.option(
+    "--multilabel/--multiclass",
+    default=False,
+    help="Only applies when reading user data from a file.  If --multilabel, each "
+    "observation may have multiple associated labels.  If --multiclass, only one label "
+    "is allowed per observation.  Defaults to --multiclass.",
+)
+@click.option(
+    "--multilabel-sep",
+    default=",",
+    help="Determines how the labels in the label column are separated for a multilabel "
+    "dataset read from a file.",
+    show_default=True,
+)
+@click.option(
     "--nvidia-visible-devices",
     default="all",
     help="Which GPUs to make available to the container; ignored if running on CPU. "
@@ -107,6 +121,8 @@ def run(
     data: str,
     n_rows: int,
     use_gpu: bool,
+    multilabel: bool,
+    multilabel_sep: str,
     nvidia_visible_devices: str,
 ):
     st.sidebar.header("Model")
@@ -119,7 +135,12 @@ def run(
     model = model_cls(**model_kwargs)
     st_model_metadata(model)
 
-    texts, labels = load_data(data, n_rows=None if n_rows == -1 else n_rows)
+    texts, labels = load_data(
+        data,
+        multilabel,
+        n_rows=None if n_rows == -1 else n_rows,
+        multilabel_sep=multilabel_sep,
+    )
 
     st.sidebar.header("Example")
     example_ndx = st.sidebar.number_input(
@@ -145,7 +166,7 @@ def run(
         "Batch Size",
         min_value=1,
         max_value=len(texts),
-        value=DEFAULT_PREDICT_BATCH_SIZE,
+        value=min(len(texts), DEFAULT_PREDICT_BATCH_SIZE),
     )
 
     predict_func = make_predict_func(
