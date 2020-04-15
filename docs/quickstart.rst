@@ -70,6 +70,18 @@ To run an experiment: ::
       "Bad",
   ]
 
+  # Example multilabel format
+  y_multilabel = [
+      ["Fancy", "Cool"],
+      ["Scary"],
+      [],
+      ["Boring"],
+      [],
+      ["Cool"],
+      ["Fancy"],
+      ["Scary", "Cool"],
+  ]
+
   exp = ClassificationExperiment(
     model_cls=MajorityClassifier,
     dataset=(X, y)
@@ -101,6 +113,8 @@ Most gobbli models can be trained. First, create your training input. Multilabel
                "This is another training document."],
       # y_train: The true class for each string in X_train
       y_train=["0", "1"],
+      # Use the below data format for multilabel classification
+      # y_train=[["0"], ["0", "1"]]
       # And likewise for validation
       X_valid=["This is a validation sentence.",
                "This is another validation sentence."],
