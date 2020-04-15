@@ -3,7 +3,7 @@ import tempfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Tuple, Union, cast
+from typing import Any, Dict, Iterator, List, Optional, Tuple, TypeVar, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -20,6 +20,8 @@ from gobbli.util import (
     pred_prob_to_pred_multilabel,
     tokenize,
 )
+
+T = TypeVar("T")
 
 
 def _check_string_list(obj: Any):
@@ -391,11 +393,11 @@ def _chunk_tokens(tokens: List[str], window_len: int) -> Iterator[List[str]]:
 def make_document_windows(
     X: List[str],
     window_len: int,
-    y: Optional[List[str]] = None,
+    y: Optional[List[T]] = None,
     tokenize_method: TokenizeMethod = TokenizeMethod.SPLIT,
     model_path: Optional[Path] = None,
     vocab_size: Optional[int] = None,
-) -> Tuple[List[str], List[int], Optional[List[str]]]:
+) -> Tuple[List[str], List[int], Optional[List[T]]]:
     """
     This is a helper for when you have a dataset with long documents which is going to be
     passed through a model with a fixed max sequence length.  If you don't have enough
@@ -412,8 +414,9 @@ def make_document_windows(
       X: List of texts to make windows out of.
       window_len: The maximum length of each window.  This should roughly correspond to
         the ``max_seq_len`` of your model.
-      y: Optional list of labels.  If passed, a list of labels for each window (the label
-        associated with the window's document) will be returned.
+      y: Optional list of classes (or list of list of labels).  If passed, a corresponding
+        list of targets for each window (the target(s) associated with the window's document)
+        will be returned.
       tokenize_method: :class:`gobbli.util.TokenizeMethod` corresponding to the tokenization
         method to use for determining windows.
       model_path: This argument is used if the tokenization method requires
@@ -427,16 +430,16 @@ def make_document_windows(
     Returns:
       A 3-tuple containing a new list of texts split into windows, a corresponding list
       containing the index of each original document for each window, and (optionally)
-      a list containing a label per window.  The index should
+      a list containing a target per window.  The index should
       be used to pool the output from the windowed text (see :func:`pool_document_windows`).
     """
-    X_windowed = []  # type: List[str]
-    X_windowed_indices = []  # type: List[int]
-    y_windowed = []  # type: List[str]
+    X_windowed: List[str] = []
+    X_windowed_indices: List[int] = []
+    y_windowed: List[T] = []
 
     # Create a temp dir in case it's needed
     with tempfile.TemporaryDirectory() as tmpdir:
-        tokenize_kwargs = {}  # type: Dict[str, Any]
+        tokenize_kwargs: Dict[str, Any] = {}
 
         if model_path is None:
             model_path = Path(tmpdir) / "tokenizer"
