@@ -1,51 +1,54 @@
 # Results: XLM
 ```
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Build finished in 0.47 sec.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Training finished in 3089.48 sec.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:  Validation loss: 0.02176531046628952
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.4906
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:  Training loss: 0.043933403673768044
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Build finished in 0.27 sec.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Training finished in 1796.83 sec.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:  Validation loss: 0.024198950758203865
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.828
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:  Training loss: 0.009087214053142816
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Build finished in 0.37 sec.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Starting prediction.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Prediction finished in 233.77 sec.
-[2m[36m(pid=551)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-[2m[36m(pid=551)[0m   if isinstance(obj, pd.SparseDataFrame):
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/7639ffbb39824aa28957eed8d4d9a415'
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Build finished in 0.21 sec.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Training finished in 3092.26 sec.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Validation loss: 0.02176959261894226
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.4988
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Training loss: 0.04383168312013149
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/5fb64087d96240efbb34656165bb0fb0'
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Build finished in 0.21 sec.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Training finished in 1831.32 sec.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Validation loss: 0.025225455497577785
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.831
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Training loss: 0.008801721643656493
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/98ca5aa511804431bb75586f5c439618'
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Build finished in 0.17 sec.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting prediction.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Prediction finished in 232.73 sec.
+[2m[36m(pid=47)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+[2m[36m(pid=47)[0m   if isinstance(obj, pd.SparseDataFrame):
 
 ```
-|    |   valid_loss |   valid_accuracy |   train_loss | labels         | checkpoint                                                                                                                 | node_ip_address   | model_params                                                                   |
-|---:|-------------:|-----------------:|-------------:|:---------------|:---------------------------------------------------------------------------------------------------------------------------|:------------------|:-------------------------------------------------------------------------------|
-|  0 |    0.0217653 |           0.4906 |   0.0439334  | ['neg', 'pos'] | benchmark_data/model/Transformer/a2e0a156e390456b862cb737a1e84bc1/train/48476a321ccf4ea2875bbf60a82c7b32/output/checkpoint | 172.80.10.2       | {'transformer_model': 'XLM', 'transformer_weights': 'xlm-mlm-tlm-xnli15-1024'} |
-|  1 |    0.024199  |           0.828  |   0.00908721 | ['neg', 'pos'] | benchmark_data/model/Transformer/bf3df4408a6f4c93adc1388cd109264d/train/830bbf21e5284c959c4d88b1c95a56bd/output/checkpoint | 172.80.10.2       | {'transformer_model': 'XLM', 'transformer_weights': 'xlm-clm-ende-1024'}       |
+|    |   valid_loss |   valid_accuracy |   train_loss | multilabel   | labels         | checkpoint                                                                                                                                                     | node_ip_address   | model_params                                                                   |
+|---:|-------------:|-----------------:|-------------:|:-------------|:---------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------|:-------------------------------------------------------------------------------|
+|  0 |    0.0217696 |           0.4988 |   0.0438317  | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/7639ffbb39824aa28957eed8d4d9a415/train/1325c2f951274b08b14f883c3f03707a/output/checkpoint | 172.80.10.2       | {'transformer_model': 'XLM', 'transformer_weights': 'xlm-mlm-tlm-xnli15-1024'} |
+|  1 |    0.0252255 |           0.831  |   0.00880172 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/5fb64087d96240efbb34656165bb0fb0/train/a29d53b00ad84d26aa2e2bd6915d1fcf/output/checkpoint | 172.80.10.2       | {'transformer_model': 'XLM', 'transformer_weights': 'xlm-clm-ende-1024'}       |
 ```
 Metrics:
 --------
-Weighted F1 Score: 0.33331549252537007
-Weighted Precision Score: 0.3213785574246503
-Weighted Recall Score: 0.4998
-Accuracy: 0.4998
+Weighted F1 Score: 0.33333333333333326
+Weighted Precision Score: 0.25
+Weighted Recall Score: 0.5
+Accuracy: 0.5
 
 Classification Report:
 ----------------------
               precision    recall  f1-score   support
 
-         neg       0.14      0.00      0.00     12500
-         pos       0.50      1.00      0.67     12500
+         neg       0.00      0.00      0.00         0
+         pos       0.00      0.00      0.00         0
 
-    accuracy                           0.50     25000
-   macro avg       0.32      0.50      0.33     25000
-weighted avg       0.32      0.50      0.33     25000
+   micro avg       0.00      0.00      0.00         0
+   macro avg       0.00      0.00      0.00         0
+weighted avg       0.00      0.00      0.00         0
 
 
 ```

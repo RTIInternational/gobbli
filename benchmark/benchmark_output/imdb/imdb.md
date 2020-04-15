@@ -1,60 +1,64 @@
 # Results: BERT
 ```
-[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:Build finished in 0.37 sec.
-[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:Training finished in 1702.40 sec.
-[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:  Validation loss: 0.55245966
-[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8882
-[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:  Training loss: 0.55339825
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:Build finished in 0.59 sec.
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:Training finished in 1699.59 sec.
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:  Validation loss: 0.63585734
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.874
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:  Training loss: 0.6350079
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:Build finished in 0.38 sec.
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:Training finished in 1702.41 sec.
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:  Validation loss: 0.5771891
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8856
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:  Training loss: 0.57802886
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:Build finished in 0.84 sec.
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:Starting prediction.
-[2m[36m(pid=44)[0m INFO:gobbli.experiment.base:Prediction finished in 226.42 sec.
-[2m[36m(pid=44)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-[2m[36m(pid=44)[0m   if isinstance(obj, pd.SparseDataFrame):
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:BERT initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/BERT/b4a974d0cbf84a26a13d943f1313a663'
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Build finished in 0.31 sec.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Training finished in 1697.72 sec.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:  Validation loss: 0.5770399
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.883
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:  Training loss: 0.5787165
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:BERT initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/BERT/947ec7f4d6c648afabc639aff4d44732'
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Build finished in 0.28 sec.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Training finished in 1692.98 sec.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:  Validation loss: 0.63589144
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8734
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:  Training loss: 0.6371434
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:BERT initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/BERT/7280affc90ee4d18aeea25fabe3808eb'
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Build finished in 0.34 sec.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Training finished in 1699.80 sec.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:  Validation loss: 0.7240024
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.854
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:  Training loss: 0.7260194
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:BERT initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/BERT/b9b55a3e2a224e3993d9fbeab85a6833'
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Build finished in 0.40 sec.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Starting prediction.
+[2m[36m(pid=3321)[0m INFO:gobbli.experiment.base:Prediction finished in 217.82 sec.
+[2m[36m(pid=3321)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+[2m[36m(pid=3321)[0m   if isinstance(obj, pd.SparseDataFrame):
 
 ```
-|    |   valid_loss |   valid_accuracy |   train_loss | labels         | checkpoint                                                                                                               | node_ip_address   | model_params                                               |
-|---:|-------------:|-----------------:|-------------:|:---------------|:-------------------------------------------------------------------------------------------------------------------------|:------------------|:-----------------------------------------------------------|
-|  0 |     0.55246  |           0.8882 |     0.553398 | ['neg', 'pos'] | benchmark_data/model/BERT/d552955c2bb24d9494adf5f67a5bc236/train/c04d9eaab55c4b289daf1fec0ad83a85/output/model.ckpt-3125 | 172.80.10.2       | {'bert_model': 'bert-base-uncased', 'max_seq_length': 128} |
-|  1 |     0.635857 |           0.874  |     0.635008 | ['neg', 'pos'] | benchmark_data/model/BERT/f0404a440eeb464290d86e69f7104dd1/train/2acd79e6f58f499fa03fb07d89ea510b/output/model.ckpt-3125 | 172.80.10.2       | {'bert_model': 'bert-base-cased', 'max_seq_length': 128}   |
-|  2 |     0.577189 |           0.8856 |     0.578029 | ['neg', 'pos'] | benchmark_data/model/BERT/cf6fd83548fe4a1580097f1325596dfa/train/76bdfaa9dd704934be341b499df1f4ce/output/model.ckpt-3125 | 172.80.10.2       | {'bert_model': 'scibert-uncased', 'max_seq_length': 128}   |
+|    |   valid_loss |   valid_accuracy |   train_loss | multilabel   | labels         | checkpoint                                                                                                                                                   | node_ip_address   | model_params                                               |
+|---:|-------------:|-----------------:|-------------:|:-------------|:---------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------|:-----------------------------------------------------------|
+|  0 |     0.57704  |           0.883  |     0.578716 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/BERT/b4a974d0cbf84a26a13d943f1313a663/train/de9b0777535341e1abbdc6b54f6c497a/output/model.ckpt-3125 | 172.80.10.2       | {'bert_model': 'bert-base-uncased', 'max_seq_length': 128} |
+|  1 |     0.635891 |           0.8734 |     0.637143 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/BERT/947ec7f4d6c648afabc639aff4d44732/train/db4df22fa3e6451abd76964dfdab0cae/output/model.ckpt-3125 | 172.80.10.2       | {'bert_model': 'bert-base-cased', 'max_seq_length': 128}   |
+|  2 |     0.724002 |           0.854  |     0.726019 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/BERT/7280affc90ee4d18aeea25fabe3808eb/train/bad61cd577a44744a48787586da65c9c/output/model.ckpt-3125 | 172.80.10.2       | {'bert_model': 'scibert-uncased', 'max_seq_length': 128}   |
 ```
 Metrics:
 --------
-Weighted F1 Score: 0.8795931909467853
-Weighted Precision Score: 0.87968588555481
-Weighted Recall Score: 0.8796
-Accuracy: 0.8796
+Weighted F1 Score: 0.8819691767698491
+Weighted Precision Score: 0.8823994477328716
+Weighted Recall Score: 0.882
+Accuracy: 0.882
 
 Classification Report:
 ----------------------
               precision    recall  f1-score   support
 
-         neg       0.89      0.87      0.88     12500
-         pos       0.87      0.89      0.88     12500
+         neg       0.00      0.00      0.00         0
+         pos       0.00      0.00      0.00         0
 
-    accuracy                           0.88     25000
-   macro avg       0.88      0.88      0.88     25000
-weighted avg       0.88      0.88      0.88     25000
+   micro avg       0.00      0.00      0.00         0
+   macro avg       0.00      0.00      0.00         0
+weighted avg       0.00      0.00      0.00         0
 
 
 ```
@@ -63,45 +67,47 @@ weighted avg       0.88      0.88      0.88     25000
 ---
 # Results: MTDNN
 ```
-[2m[36m(pid=207)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=207)[0m INFO:gobbli.experiment.base:Build finished in 0.55 sec.
-[2m[36m(pid=207)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=207)[0m /code/gobbli/model/mtdnn/model.py:193: UserWarning: MT-DNN model does not support separate validation batch size; using train batch size '16' for both training and validation.
-[2m[36m(pid=207)[0m   "MT-DNN model does not support separate validation batch size; "
-[2m[36m(pid=207)[0m INFO:gobbli.experiment.base:Training finished in 2652.60 sec.
-[2m[36m(pid=207)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=207)[0m INFO:gobbli.experiment.base:  Validation loss: 0.42352402210235596
-[2m[36m(pid=207)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8866
-[2m[36m(pid=207)[0m INFO:gobbli.experiment.base:  Training loss: 0.3258255124092102
-[2m[36m(pid=207)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=207)[0m INFO:gobbli.experiment.base:Build finished in 1.00 sec.
-[2m[36m(pid=207)[0m INFO:gobbli.experiment.base:Starting prediction.
-[2m[36m(pid=207)[0m INFO:gobbli.experiment.base:Prediction finished in 189.84 sec.
-[2m[36m(pid=207)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-[2m[36m(pid=207)[0m   if isinstance(obj, pd.SparseDataFrame):
+[2m[36m(pid=3537)[0m INFO:gobbli.experiment.base:MTDNN initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/MTDNN/97bd914c45964562810bc65fbb005958'
+[2m[36m(pid=3537)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3537)[0m INFO:gobbli.experiment.base:Build finished in 0.27 sec.
+[2m[36m(pid=3537)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=3537)[0m /code/gobbli/model/mtdnn/model.py:204: UserWarning: MT-DNN model does not support separate validation batch size; using train batch size '16' for both training and validation.
+[2m[36m(pid=3537)[0m   "MT-DNN model does not support separate validation batch size; "
+[2m[36m(pid=3537)[0m INFO:gobbli.experiment.base:Training finished in 2691.56 sec.
+[2m[36m(pid=3537)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=3537)[0m INFO:gobbli.experiment.base:  Validation loss: 0.4333544969558716
+[2m[36m(pid=3537)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8782
+[2m[36m(pid=3537)[0m INFO:gobbli.experiment.base:  Training loss: 0.3258266746997833
+[2m[36m(pid=3537)[0m INFO:gobbli.experiment.base:MTDNN initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/MTDNN/2400ab65a9b1404a893cb9e3e6c18f0b'
+[2m[36m(pid=3537)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3537)[0m INFO:gobbli.experiment.base:Build finished in 0.31 sec.
+[2m[36m(pid=3537)[0m INFO:gobbli.experiment.base:Starting prediction.
+[2m[36m(pid=3537)[0m INFO:gobbli.experiment.base:Prediction finished in 187.28 sec.
+[2m[36m(pid=3537)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+[2m[36m(pid=3537)[0m   if isinstance(obj, pd.SparseDataFrame):
 
 ```
-|    |   valid_loss |   valid_accuracy |   train_loss | labels         | checkpoint                                                                                                           | node_ip_address   | model_params                                          |
-|---:|-------------:|-----------------:|-------------:|:---------------|:---------------------------------------------------------------------------------------------------------------------|:------------------|:------------------------------------------------------|
-|  0 |     0.423524 |           0.8866 |     0.325826 | ['neg', 'pos'] | benchmark_data/model/MTDNN/22da8b980a894693b8812dc521417784/train/d81d2cdf873a4b23a8f7109a2fcd2df8/output/model_4.pt | 172.80.10.2       | {'max_seq_length': 128, 'mtdnn_model': 'mt-dnn-base'} |
+|    |   valid_loss |   valid_accuracy |   train_loss | multilabel   | labels         | checkpoint                                                                                                                                               | node_ip_address   | model_params                                          |
+|---:|-------------:|-----------------:|-------------:|:-------------|:---------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------|:------------------------------------------------------|
+|  0 |     0.433354 |           0.8782 |     0.325827 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/MTDNN/97bd914c45964562810bc65fbb005958/train/a64ab92d26334450b788b96d243fba71/output/model_4.pt | 172.80.10.2       | {'max_seq_length': 128, 'mtdnn_model': 'mt-dnn-base'} |
 ```
 Metrics:
 --------
-Weighted F1 Score: 0.8820389383504452
-Weighted Precision Score: 0.8820537539351417
-Weighted Recall Score: 0.88204
-Accuracy: 0.88204
+Weighted F1 Score: 0.8816735903057176
+Weighted Precision Score: 0.8817627197352919
+Weighted Recall Score: 0.88168
+Accuracy: 0.88168
 
 Classification Report:
 ----------------------
               precision    recall  f1-score   support
 
-         neg       0.88      0.88      0.88     12500
-         pos       0.88      0.89      0.88     12500
+         neg       0.00      0.00      0.00         0
+         pos       0.00      0.00      0.00         0
 
-    accuracy                           0.88     25000
-   macro avg       0.88      0.88      0.88     25000
-weighted avg       0.88      0.88      0.88     25000
+   micro avg       0.00      0.00      0.00         0
+   macro avg       0.00      0.00      0.00         0
+weighted avg       0.00      0.00      0.00         0
 
 
 ```
@@ -110,106 +116,115 @@ weighted avg       0.88      0.88      0.88     25000
 ---
 # Results: FastText
 ```
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Build finished in 0.70 sec.
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:Build finished in 0.70 sec.
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:Build finished in 0.63 sec.
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:Build finished in 0.75 sec.
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:Training finished in 322.28 sec.
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8982
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8982
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:  Training loss: 0.258553
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:Build finished in 0.36 sec.
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:Training finished in 327.91 sec.
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8992
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8992
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:  Training loss: 0.260865
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:Build finished in 0.26 sec.
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Training finished in 329.68 sec.
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8876
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8876
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:  Training loss: 0.300632
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:Training finished in 329.81 sec.
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8878
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8878
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:  Training loss: 0.292702
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Build finished in 0.44 sec.
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:Build finished in 0.37 sec.
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:Training finished in 325.45 sec.
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8882
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8882
-[2m[36m(pid=357)[0m INFO:gobbli.experiment.base:  Training loss: 0.333738
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Training finished in 376.47 sec.
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8916
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8916
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:  Training loss: 0.319099
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:Training finished in 414.33 sec.
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8974
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8974
-[2m[36m(pid=356)[0m INFO:gobbli.experiment.base:  Training loss: 0.218359
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:Training finished in 417.83 sec.
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8946
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8946
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:  Training loss: 0.273403
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:Build finished in 0.53 sec.
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:Starting prediction.
-[2m[36m(pid=355)[0m INFO:gobbli.experiment.base:Prediction finished in 9.24 sec.
-[2m[36m(pid=355)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-[2m[36m(pid=355)[0m   if isinstance(obj, pd.SparseDataFrame):
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/cd128674518a40f188195fed86512184'
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/ac0e2c59ee944c07af0f7d5b6ad9ffd1'
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/7b21e9fb6ee64d4bb7d210a47784c094'
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/053a11ae86a446ffaee8fa7f11dc81df'
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:Build finished in 0.30 sec.
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:Build finished in 0.34 sec.
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:Build finished in 0.28 sec.
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:Build finished in 0.28 sec.
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:Training finished in 312.29 sec.
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:  Validation loss: -0.883
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.883
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:  Training loss: 0.329469
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/be56fe65ba39471d83df1cbc6a41a11b'
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:Build finished in 0.33 sec.
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:Training finished in 312.65 sec.
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:  Validation loss: -0.888
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.888
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:  Training loss: 0.31366
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/c57044730473433d82cdc342918a5606'
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:Build finished in 0.28 sec.
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:Training finished in 312.95 sec.
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:  Validation loss: -0.897
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.897
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:  Training loss: 0.277508
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/de53d34b14f74c66abe97283f6c8d92c'
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:Build finished in 0.30 sec.
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:Training finished in 316.22 sec.
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8976
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8976
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:  Training loss: 0.257975
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/292548946e204b6e9859f79d718634df'
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:Build finished in 0.45 sec.
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:Training finished in 319.10 sec.
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:  Validation loss: -0.888
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.888
+[2m[36m(pid=3754)[0m INFO:gobbli.experiment.base:  Training loss: 0.362867
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:Training finished in 319.25 sec.
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8912
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8912
+[2m[36m(pid=3753)[0m INFO:gobbli.experiment.base:  Training loss: 0.309882
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:Training finished in 324.26 sec.
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8998
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8998
+[2m[36m(pid=3752)[0m INFO:gobbli.experiment.base:  Training loss: 0.312032
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:Training finished in 321.45 sec.
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:  Validation loss: -0.9004
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.9004
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:  Training loss: 0.29699
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/9a7abdc6832743269eb34cd36db34aa3'
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:Build finished in 0.30 sec.
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:Starting prediction.
+[2m[36m(pid=3751)[0m INFO:gobbli.experiment.base:Prediction finished in 5.15 sec.
+[2m[36m(pid=3751)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+[2m[36m(pid=3751)[0m   if isinstance(obj, pd.SparseDataFrame):
 
 ```
-|    |   valid_loss |   valid_accuracy |   train_loss | labels         | checkpoint                                                                                                         | node_ip_address   | model_params                              |
-|---:|-------------:|-----------------:|-------------:|:---------------|:-------------------------------------------------------------------------------------------------------------------|:------------------|:------------------------------------------|
-|  0 |      -0.8876 |           0.8876 |     0.300632 | ['neg', 'pos'] | benchmark_data/model/FastText/2bd8d69da37c4029b3535ddf32edbc1c/train/f94206879eb74907b139ab23fedcd26c/output/model | 172.80.10.2       | {'dim': 100, 'lr': 0.5, 'word_ngrams': 1} |
-|  1 |      -0.8982 |           0.8982 |     0.258553 | ['neg', 'pos'] | benchmark_data/model/FastText/2a3a9af96efb4c47baa4c48f23253623/train/c96f489df90d4cdea9f5d1bf9bd5a856/output/model | 172.80.10.2       | {'dim': 100, 'lr': 0.5, 'word_ngrams': 2} |
-|  2 |      -0.8878 |           0.8878 |     0.292702 | ['neg', 'pos'] | benchmark_data/model/FastText/83e00259e9b6464ab5c19fafff50c7a3/train/6c400b6e35e542aba24e63fbaf186bc2/output/model | 172.80.10.2       | {'dim': 100, 'lr': 1.0, 'word_ngrams': 1} |
-|  3 |      -0.8992 |           0.8992 |     0.260865 | ['neg', 'pos'] | benchmark_data/model/FastText/b95b50e9cbf246dc800257fbe44d24ae/train/af6c14c956ed4bcc92f2ae00e3bee234/output/model | 172.80.10.2       | {'dim': 100, 'lr': 1.0, 'word_ngrams': 2} |
-|  4 |      -0.8882 |           0.8882 |     0.333738 | ['neg', 'pos'] | benchmark_data/model/FastText/19c14eecf6a14edea9234c9f0f15c759/train/d83b2903ca22478dbb6ae0de6b5a7b5e/output/model | 172.80.10.2       | {'dim': 300, 'lr': 0.5, 'word_ngrams': 1} |
-|  5 |      -0.8946 |           0.8946 |     0.273403 | ['neg', 'pos'] | benchmark_data/model/FastText/8bf691dc39ac466c8b0e540710146566/train/8261fd62582c4fa694140db3350e018e/output/model | 172.80.10.2       | {'dim': 300, 'lr': 0.5, 'word_ngrams': 2} |
-|  6 |      -0.8916 |           0.8916 |     0.319099 | ['neg', 'pos'] | benchmark_data/model/FastText/012505f753b44a38920ed4c5ac3c2738/train/dda929c9ee9f4feb8eb8692eb5d1af7d/output/model | 172.80.10.2       | {'dim': 300, 'lr': 1.0, 'word_ngrams': 1} |
-|  7 |      -0.8974 |           0.8974 |     0.218359 | ['neg', 'pos'] | benchmark_data/model/FastText/cb2018065d7e427d803b481b1e7e17d2/train/4ef1c944998e442aa1975e36e8217a2f/output/model | 172.80.10.2       | {'dim': 300, 'lr': 1.0, 'word_ngrams': 2} |
+|    |   valid_loss |   valid_accuracy |   train_loss | multilabel   | labels         | checkpoint                                                                                                                                             | node_ip_address   | model_params                              |
+|---:|-------------:|-----------------:|-------------:|:-------------|:---------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------|:------------------------------------------|
+|  0 |      -0.883  |           0.883  |     0.329469 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/cd128674518a40f188195fed86512184/train/e68480643e744624978ffd5a4bf373f7/output/model | 172.80.10.2       | {'dim': 100, 'lr': 0.5, 'word_ngrams': 1} |
+|  1 |      -0.8976 |           0.8976 |     0.257975 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/ac0e2c59ee944c07af0f7d5b6ad9ffd1/train/8c0b4c217c4441c98446023e3aee5a15/output/model | 172.80.10.2       | {'dim': 100, 'lr': 0.5, 'word_ngrams': 2} |
+|  2 |      -0.888  |           0.888  |     0.31366  | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/7b21e9fb6ee64d4bb7d210a47784c094/train/540bf38999424506a1619c0da46d80e8/output/model | 172.80.10.2       | {'dim': 100, 'lr': 1.0, 'word_ngrams': 1} |
+|  3 |      -0.897  |           0.897  |     0.277508 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/053a11ae86a446ffaee8fa7f11dc81df/train/25b72bd83196489e891c3bc204e976e9/output/model | 172.80.10.2       | {'dim': 100, 'lr': 1.0, 'word_ngrams': 2} |
+|  4 |      -0.888  |           0.888  |     0.362867 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/be56fe65ba39471d83df1cbc6a41a11b/train/a2e43f09612642e7a039fc4f9d9f39f6/output/model | 172.80.10.2       | {'dim': 300, 'lr': 0.5, 'word_ngrams': 1} |
+|  5 |      -0.8998 |           0.8998 |     0.312032 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/c57044730473433d82cdc342918a5606/train/364f850e9b7f41258710ec9cfb508768/output/model | 172.80.10.2       | {'dim': 300, 'lr': 0.5, 'word_ngrams': 2} |
+|  6 |      -0.8912 |           0.8912 |     0.309882 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/de53d34b14f74c66abe97283f6c8d92c/train/839eb49b93384153be401e693b9253a2/output/model | 172.80.10.2       | {'dim': 300, 'lr': 1.0, 'word_ngrams': 1} |
+|  7 |      -0.9004 |           0.9004 |     0.29699  | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/292548946e204b6e9859f79d718634df/train/f940017802dd457bbfc6ecf58e62e397/output/model | 172.80.10.2       | {'dim': 300, 'lr': 1.0, 'word_ngrams': 2} |
 ```
 Metrics:
 --------
-Weighted F1 Score: 0.8884791256763455
-Weighted Precision Score: 0.8884921831148624
-Weighted Recall Score: 0.88848
-Accuracy: 0.88848
+Weighted F1 Score: 0.8860921370432054
+Weighted Precision Score: 0.8864981646458191
+Weighted Recall Score: 0.88612
+Accuracy: 0.88612
 
 Classification Report:
 ----------------------
               precision    recall  f1-score   support
 
-         neg       0.89      0.89      0.89     12500
-         pos       0.89      0.89      0.89     12500
+         neg       0.00      0.00      0.00         0
+         pos       0.00      0.00      0.00         0
 
-    accuracy                           0.89     25000
-   macro avg       0.89      0.89      0.89     25000
-weighted avg       0.89      0.89      0.89     25000
+   micro avg       0.00      0.00      0.00         0
+   macro avg       0.00      0.00      0.00         0
+weighted avg       0.00      0.00      0.00         0
 
 
 ```
@@ -218,52 +233,55 @@ weighted avg       0.89      0.89      0.89     25000
 ---
 # Results: XLM
 ```
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Build finished in 0.47 sec.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Training finished in 3089.48 sec.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:  Validation loss: 0.02176531046628952
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.4906
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:  Training loss: 0.043933403673768044
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Build finished in 0.27 sec.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Training finished in 1796.83 sec.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:  Validation loss: 0.024198950758203865
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.828
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:  Training loss: 0.009087214053142816
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Build finished in 0.37 sec.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Starting prediction.
-[2m[36m(pid=551)[0m INFO:gobbli.experiment.base:Prediction finished in 233.77 sec.
-[2m[36m(pid=551)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-[2m[36m(pid=551)[0m   if isinstance(obj, pd.SparseDataFrame):
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/7639ffbb39824aa28957eed8d4d9a415'
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Build finished in 0.21 sec.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Training finished in 3092.26 sec.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Validation loss: 0.02176959261894226
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.4988
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Training loss: 0.04383168312013149
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/5fb64087d96240efbb34656165bb0fb0'
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Build finished in 0.21 sec.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Training finished in 1831.32 sec.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Validation loss: 0.025225455497577785
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.831
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Training loss: 0.008801721643656493
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/98ca5aa511804431bb75586f5c439618'
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Build finished in 0.17 sec.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting prediction.
+[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Prediction finished in 232.73 sec.
+[2m[36m(pid=47)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+[2m[36m(pid=47)[0m   if isinstance(obj, pd.SparseDataFrame):
 
 ```
-|    |   valid_loss |   valid_accuracy |   train_loss | labels         | checkpoint                                                                                                                 | node_ip_address   | model_params                                                                   |
-|---:|-------------:|-----------------:|-------------:|:---------------|:---------------------------------------------------------------------------------------------------------------------------|:------------------|:-------------------------------------------------------------------------------|
-|  0 |    0.0217653 |           0.4906 |   0.0439334  | ['neg', 'pos'] | benchmark_data/model/Transformer/a2e0a156e390456b862cb737a1e84bc1/train/48476a321ccf4ea2875bbf60a82c7b32/output/checkpoint | 172.80.10.2       | {'transformer_model': 'XLM', 'transformer_weights': 'xlm-mlm-tlm-xnli15-1024'} |
-|  1 |    0.024199  |           0.828  |   0.00908721 | ['neg', 'pos'] | benchmark_data/model/Transformer/bf3df4408a6f4c93adc1388cd109264d/train/830bbf21e5284c959c4d88b1c95a56bd/output/checkpoint | 172.80.10.2       | {'transformer_model': 'XLM', 'transformer_weights': 'xlm-clm-ende-1024'}       |
+|    |   valid_loss |   valid_accuracy |   train_loss | multilabel   | labels         | checkpoint                                                                                                                                                     | node_ip_address   | model_params                                                                   |
+|---:|-------------:|-----------------:|-------------:|:-------------|:---------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------|:-------------------------------------------------------------------------------|
+|  0 |    0.0217696 |           0.4988 |   0.0438317  | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/7639ffbb39824aa28957eed8d4d9a415/train/1325c2f951274b08b14f883c3f03707a/output/checkpoint | 172.80.10.2       | {'transformer_model': 'XLM', 'transformer_weights': 'xlm-mlm-tlm-xnli15-1024'} |
+|  1 |    0.0252255 |           0.831  |   0.00880172 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/5fb64087d96240efbb34656165bb0fb0/train/a29d53b00ad84d26aa2e2bd6915d1fcf/output/checkpoint | 172.80.10.2       | {'transformer_model': 'XLM', 'transformer_weights': 'xlm-clm-ende-1024'}       |
 ```
 Metrics:
 --------
-Weighted F1 Score: 0.33331549252537007
-Weighted Precision Score: 0.3213785574246503
-Weighted Recall Score: 0.4998
-Accuracy: 0.4998
+Weighted F1 Score: 0.33333333333333326
+Weighted Precision Score: 0.25
+Weighted Recall Score: 0.5
+Accuracy: 0.5
 
 Classification Report:
 ----------------------
               precision    recall  f1-score   support
 
-         neg       0.14      0.00      0.00     12500
-         pos       0.50      1.00      0.67     12500
+         neg       0.00      0.00      0.00         0
+         pos       0.00      0.00      0.00         0
 
-    accuracy                           0.50     25000
-   macro avg       0.32      0.50      0.33     25000
-weighted avg       0.32      0.50      0.33     25000
+   micro avg       0.00      0.00      0.00         0
+   macro avg       0.00      0.00      0.00         0
+weighted avg       0.00      0.00      0.00         0
 
 
 ```
@@ -272,43 +290,45 @@ weighted avg       0.32      0.50      0.33     25000
 ---
 # Results: XLNet
 ```
-[2m[36m(pid=710)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=710)[0m INFO:gobbli.experiment.base:Build finished in 0.67 sec.
-[2m[36m(pid=710)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=710)[0m INFO:gobbli.experiment.base:Training finished in 2395.51 sec.
-[2m[36m(pid=710)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=710)[0m INFO:gobbli.experiment.base:  Validation loss: 0.017671398958563806
-[2m[36m(pid=710)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.885
-[2m[36m(pid=710)[0m INFO:gobbli.experiment.base:  Training loss: 0.003449625564739108
-[2m[36m(pid=710)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=710)[0m INFO:gobbli.experiment.base:Build finished in 0.22 sec.
-[2m[36m(pid=710)[0m INFO:gobbli.experiment.base:Starting prediction.
-[2m[36m(pid=710)[0m INFO:gobbli.experiment.base:Prediction finished in 205.30 sec.
-[2m[36m(pid=710)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-[2m[36m(pid=710)[0m   if isinstance(obj, pd.SparseDataFrame):
+[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/bcc8a9b71b50460abf8789b013c978d5'
+[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:Build finished in 0.16 sec.
+[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:Training finished in 2385.69 sec.
+[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:  Validation loss: 0.019337966107577084
+[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8936
+[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:  Training loss: 0.0028089337879791854
+[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/b4a59e2c2e724e4481b2a139c32cfdab'
+[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:Build finished in 0.17 sec.
+[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:Starting prediction.
+[2m[36m(pid=45)[0m INFO:gobbli.experiment.base:Prediction finished in 204.68 sec.
+[2m[36m(pid=45)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+[2m[36m(pid=45)[0m   if isinstance(obj, pd.SparseDataFrame):
 
 ```
-|    |   valid_loss |   valid_accuracy |   train_loss | labels         | checkpoint                                                                                                                 | node_ip_address   | model_params                                                              |
-|---:|-------------:|-----------------:|-------------:|:---------------|:---------------------------------------------------------------------------------------------------------------------------|:------------------|:--------------------------------------------------------------------------|
-|  0 |    0.0176714 |            0.885 |   0.00344963 | ['neg', 'pos'] | benchmark_data/model/Transformer/7f725266c5c645ff9aae2cd91064e0b0/train/1b7e91e576da4acda9f7eb091e841dd1/output/checkpoint | 172.80.10.2       | {'transformer_model': 'XLNet', 'transformer_weights': 'xlnet-base-cased'} |
+|    |   valid_loss |   valid_accuracy |   train_loss | multilabel   | labels         | checkpoint                                                                                                                                                     | node_ip_address   | model_params                                                              |
+|---:|-------------:|-----------------:|-------------:|:-------------|:---------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------|:--------------------------------------------------------------------------|
+|  0 |     0.019338 |           0.8936 |   0.00280893 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/bcc8a9b71b50460abf8789b013c978d5/train/559d8078f84e4fa4b8f33f9c950110af/output/checkpoint | 172.80.10.2       | {'transformer_model': 'XLNet', 'transformer_weights': 'xlnet-base-cased'} |
 ```
 Metrics:
 --------
-Weighted F1 Score: 0.8893179724823471
-Weighted Precision Score: 0.8893485289683722
-Weighted Recall Score: 0.88932
-Accuracy: 0.88932
+Weighted F1 Score: 0.8896881198666413
+Weighted Precision Score: 0.8901710377196039
+Weighted Recall Score: 0.88972
+Accuracy: 0.88972
 
 Classification Report:
 ----------------------
               precision    recall  f1-score   support
 
-         neg       0.89      0.89      0.89     12500
-         pos       0.89      0.89      0.89     12500
+         neg       0.00      0.00      0.00         0
+         pos       0.00      0.00      0.00         0
 
-    accuracy                           0.89     25000
-   macro avg       0.89      0.89      0.89     25000
-weighted avg       0.89      0.89      0.89     25000
+   micro avg       0.00      0.00      0.00         0
+   macro avg       0.00      0.00      0.00         0
+weighted avg       0.00      0.00      0.00         0
 
 
 ```
@@ -317,43 +337,45 @@ weighted avg       0.89      0.89      0.89     25000
 ---
 # Results: RoBERTa
 ```
-[2m[36m(pid=849)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=849)[0m INFO:gobbli.experiment.base:Build finished in 0.23 sec.
-[2m[36m(pid=849)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=849)[0m INFO:gobbli.experiment.base:Training finished in 1828.11 sec.
-[2m[36m(pid=849)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=849)[0m INFO:gobbli.experiment.base:  Validation loss: 0.017278218799829482
-[2m[36m(pid=849)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8828
-[2m[36m(pid=849)[0m INFO:gobbli.experiment.base:  Training loss: 0.006217972612846643
-[2m[36m(pid=849)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=849)[0m INFO:gobbli.experiment.base:Build finished in 0.38 sec.
-[2m[36m(pid=849)[0m INFO:gobbli.experiment.base:Starting prediction.
-[2m[36m(pid=849)[0m INFO:gobbli.experiment.base:Prediction finished in 134.85 sec.
-[2m[36m(pid=849)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-[2m[36m(pid=849)[0m   if isinstance(obj, pd.SparseDataFrame):
+[2m[36m(pid=271)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/08a2251f036a4899b6613602d62acf64'
+[2m[36m(pid=271)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=271)[0m INFO:gobbli.experiment.base:Build finished in 0.21 sec.
+[2m[36m(pid=271)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=271)[0m INFO:gobbli.experiment.base:Training finished in 1886.50 sec.
+[2m[36m(pid=271)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=271)[0m INFO:gobbli.experiment.base:  Validation loss: 0.016859848795831203
+[2m[36m(pid=271)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8932
+[2m[36m(pid=271)[0m INFO:gobbli.experiment.base:  Training loss: 0.005073892575781792
+[2m[36m(pid=271)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/dd28d9d153a74318ad848edc19d8bf5f'
+[2m[36m(pid=271)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=271)[0m INFO:gobbli.experiment.base:Build finished in 0.22 sec.
+[2m[36m(pid=271)[0m INFO:gobbli.experiment.base:Starting prediction.
+[2m[36m(pid=271)[0m INFO:gobbli.experiment.base:Prediction finished in 135.27 sec.
+[2m[36m(pid=271)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+[2m[36m(pid=271)[0m   if isinstance(obj, pd.SparseDataFrame):
 
 ```
-|    |   valid_loss |   valid_accuracy |   train_loss | labels         | checkpoint                                                                                                                 | node_ip_address   | model_params                                                            |
-|---:|-------------:|-----------------:|-------------:|:---------------|:---------------------------------------------------------------------------------------------------------------------------|:------------------|:------------------------------------------------------------------------|
-|  0 |    0.0172782 |           0.8828 |   0.00621797 | ['neg', 'pos'] | benchmark_data/model/Transformer/028e12ba75924423a3e0f545ea2184ca/train/5da16b506b084ee0b691695f9d0882b4/output/checkpoint | 172.80.10.2       | {'transformer_model': 'Roberta', 'transformer_weights': 'roberta-base'} |
+|    |   valid_loss |   valid_accuracy |   train_loss | multilabel   | labels         | checkpoint                                                                                                                                                     | node_ip_address   | model_params                                                            |
+|---:|-------------:|-----------------:|-------------:|:-------------|:---------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------|:------------------------------------------------------------------------|
+|  0 |    0.0168598 |           0.8932 |   0.00507389 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/08a2251f036a4899b6613602d62acf64/train/e1b508abb8ed4967bedd757b43240b41/output/checkpoint | 172.80.10.2       | {'transformer_model': 'Roberta', 'transformer_weights': 'roberta-base'} |
 ```
 Metrics:
 --------
-Weighted F1 Score: 0.8888282515474982
-Weighted Precision Score: 0.8890044374661773
-Weighted Recall Score: 0.88884
-Accuracy: 0.88884
+Weighted F1 Score: 0.8889997568650675
+Weighted Precision Score: 0.8890034082922622
+Weighted Recall Score: 0.889
+Accuracy: 0.889
 
 Classification Report:
 ----------------------
               precision    recall  f1-score   support
 
-         neg       0.90      0.88      0.89     12500
-         pos       0.88      0.90      0.89     12500
+         neg       0.00      0.00      0.00         0
+         pos       0.00      0.00      0.00         0
 
-    accuracy                           0.89     25000
-   macro avg       0.89      0.89      0.89     25000
-weighted avg       0.89      0.89      0.89     25000
+   micro avg       0.00      0.00      0.00         0
+   macro avg       0.00      0.00      0.00         0
+weighted avg       0.00      0.00      0.00         0
 
 
 ```
@@ -362,52 +384,55 @@ weighted avg       0.89      0.89      0.89     25000
 ---
 # Results: DistilBERT
 ```
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Build finished in 0.20 sec.
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Training finished in 1138.47 sec.
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Validation loss: 0.01951769427470863
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8794
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Training loss: 0.0008909900698810815
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Build finished in 0.42 sec.
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Training finished in 1309.98 sec.
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Validation loss: 0.022120918272435664
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8656
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:  Training loss: 0.0011140721491072327
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Build finished in 0.45 sec.
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Starting prediction.
-[2m[36m(pid=47)[0m INFO:gobbli.experiment.base:Prediction finished in 135.92 sec.
-[2m[36m(pid=47)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-[2m[36m(pid=47)[0m   if isinstance(obj, pd.SparseDataFrame):
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/58afa92d48d246768b760698ed6f9f8c'
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Build finished in 0.24 sec.
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Training finished in 1309.59 sec.
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:  Validation loss: 0.021510520422831178
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8664
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:  Training loss: 0.0006958735693711787
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/2b6000a2aa8948328277ba2ede2199e3'
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Build finished in 0.20 sec.
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Training finished in 1271.24 sec.
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:  Validation loss: 0.023426591290533542
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8548
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:  Training loss: 0.00114441422293894
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/519e54c2b59c4285b70585392b125613'
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Build finished in 0.23 sec.
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Starting prediction.
+[2m[36m(pid=483)[0m INFO:gobbli.experiment.base:Prediction finished in 132.28 sec.
+[2m[36m(pid=483)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+[2m[36m(pid=483)[0m   if isinstance(obj, pd.SparseDataFrame):
 
 ```
-|    |   valid_loss |   valid_accuracy |   train_loss | labels         | checkpoint                                                                                                                 | node_ip_address   | model_params                                                                                          |
-|---:|-------------:|-----------------:|-------------:|:---------------|:---------------------------------------------------------------------------------------------------------------------------|:------------------|:------------------------------------------------------------------------------------------------------|
-|  0 |    0.0195177 |           0.8794 |   0.00089099 | ['neg', 'pos'] | benchmark_data/model/Transformer/435c67bafd9e46c58ea9a0b422237ff3/train/9e63350a7b5d4d70aa3ba59db2169ebf/output/checkpoint | 172.80.10.2       | {'transformer_model': 'DistilBert', 'transformer_weights': 'distilbert-base-uncased'}                 |
-|  1 |    0.0221209 |           0.8656 |   0.00111407 | ['neg', 'pos'] | benchmark_data/model/Transformer/a08680cf48814518a3482ede744a5f93/train/725dccf1633846598aa884efeb9132d7/output/checkpoint | 172.80.10.2       | {'transformer_model': 'DistilBert', 'transformer_weights': 'distilbert-base-uncased-distilled-squad'} |
+|    |   valid_loss |   valid_accuracy |   train_loss | multilabel   | labels         | checkpoint                                                                                                                                                     | node_ip_address   | model_params                                                                                          |
+|---:|-------------:|-----------------:|-------------:|:-------------|:---------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------|:------------------------------------------------------------------------------------------------------|
+|  0 |    0.0215105 |           0.8664 |  0.000695874 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/58afa92d48d246768b760698ed6f9f8c/train/cb6a2161339e46aca0b3f84e14ea8a54/output/checkpoint | 172.80.10.2       | {'transformer_model': 'DistilBert', 'transformer_weights': 'distilbert-base-uncased'}                 |
+|  1 |    0.0234266 |           0.8548 |  0.00114441  | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/2b6000a2aa8948328277ba2ede2199e3/train/c9775a474a9a472db73bca2c88249ce6/output/checkpoint | 172.80.10.2       | {'transformer_model': 'DistilBert', 'transformer_weights': 'distilbert-base-uncased-distilled-squad'} |
 ```
 Metrics:
 --------
-Weighted F1 Score: 0.8688310072637285
-Weighted Precision Score: 0.8689411760669009
-Weighted Recall Score: 0.86884
-Accuracy: 0.86884
+Weighted F1 Score: 0.8641388395699184
+Weighted Precision Score: 0.8643870136925497
+Weighted Recall Score: 0.86416
+Accuracy: 0.86416
 
 Classification Report:
 ----------------------
               precision    recall  f1-score   support
 
-         neg       0.88      0.86      0.87     12500
-         pos       0.86      0.88      0.87     12500
+         neg       0.00      0.00      0.00         0
+         pos       0.00      0.00      0.00         0
 
-    accuracy                           0.87     25000
-   macro avg       0.87      0.87      0.87     25000
-weighted avg       0.87      0.87      0.87     25000
+   micro avg       0.00      0.00      0.00         0
+   macro avg       0.00      0.00      0.00         0
+weighted avg       0.00      0.00      0.00         0
 
 
 ```
@@ -416,52 +441,55 @@ weighted avg       0.87      0.87      0.87     25000
 ---
 # Results: ALBERT
 ```
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:Build finished in 0.25 sec.
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:Training finished in 1534.16 sec.
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:  Validation loss: 0.018503880481421948
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8532
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:  Training loss: 0.00325197589895688
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:Build finished in 0.38 sec.
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:Training finished in 1561.44 sec.
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:  Validation loss: 0.01970496486723423
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8652
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:  Training loss: 0.002900374274421483
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:Build finished in 0.22 sec.
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:Starting prediction.
-[2m[36m(pid=208)[0m INFO:gobbli.experiment.base:Prediction finished in 128.00 sec.
-[2m[36m(pid=208)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-[2m[36m(pid=208)[0m   if isinstance(obj, pd.SparseDataFrame):
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/83cdde3f4ff34ce89ce6a83017a158db'
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Build finished in 0.17 sec.
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Training finished in 1537.64 sec.
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:  Validation loss: 0.017922103345394135
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8568
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:  Training loss: 0.0030251576885581017
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/0faea1cc752e4c6fb2b636611d87301a'
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Build finished in 0.21 sec.
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Training finished in 1564.51 sec.
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:  Validation loss: 0.011985438811779022
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8344
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:  Training loss: 0.01198964168727398
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/766f581291804f0480926d9ef37b5664'
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Build finished in 0.18 sec.
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Starting prediction.
+[2m[36m(pid=696)[0m INFO:gobbli.experiment.base:Prediction finished in 135.32 sec.
+[2m[36m(pid=696)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+[2m[36m(pid=696)[0m   if isinstance(obj, pd.SparseDataFrame):
 
 ```
-|    |   valid_loss |   valid_accuracy |   train_loss | labels         | checkpoint                                                                                                                 | node_ip_address   | model_params                                                             |
-|---:|-------------:|-----------------:|-------------:|:---------------|:---------------------------------------------------------------------------------------------------------------------------|:------------------|:-------------------------------------------------------------------------|
-|  0 |    0.0185039 |           0.8532 |   0.00325198 | ['neg', 'pos'] | benchmark_data/model/Transformer/d04b1868e89747efadba75150e8ce7cb/train/b96fc714aa374cf6b3e860c6dbda22f8/output/checkpoint | 172.80.10.2       | {'transformer_model': 'Albert', 'transformer_weights': 'albert-base-v1'} |
-|  1 |    0.019705  |           0.8652 |   0.00290037 | ['neg', 'pos'] | benchmark_data/model/Transformer/8ea140e7b6ff414ea7a1901498317535/train/1ea5925dece04ceeb6701fd10127c8e8/output/checkpoint | 172.80.10.2       | {'transformer_model': 'Albert', 'transformer_weights': 'albert-base-v2'} |
+|    |   valid_loss |   valid_accuracy |   train_loss | multilabel   | labels         | checkpoint                                                                                                                                                     | node_ip_address   | model_params                                                             |
+|---:|-------------:|-----------------:|-------------:|:-------------|:---------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------|:-------------------------------------------------------------------------|
+|  0 |    0.0179221 |           0.8568 |   0.00302516 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/83cdde3f4ff34ce89ce6a83017a158db/train/811ffb962c834b51bf487f185c5db3a8/output/checkpoint | 172.80.10.2       | {'transformer_model': 'Albert', 'transformer_weights': 'albert-base-v1'} |
+|  1 |    0.0119854 |           0.8344 |   0.0119896  | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/0faea1cc752e4c6fb2b636611d87301a/train/1341b3c880654804bd447e8d56fad5e9/output/checkpoint | 172.80.10.2       | {'transformer_model': 'Albert', 'transformer_weights': 'albert-base-v2'} |
 ```
 Metrics:
 --------
-Weighted F1 Score: 0.8512799048191391
-Weighted Precision Score: 0.8512808992791021
-Weighted Recall Score: 0.85128
-Accuracy: 0.85128
+Weighted F1 Score: 0.8273984465860195
+Weighted Precision Score: 0.8274117868243257
+Weighted Recall Score: 0.8274
+Accuracy: 0.8274
 
 Classification Report:
 ----------------------
               precision    recall  f1-score   support
 
-         neg       0.85      0.85      0.85     12500
-         pos       0.85      0.85      0.85     12500
+         neg       0.00      0.00      0.00         0
+         pos       0.00      0.00      0.00         0
 
-    accuracy                           0.85     25000
-   macro avg       0.85      0.85      0.85     25000
-weighted avg       0.85      0.85      0.85     25000
+   micro avg       0.00      0.00      0.00         0
+   macro avg       0.00      0.00      0.00         0
+weighted avg       0.00      0.00      0.00         0
 
 
 ```
@@ -470,43 +498,45 @@ weighted avg       0.85      0.85      0.85     25000
 ---
 # Results: XLM-RoBERTa
 ```
-[2m[36m(pid=1285)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=1285)[0m INFO:gobbli.experiment.base:Build finished in 0.18 sec.
-[2m[36m(pid=1285)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=1285)[0m INFO:gobbli.experiment.base:Training finished in 1672.08 sec.
-[2m[36m(pid=1285)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=1285)[0m INFO:gobbli.experiment.base:  Validation loss: 0.015142943879961967
-[2m[36m(pid=1285)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.7912
-[2m[36m(pid=1285)[0m INFO:gobbli.experiment.base:  Training loss: 0.013316278763115407
-[2m[36m(pid=1284)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=1284)[0m INFO:gobbli.experiment.base:Build finished in 0.17 sec.
-[2m[36m(pid=1284)[0m INFO:gobbli.experiment.base:Starting prediction.
-[2m[36m(pid=1284)[0m INFO:gobbli.experiment.base:Prediction finished in 132.19 sec.
-[2m[36m(pid=1284)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-[2m[36m(pid=1284)[0m   if isinstance(obj, pd.SparseDataFrame):
+[2m[36m(pid=911)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/5a35a362b75a477bbc3fa0f1d4b7b329'
+[2m[36m(pid=911)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=911)[0m INFO:gobbli.experiment.base:Build finished in 0.16 sec.
+[2m[36m(pid=911)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=911)[0m INFO:gobbli.experiment.base:Training finished in 1685.29 sec.
+[2m[36m(pid=911)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=911)[0m INFO:gobbli.experiment.base:  Validation loss: 0.02177449142932892
+[2m[36m(pid=911)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.4892
+[2m[36m(pid=911)[0m INFO:gobbli.experiment.base:  Training loss: 0.021700730556249617
+[2m[36m(pid=910)[0m INFO:gobbli.experiment.base:Transformer initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/6c89be08abf54bfc983d6809e469f44e'
+[2m[36m(pid=910)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=910)[0m INFO:gobbli.experiment.base:Build finished in 0.23 sec.
+[2m[36m(pid=910)[0m INFO:gobbli.experiment.base:Starting prediction.
+[2m[36m(pid=910)[0m INFO:gobbli.experiment.base:Prediction finished in 132.11 sec.
+[2m[36m(pid=910)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+[2m[36m(pid=910)[0m   if isinstance(obj, pd.SparseDataFrame):
 
 ```
-|    |   valid_loss |   valid_accuracy |   train_loss | labels         | checkpoint                                                                                                                 | node_ip_address   | model_params                                                                   |
-|---:|-------------:|-----------------:|-------------:|:---------------|:---------------------------------------------------------------------------------------------------------------------------|:------------------|:-------------------------------------------------------------------------------|
-|  0 |    0.0151429 |           0.7912 |    0.0133163 | ['neg', 'pos'] | benchmark_data/model/Transformer/1b57d60374a340e0a942151f161a6e83/train/aae6c048fbee4891a21fcfc18f4fc18f/output/checkpoint | 172.80.10.2       | {'transformer_model': 'XLMRoberta', 'transformer_weights': 'xlm-roberta-base'} |
+|    |   valid_loss |   valid_accuracy |   train_loss | multilabel   | labels         | checkpoint                                                                                                                                                     | node_ip_address   | model_params                                                                   |
+|---:|-------------:|-----------------:|-------------:|:-------------|:---------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------|:-------------------------------------------------------------------------------|
+|  0 |    0.0217745 |           0.4892 |    0.0217007 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/Transformer/5a35a362b75a477bbc3fa0f1d4b7b329/train/fe8dfe640bf244ffab350176432dce17/output/checkpoint | 172.80.10.2       | {'transformer_model': 'XLMRoberta', 'transformer_weights': 'xlm-roberta-base'} |
 ```
 Metrics:
 --------
-Weighted F1 Score: 0.7942145206191481
-Weighted Precision Score: 0.7949246776963078
-Weighted Recall Score: 0.79432
-Accuracy: 0.79432
+Weighted F1 Score: 0.33333333333333326
+Weighted Precision Score: 0.25
+Weighted Recall Score: 0.5
+Accuracy: 0.5
 
 Classification Report:
 ----------------------
               precision    recall  f1-score   support
 
-         neg       0.78      0.82      0.80     12500
-         pos       0.81      0.77      0.79     12500
+         neg       0.00      0.00      0.00         0
+         pos       0.00      0.00      0.00         0
 
-    accuracy                           0.79     25000
-   macro avg       0.79      0.79      0.79     25000
-weighted avg       0.79      0.79      0.79     25000
+   micro avg       0.00      0.00      0.00         0
+   macro avg       0.00      0.00      0.00         0
+weighted avg       0.00      0.00      0.00         0
 
 
 ```
@@ -515,43 +545,45 @@ weighted avg       0.79      0.79      0.79     25000
 ---
 # Results: SKLearn
 ```
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Build finished in 0.00 sec.
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Training finished in 14.84 sec.
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8863778586526605
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8864
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:  Training loss: -0.9309477856498368
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Build finished in 0.00 sec.
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Starting prediction.
-[2m[36m(pid=354)[0m INFO:gobbli.experiment.base:Prediction finished in 6.54 sec.
-[2m[36m(pid=354)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-[2m[36m(pid=354)[0m   if isinstance(obj, pd.SparseDataFrame):
+[2m[36m(pid=1125)[0m INFO:gobbli.experiment.base:SKLearnClassifier initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/SKLearnClassifier/0e1cea5a30334471a64403e0a14af82b'
+[2m[36m(pid=1125)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=1125)[0m INFO:gobbli.experiment.base:Build finished in 0.00 sec.
+[2m[36m(pid=1125)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=1125)[0m INFO:gobbli.experiment.base:Training finished in 14.64 sec.
+[2m[36m(pid=1125)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=1125)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8831828424147392
+[2m[36m(pid=1125)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8832
+[2m[36m(pid=1125)[0m INFO:gobbli.experiment.base:  Training loss: -0.9301481917044141
+[2m[36m(pid=1125)[0m INFO:gobbli.experiment.base:SKLearnClassifier initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/SKLearnClassifier/0437d1aa0f7f4095a6efdee1864759af'
+[2m[36m(pid=1125)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=1125)[0m INFO:gobbli.experiment.base:Build finished in 0.00 sec.
+[2m[36m(pid=1125)[0m INFO:gobbli.experiment.base:Starting prediction.
+[2m[36m(pid=1125)[0m INFO:gobbli.experiment.base:Prediction finished in 7.29 sec.
+[2m[36m(pid=1125)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+[2m[36m(pid=1125)[0m   if isinstance(obj, pd.SparseDataFrame):
 
 ```
-|    |   valid_loss |   valid_accuracy |   train_loss | labels         | checkpoint                                                                                                                             | node_ip_address   | model_params   |
-|---:|-------------:|-----------------:|-------------:|:---------------|:---------------------------------------------------------------------------------------------------------------------------------------|:------------------|:---------------|
-|  0 |    -0.886378 |           0.8864 |    -0.930948 | ['neg', 'pos'] | benchmark_data/model/SKLearnClassifier/88785fc4fc37491e934045d37cf08752/train/ebe02fe975dc428b93d707744eda023e/output/estimator.joblib | 172.80.10.2       | {}             |
+|    |   valid_loss |   valid_accuracy |   train_loss | multilabel   | labels         | checkpoint                                                                                                                                                                 | node_ip_address   | model_params   |
+|---:|-------------:|-----------------:|-------------:|:-------------|:---------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------|:---------------|
+|  0 |    -0.883183 |           0.8832 |    -0.930148 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/SKLearnClassifier/0e1cea5a30334471a64403e0a14af82b/train/94255bd9aed1427b943c6bcae9b47090/output/estimator.joblib | 172.80.10.2       | {}             |
 ```
 Metrics:
 --------
-Weighted F1 Score: 0.87775924817048
-Weighted Precision Score: 0.8777692937290567
-Weighted Recall Score: 0.87776
-Accuracy: 0.87776
+Weighted F1 Score: 0.8781994931150106
+Weighted Precision Score: 0.8782062957732819
+Weighted Recall Score: 0.8782
+Accuracy: 0.8782
 
 Classification Report:
 ----------------------
               precision    recall  f1-score   support
 
-         neg       0.88      0.88      0.88     12500
-         pos       0.88      0.88      0.88     12500
+         neg       0.00      0.00      0.00         0
+         pos       0.00      0.00      0.00         0
 
-    accuracy                           0.88     25000
-   macro avg       0.88      0.88      0.88     25000
-weighted avg       0.88      0.88      0.88     25000
+   micro avg       0.00      0.00      0.00         0
+   macro avg       0.00      0.00      0.00         0
+weighted avg       0.00      0.00      0.00         0
 
 
 ```
@@ -560,92 +592,97 @@ weighted avg       0.88      0.88      0.88     25000
 ---
 # Results: spaCy
 ```
-[2m[36m(pid=527)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=527)[0m INFO:gobbli.experiment.base:Build finished in 12.91 sec.
-[2m[36m(pid=527)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=527)[0m /code/gobbli/model/spacy/model.py:174: UserWarning: The spaCy model doesn't batch validation data, so the validation batch size parameter will be ignored.
-[2m[36m(pid=527)[0m   "The spaCy model doesn't batch validation data, so the validation "
-[2m[36m(pid=527)[0m INFO:gobbli.experiment.base:Training finished in 475.22 sec.
-[2m[36m(pid=527)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=527)[0m INFO:gobbli.experiment.base:  Validation loss: 1.4586578167552488e-12
-[2m[36m(pid=527)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.882999999998234
-[2m[36m(pid=527)[0m INFO:gobbli.experiment.base:  Training loss: 2.33840203393072e-06
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Build finished in 174.79 sec.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=525)[0m /code/gobbli/model/spacy/model.py:174: UserWarning: The spaCy model doesn't batch validation data, so the validation batch size parameter will be ignored.
-[2m[36m(pid=525)[0m   "The spaCy model doesn't batch validation data, so the validation "
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Training finished in 373.63 sec.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Validation loss: 1.3960288036685143e-12
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8875999999982248
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Training loss: 2.4568754242466182e-06
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Build finished in 1.04 sec.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Training finished in 620.37 sec.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Validation loss: 1.5302036970865628e-12
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8745999999982508
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Training loss: 3.398328638468229e-06
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Build finished in 0.39 sec.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Training finished in 512.15 sec.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Validation loss: 1.2428309048573283e-12
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8981999999982037
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Training loss: 2.7608190358705542e-06
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Build finished in 0.56 sec.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Training finished in 635.63 sec.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Validation loss: 1.2529507209535496e-12
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8983999999982032
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Training loss: 2.1401459845151294e-06
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Build finished in 0.34 sec.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Training finished in 517.31 sec.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Validation loss: 1.249463377206439e-12
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8975999999982048
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:  Training loss: 1.985827455712297e-06
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Build finished in 0.69 sec.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Starting prediction.
-[2m[36m(pid=525)[0m INFO:gobbli.experiment.base:Prediction finished in 67.17 sec.
-[2m[36m(pid=525)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-[2m[36m(pid=525)[0m   if isinstance(obj, pd.SparseDataFrame):
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:SpaCyModel initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/d820d71083f6444b8c6e872a9202d60d'
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Build finished in 0.27 sec.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=1338)[0m /code/gobbli/model/spacy/model.py:176: UserWarning: The spaCy model doesn't batch validation data, so the validation batch size parameter will be ignored.
+[2m[36m(pid=1338)[0m   "The spaCy model doesn't batch validation data, so the validation "
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Training finished in 497.69 sec.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Validation loss: 1.514052705431368e-12
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8767999999991232
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Training loss: 2.5458573666213624e-06
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:SpaCyModel initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/967e970f21e84bfaacb64586b1cd54f0'
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Build finished in 0.29 sec.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Training finished in 355.70 sec.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Validation loss: 1.464429555397828e-12
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8805999999991193
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Training loss: 2.4804763286397245e-06
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:SpaCyModel initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/44fcc0f4c2ac4ea2a447be386b89b2be'
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Build finished in 0.28 sec.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Training finished in 612.76 sec.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Validation loss: 1.4999768538359603e-12
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8765999999991233
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Training loss: 3.3720109899491034e-06
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:SpaCyModel initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/3dc2e292bec84eb1a5f30746b712c7c9'
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Build finished in 0.33 sec.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Training finished in 503.30 sec.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Validation loss: 1.2618286859833461e-12
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8945999999991053
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Training loss: 2.94094138047285e-06
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:SpaCyModel initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/4611dca9050e4c9caa7158d44698c2dd'
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Build finished in 0.40 sec.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Training finished in 631.05 sec.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Validation loss: 1.2499411283783957e-12
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8945999999991053
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Training loss: 1.927604680491868e-06
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:SpaCyModel initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/4a7e424948124b80bdbf09794debddba'
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Build finished in 0.31 sec.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Training finished in 512.05 sec.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Validation loss: 1.2148907657660856e-12
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.9015999999990983
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:  Training loss: 2.0593311421521322e-06
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:SpaCyModel initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/cc4ec419a05147428f495e2090f4ff08'
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Build finished in 0.28 sec.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Starting prediction.
+[2m[36m(pid=1338)[0m INFO:gobbli.experiment.base:Prediction finished in 58.89 sec.
+[2m[36m(pid=1338)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+[2m[36m(pid=1338)[0m   if isinstance(obj, pd.SparseDataFrame):
 
 ```
-|    |   valid_loss |   valid_accuracy |   train_loss | labels         | checkpoint                                                                                                                | node_ip_address   | model_params                                              |
-|---:|-------------:|-----------------:|-------------:|:---------------|:--------------------------------------------------------------------------------------------------------------------------|:------------------|:----------------------------------------------------------|
-|  0 |  1.45866e-12 |           0.883  |  2.3384e-06  | ['neg', 'pos'] | benchmark_data/model/SpaCyModel/ec86dae672aa48a88a5a69732c17f694/train/15e8835d9b194ace9060ee925e0227c6/output/checkpoint | 172.80.10.2       | {'architecture': 'bow', 'model': 'en_core_web_sm'}        |
-|  1 |  1.39603e-12 |           0.8876 |  2.45688e-06 | ['neg', 'pos'] | benchmark_data/model/SpaCyModel/60e88751d9a0432aa5d0fa92f814898e/train/23a35954c8f7491e9cb914b56a69502c/output/checkpoint | 172.80.10.2       | {'architecture': 'bow', 'model': 'en_core_web_lg'}        |
-|  2 |  1.5302e-12  |           0.8746 |  3.39833e-06 | ['neg', 'pos'] | benchmark_data/model/SpaCyModel/d01b28d59cb04bf3957c7f2347acc080/train/2f9ee0af8ecd4c77bb64b1976e7267b5/output/checkpoint | 172.80.10.2       | {'architecture': 'simple_cnn', 'model': 'en_core_web_sm'} |
-|  3 |  1.24283e-12 |           0.8982 |  2.76082e-06 | ['neg', 'pos'] | benchmark_data/model/SpaCyModel/4940440210004901985400ee5681b2d6/train/028716e4996b4542934641d4a813fd94/output/checkpoint | 172.80.10.2       | {'architecture': 'simple_cnn', 'model': 'en_core_web_lg'} |
-|  4 |  1.25295e-12 |           0.8984 |  2.14015e-06 | ['neg', 'pos'] | benchmark_data/model/SpaCyModel/37246c151f0b48b5a7975dd1e202e2cd/train/ef3515aafd584ed1b2436b308e871ecd/output/checkpoint | 172.80.10.2       | {'architecture': 'ensemble', 'model': 'en_core_web_sm'}   |
-|  5 |  1.24946e-12 |           0.8976 |  1.98583e-06 | ['neg', 'pos'] | benchmark_data/model/SpaCyModel/a568bb1bc91f450aa14ca4d6a7fd1677/train/6be135a3e0f941b1a37bf945c04373c3/output/checkpoint | 172.80.10.2       | {'architecture': 'ensemble', 'model': 'en_core_web_lg'}   |
+|    |   valid_loss |   valid_accuracy |   train_loss | multilabel   | labels         | checkpoint                                                                                                                                                    | node_ip_address   | model_params                                              |
+|---:|-------------:|-----------------:|-------------:|:-------------|:---------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------|:----------------------------------------------------------|
+|  0 |  1.51405e-12 |           0.8768 |  2.54586e-06 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/d820d71083f6444b8c6e872a9202d60d/train/beb1652d409e4704a5d099529ef1f36f/output/checkpoint | 172.80.10.2       | {'architecture': 'bow', 'model': 'en_core_web_sm'}        |
+|  1 |  1.46443e-12 |           0.8806 |  2.48048e-06 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/967e970f21e84bfaacb64586b1cd54f0/train/8bc49a908eb04b50ab49d1b45a051685/output/checkpoint | 172.80.10.2       | {'architecture': 'bow', 'model': 'en_core_web_lg'}        |
+|  2 |  1.49998e-12 |           0.8766 |  3.37201e-06 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/44fcc0f4c2ac4ea2a447be386b89b2be/train/d1ea8b4a0c6248c9be838d90ca889030/output/checkpoint | 172.80.10.2       | {'architecture': 'simple_cnn', 'model': 'en_core_web_sm'} |
+|  3 |  1.26183e-12 |           0.8946 |  2.94094e-06 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/3dc2e292bec84eb1a5f30746b712c7c9/train/ba0b0954d8a74327ab1f3fa87964b144/output/checkpoint | 172.80.10.2       | {'architecture': 'simple_cnn', 'model': 'en_core_web_lg'} |
+|  4 |  1.24994e-12 |           0.8946 |  1.9276e-06  | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/4611dca9050e4c9caa7158d44698c2dd/train/dbe4e49acf804922bbebadfb150c34a5/output/checkpoint | 172.80.10.2       | {'architecture': 'ensemble', 'model': 'en_core_web_sm'}   |
+|  5 |  1.21489e-12 |           0.9016 |  2.05933e-06 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/4a7e424948124b80bdbf09794debddba/train/c2b1b7e41bf3474a944f77430a445b0f/output/checkpoint | 172.80.10.2       | {'architecture': 'ensemble', 'model': 'en_core_web_lg'}   |
 ```
 Metrics:
 --------
-Weighted F1 Score: 0.8982355132444846
-Weighted Precision Score: 0.8983102453575749
-Weighted Recall Score: 0.89824
-Accuracy: 0.89824
+Weighted F1 Score: 0.8953599330303571
+Weighted Precision Score: 0.8953610121241911
+Weighted Recall Score: 0.89536
+Accuracy: 0.89536
 
 Classification Report:
 ----------------------
               precision    recall  f1-score   support
 
-         neg       0.89      0.90      0.90     12500
-         pos       0.90      0.89      0.90     12500
+         neg       0.00      0.00      0.00         0
+         pos       0.00      0.00      0.00         0
 
-    accuracy                           0.90     25000
-   macro avg       0.90      0.90      0.90     25000
-weighted avg       0.90      0.90      0.90     25000
+   micro avg       0.00      0.00      0.00         0
+   macro avg       0.00      0.00      0.00         0
+weighted avg       0.00      0.00      0.00         0
 
 
 ```
@@ -654,72 +691,77 @@ weighted avg       0.90      0.90      0.90     25000
 ---
 # Results: spacy-transformers
 ```
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Build finished in 0.36 sec.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=665)[0m /code/gobbli/model/spacy/model.py:174: UserWarning: The spaCy model doesn't batch validation data, so the validation batch size parameter will be ignored.
-[2m[36m(pid=665)[0m   "The spaCy model doesn't batch validation data, so the validation "
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Training finished in 7872.90 sec.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:  Validation loss: 4.758294025464238e-12
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.3631999999992736
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:  Training loss: 3.0240254466275473e-05
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Build finished in 0.34 sec.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Training finished in 8524.58 sec.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:  Validation loss: 2.855722591732501e-12
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.7397999999985204
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:  Training loss: 8.88249805138912e-05
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Build finished in 0.28 sec.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Training finished in 7744.93 sec.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:  Validation loss: 4.001228504080245e-12
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.5013999999989972
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:  Training loss: 0.00012297899288823828
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Build finished in 0.39 sec.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Training finished in 6012.45 sec.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:  Validation loss: 1.9479770685393303e-12
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8503999999982992
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:  Training loss: 4.971897644175955e-06
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Build finished in 0.29 sec.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Starting prediction.
-[2m[36m(pid=665)[0m INFO:gobbli.experiment.base:Prediction finished in 705.86 sec.
-[2m[36m(pid=665)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-[2m[36m(pid=665)[0m   if isinstance(obj, pd.SparseDataFrame):
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:SpaCyModel initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/4c7c27aff9f14cc294b36e82453bb228'
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Build finished in 0.25 sec.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=1550)[0m /code/gobbli/model/spacy/model.py:176: UserWarning: The spaCy model doesn't batch validation data, so the validation batch size parameter will be ignored.
+[2m[36m(pid=1550)[0m   "The spaCy model doesn't batch validation data, so the validation "
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Training finished in 7927.30 sec.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:  Validation loss: 2.3743533361653136e-12
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8043999999991955
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:  Training loss: 2.278554696628703e-05
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:SpaCyModel initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/465b45ef238f480991aa09c078888cff'
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Build finished in 0.35 sec.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Training finished in 9247.67 sec.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:  Validation loss: 4.0018200309077656e-12
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.49799999999950195
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:  Training loss: 0.00012271622593980282
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:SpaCyModel initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/e06e1e0ba7f74b51becb654ddcfb962e'
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Build finished in 0.40 sec.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Training finished in 7814.58 sec.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:  Validation loss: 4.003729969781489e-12
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.49799999999950195
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:  Training loss: 0.00012297076051472687
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:SpaCyModel initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/708a1a4b6d684b96b0f597b91e1947d5'
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Build finished in 0.34 sec.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Training finished in 5899.18 sec.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:  Validation loss: 2.0054175209338608e-12
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8479999999991519
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:  Training loss: 3.980713727162897e-06
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:SpaCyModel initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/ce3aad4a5ca9499c909ac2e5883246a9'
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Build finished in 0.27 sec.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Starting prediction.
+[2m[36m(pid=1550)[0m INFO:gobbli.experiment.base:Prediction finished in 708.64 sec.
+[2m[36m(pid=1550)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+[2m[36m(pid=1550)[0m   if isinstance(obj, pd.SparseDataFrame):
 
 ```
-|    |   valid_loss |   valid_accuracy |   train_loss | labels         | checkpoint                                                                                                                | node_ip_address   | model_params                                 |
-|---:|-------------:|-----------------:|-------------:|:---------------|:--------------------------------------------------------------------------------------------------------------------------|:------------------|:---------------------------------------------|
-|  0 |  4.75829e-12 |           0.3632 |  3.02403e-05 | ['neg', 'pos'] | benchmark_data/model/SpaCyModel/79329ba7167b44d894ebaff98f09e937/train/fa7e77298b1c4b2b840bf3a68c084eec/output/checkpoint | 172.80.10.2       | {'model': 'en_trf_bertbaseuncased_lg'}       |
-|  1 |  2.85572e-12 |           0.7398 |  8.8825e-05  | ['neg', 'pos'] | benchmark_data/model/SpaCyModel/b9d9c344d270433fb1f6415c78fe41cc/train/b9258f302b644c78a6357da377a7b191/output/checkpoint | 172.80.10.2       | {'model': 'en_trf_xlnetbasecased_lg'}        |
-|  2 |  4.00123e-12 |           0.5014 |  0.000122979 | ['neg', 'pos'] | benchmark_data/model/SpaCyModel/39853179da05474e82d29749f585c031/train/f3e660cad88e40b1ae9077ae1714dacd/output/checkpoint | 172.80.10.2       | {'model': 'en_trf_robertabase_lg'}           |
-|  3 |  1.94798e-12 |           0.8504 |  4.9719e-06  | ['neg', 'pos'] | benchmark_data/model/SpaCyModel/9a8ea90c6298424f8d2c94cc64a6e22e/train/6c1b6fe0d8684ca38c2537c59b361b81/output/checkpoint | 172.80.10.2       | {'model': 'en_trf_distilbertbaseuncased_lg'} |
+|    |   valid_loss |   valid_accuracy |   train_loss | multilabel   | labels         | checkpoint                                                                                                                                                    | node_ip_address   | model_params                                 |
+|---:|-------------:|-----------------:|-------------:|:-------------|:---------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------|:---------------------------------------------|
+|  0 |  2.37435e-12 |           0.8044 |  2.27855e-05 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/4c7c27aff9f14cc294b36e82453bb228/train/f1c15f7b8f3b4789b7cc3d8509f813a4/output/checkpoint | 172.80.10.2       | {'model': 'en_trf_bertbaseuncased_lg'}       |
+|  1 |  4.00182e-12 |           0.498  |  0.000122716 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/465b45ef238f480991aa09c078888cff/train/bf4d19786f2948638cadfdcc949d5093/output/checkpoint | 172.80.10.2       | {'model': 'en_trf_xlnetbasecased_lg'}        |
+|  2 |  4.00373e-12 |           0.498  |  0.000122971 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/e06e1e0ba7f74b51becb654ddcfb962e/train/db858c5c264847478d486c850e9cd513/output/checkpoint | 172.80.10.2       | {'model': 'en_trf_robertabase_lg'}           |
+|  3 |  2.00542e-12 |           0.848  |  3.98071e-06 | False        | ['neg', 'pos'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/SpaCyModel/708a1a4b6d684b96b0f597b91e1947d5/train/ab68b0282a6f4c84a61d8bde5a6bcb2e/output/checkpoint | 172.80.10.2       | {'model': 'en_trf_distilbertbaseuncased_lg'} |
 ```
 Metrics:
 --------
-Weighted F1 Score: 0.8372719349367306
-Weighted Precision Score: 0.8373468778040759
-Weighted Recall Score: 0.83728
-Accuracy: 0.83728
+Weighted F1 Score: 0.8407997391662927
+Weighted Precision Score: 0.8408022334815173
+Weighted Recall Score: 0.8408
+Accuracy: 0.8408
 
 Classification Report:
 ----------------------
               precision    recall  f1-score   support
 
-         neg       0.83      0.84      0.84     12500
-         pos       0.84      0.83      0.84     12500
+         neg       0.00      0.00      0.00         0
+         pos       0.00      0.00      0.00         0
 
-    accuracy                           0.84     25000
-   macro avg       0.84      0.84      0.84     25000
-weighted avg       0.84      0.84      0.84     25000
+   micro avg       0.00      0.00      0.00         0
+   macro avg       0.00      0.00      0.00         0
+weighted avg       0.00      0.00      0.00         0
 
 
 ```

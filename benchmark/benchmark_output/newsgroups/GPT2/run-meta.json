@@ -1,1 +1,0 @@
-{"name": "GPT2", "model_name": "Transformer", "param_grid": {"transformer_weights": ["gpt2"], "transformer_model": ["GPT2"]}, "preprocess_func": "bert_preprocess", "run_kwargs": {}}

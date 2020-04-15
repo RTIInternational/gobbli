@@ -1,123 +1,132 @@
 # Results: FastText
 ```
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=378)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:Build finished in 1.26 sec.
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=378)[0m INFO:gobbli.experiment.base:Build finished in 1.25 sec.
-[2m[36m(pid=378)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:Build finished in 1.26 sec.
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:Build finished in 1.25 sec.
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:Training finished in 315.01 sec.
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8497569597878922
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8497569597878922
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:  Training loss: 1.57841
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:Build finished in 0.65 sec.
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=378)[0m INFO:gobbli.experiment.base:Training finished in 317.94 sec.
-[2m[36m(pid=378)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=378)[0m INFO:gobbli.experiment.base:  Validation loss: -0.41802916482545294
-[2m[36m(pid=378)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.41802916482545294
-[2m[36m(pid=378)[0m INFO:gobbli.experiment.base:  Training loss: 2.489756
-[2m[36m(pid=476)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=476)[0m INFO:gobbli.experiment.base:Build finished in 0.34 sec.
-[2m[36m(pid=476)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:Training finished in 318.80 sec.
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:  Validation loss: -0.7255855059655325
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.7255855059655325
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:  Training loss: 1.632553
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:Build finished in 0.38 sec.
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:Training finished in 327.84 sec.
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:  Validation loss: -0.7901016349977905
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.7901016349977905
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:  Training loss: 1.106578
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:Build finished in 0.65 sec.
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:Starting training.
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:Training finished in 341.45 sec.
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8453380468404772
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8453380468404772
-[2m[36m(pid=379)[0m INFO:gobbli.experiment.base:  Training loss: 1.178128
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:Training finished in 345.06 sec.
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:  Validation loss: -0.7061422889969068
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.7061422889969068
-[2m[36m(pid=380)[0m INFO:gobbli.experiment.base:  Training loss: 1.903518
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:Training finished in 337.78 sec.
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:  Validation loss: -0.7578435704816615
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.7578435704816615
-[2m[36m(pid=377)[0m INFO:gobbli.experiment.base:  Training loss: 1.544925
-[2m[36m(pid=476)[0m INFO:gobbli.experiment.base:Training finished in 349.15 sec.
-[2m[36m(pid=476)[0m INFO:gobbli.experiment.base:RESULTS:
-[2m[36m(pid=476)[0m INFO:gobbli.experiment.base:  Validation loss: -0.34953601414052143
-[2m[36m(pid=476)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.34953601414052143
-[2m[36m(pid=476)[0m INFO:gobbli.experiment.base:  Training loss: 2.474048
-[2m[36m(pid=476)[0m INFO:gobbli.experiment.base:Starting build.
-[2m[36m(pid=476)[0m INFO:gobbli.experiment.base:Build finished in 0.35 sec.
-[2m[36m(pid=476)[0m INFO:gobbli.experiment.base:Starting prediction.
-[2m[36m(pid=476)[0m INFO:gobbli.experiment.base:Prediction finished in 3.37 sec.
-[2m[36m(pid=476)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-[2m[36m(pid=476)[0m   if isinstance(obj, pd.SparseDataFrame):
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/9e148e5671b7432ebe2e20d1f55e465a'
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/13541a064a5344088ea0e74a5b6c52e6'
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/8f14bec4cbe54549af7383866f04372f'
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/2054f0f170bc416eb044a37e4e815acf'
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:Build finished in 0.43 sec.
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:Build finished in 0.46 sec.
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:Build finished in 0.42 sec.
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:Build finished in 0.42 sec.
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:Training finished in 312.13 sec.
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:  Validation loss: -0.7344233318603623
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.7344233318603623
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:  Training loss: 1.653927
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/b8164e8bf46a4aaea14dc7ab075df619'
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:Build finished in 0.22 sec.
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:Training finished in 312.29 sec.
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:  Validation loss: -0.7825894829871851
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.7825894829871851
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:  Training loss: 1.680546
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/fb9ef6b5e6204ca59b6cd77fc2547bbc'
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:Build finished in 0.22 sec.
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:Training finished in 318.82 sec.
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8497569597878922
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8497569597878922
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:  Training loss: 1.310192
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/c59a62818497493fbe9804e3285f5f8b'
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:Build finished in 0.20 sec.
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:Training finished in 319.73 sec.
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:  Validation loss: -0.39681838267786124
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.39681838267786124
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:  Training loss: 2.303738
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/42f8e168a25e44edae72e1d2d725d067'
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:Build finished in 0.33 sec.
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:Starting training.
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:Training finished in 319.65 sec.
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:  Validation loss: -0.7118868758285462
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.7118868758285462
+[2m[36m(pid=976)[0m INFO:gobbli.experiment.base:  Training loss: 1.481531
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:Training finished in 318.81 sec.
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:  Validation loss: -0.8356164383561644
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.8356164383561644
+[2m[36m(pid=977)[0m INFO:gobbli.experiment.base:  Training loss: 1.373516
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:Training finished in 457.83 sec.
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:  Validation loss: -0.760053026955369
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.760053026955369
+[2m[36m(pid=975)[0m INFO:gobbli.experiment.base:  Training loss: 1.478671
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:Training finished in 466.52 sec.
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:RESULTS:
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:  Validation loss: -0.34025629695095005
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:  Validation accuracy: 0.34025629695095005
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:  Training loss: 2.429249
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:FastText initialized with data directory '/data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/1f8ad3e548fc4c778d2c1ef74a26aac2'
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:Starting build.
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:Build finished in 0.45 sec.
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:Starting prediction.
+[2m[36m(pid=978)[0m INFO:gobbli.experiment.base:Prediction finished in 2.57 sec.
+[2m[36m(pid=978)[0m /usr/local/lib/python3.7/site-packages/ray/pyarrow_files/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+[2m[36m(pid=978)[0m   if isinstance(obj, pd.SparseDataFrame):
 
 ```
-|    |   valid_loss |   valid_accuracy |   train_loss | labels                                                                                                                                                                                                                                                                                                                                                                                                    | checkpoint                                                                                                         | node_ip_address   | model_params                              |
-|---:|-------------:|-----------------:|-------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------|:------------------|:------------------------------------------|
-|  0 |    -0.725586 |         0.725586 |      1.63255 | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | benchmark_data/model/FastText/ecf43233518d44049671621b232e27d9/train/d674f3ea30a64a659ecf38222d28623f/output/model | 172.80.10.2       | {'dim': 100, 'lr': 0.5, 'word_ngrams': 1} |
-|  1 |    -0.418029 |         0.418029 |      2.48976 | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | benchmark_data/model/FastText/945e185dcf9e495ea197301f7377a443/train/5114c2313d9a4e13bfa367ab869c1aca/output/model | 172.80.10.2       | {'dim': 100, 'lr': 0.5, 'word_ngrams': 2} |
-|  2 |    -0.849757 |         0.849757 |      1.57841 | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | benchmark_data/model/FastText/1cf1cbc011bb48d092fe349d8d27afdb/train/a84dac18845842b3aa28fff084ee0c52/output/model | 172.80.10.2       | {'dim': 100, 'lr': 1.0, 'word_ngrams': 1} |
-|  3 |    -0.790102 |         0.790102 |      1.10658 | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | benchmark_data/model/FastText/76ccb6afecc84b79a70b4c5c801fc121/train/bb91e6e7ea2e48e2995cb5672b4205a7/output/model | 172.80.10.2       | {'dim': 100, 'lr': 1.0, 'word_ngrams': 2} |
-|  4 |    -0.706142 |         0.706142 |      1.90352 | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | benchmark_data/model/FastText/10997ef754e34abda7764ff849f823e0/train/2d437e173596465e998b5bfc7c87dfb7/output/model | 172.80.10.2       | {'dim': 300, 'lr': 0.5, 'word_ngrams': 1} |
-|  5 |    -0.349536 |         0.349536 |      2.47405 | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | benchmark_data/model/FastText/f833f73cfd9e40ba8735fc30258c39f8/train/3909ff17d2af4414a88a0349407ca1aa/output/model | 172.80.10.2       | {'dim': 300, 'lr': 0.5, 'word_ngrams': 2} |
-|  6 |    -0.845338 |         0.845338 |      1.17813 | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | benchmark_data/model/FastText/745d9f3117824dd3bc987a3c6999ad6a/train/6901cf42586f4911bb6661aa42f71ad2/output/model | 172.80.10.2       | {'dim': 300, 'lr': 1.0, 'word_ngrams': 1} |
-|  7 |    -0.757844 |         0.757844 |      1.54493 | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | benchmark_data/model/FastText/448abc9fd8184c2c9f9789af4e09f281/train/165d24429e8748249745f3b7aa56127c/output/model | 172.80.10.2       | {'dim': 300, 'lr': 1.0, 'word_ngrams': 2} |
+|    |   valid_loss |   valid_accuracy |   train_loss | multilabel   | labels                                                                                                                                                                                                                                                                                                                                                                                                    | checkpoint                                                                                                                                             | node_ip_address   | model_params                              |
+|---:|-------------:|-----------------:|-------------:|:-------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------|:------------------------------------------|
+|  0 |    -0.734423 |         0.734423 |      1.65393 | False        | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/9e148e5671b7432ebe2e20d1f55e465a/train/023ce04a0198471db50e25fb33e25487/output/model | 172.80.10.2       | {'dim': 100, 'lr': 0.5, 'word_ngrams': 1} |
+|  1 |    -0.396818 |         0.396818 |      2.30374 | False        | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/13541a064a5344088ea0e74a5b6c52e6/train/85ad91df90d745a093de23b96dde5982/output/model | 172.80.10.2       | {'dim': 100, 'lr': 0.5, 'word_ngrams': 2} |
+|  2 |    -0.849757 |         0.849757 |      1.31019 | False        | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/8f14bec4cbe54549af7383866f04372f/train/5d89f7b71a024ae3a82724f89775a802/output/model | 172.80.10.2       | {'dim': 100, 'lr': 1.0, 'word_ngrams': 1} |
+|  3 |    -0.782589 |         0.782589 |      1.68055 | False        | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/2054f0f170bc416eb044a37e4e815acf/train/f66b7d6280294821aff919a4dc79a82a/output/model | 172.80.10.2       | {'dim': 100, 'lr': 1.0, 'word_ngrams': 2} |
+|  4 |    -0.711887 |         0.711887 |      1.48153 | False        | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/b8164e8bf46a4aaea14dc7ab075df619/train/d7149ed094454138af3073e737f27fb2/output/model | 172.80.10.2       | {'dim': 300, 'lr': 0.5, 'word_ngrams': 1} |
+|  5 |    -0.340256 |         0.340256 |      2.42925 | False        | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/fb9ef6b5e6204ca59b6cd77fc2547bbc/train/7bb1a0a98cb049709ecc3b0fe2584cd5/output/model | 172.80.10.2       | {'dim': 300, 'lr': 0.5, 'word_ngrams': 2} |
+|  6 |    -0.835616 |         0.835616 |      1.37352 | False        | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/c59a62818497493fbe9804e3285f5f8b/train/441fb3d4cf604477a305df6ee8bfc26b/output/model | 172.80.10.2       | {'dim': 300, 'lr': 1.0, 'word_ngrams': 1} |
+|  7 |    -0.760053 |         0.760053 |      1.47867 | False        | ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc'] | /data/users/jnance/gobbli/benchmark/benchmark_data/model/FastText/42f8e168a25e44edae72e1d2d725d067/train/98b72399d408401685bb83bf20e6998a/output/model | 172.80.10.2       | {'dim': 300, 'lr': 1.0, 'word_ngrams': 2} |
 ```
 Metrics:
 --------
-Weighted F1 Score: 0.746025332814778
-Weighted Precision Score: 0.7510731273540894
-Weighted Recall Score: 0.7441582580987786
-Accuracy: 0.7441582580987786
+Weighted F1 Score: 0.741617629055201
+Weighted Precision Score: 0.7479753772925986
+Weighted Recall Score: 0.7392458842272969
+Accuracy: 0.7392458842272969
 
 Classification Report:
 ----------------------
                           precision    recall  f1-score   support
 
-             alt.atheism       0.59      0.65      0.62       319
-           comp.graphics       0.65      0.66      0.65       389
- comp.os.ms-windows.misc       0.72      0.64      0.68       394
-comp.sys.ibm.pc.hardware       0.60      0.66      0.63       392
-   comp.sys.mac.hardware       0.74      0.70      0.72       385
-          comp.windows.x       0.81      0.70      0.75       395
-            misc.forsale       0.81      0.83      0.82       390
-               rec.autos       0.78      0.83      0.80       396
-         rec.motorcycles       0.87      0.86      0.87       398
-      rec.sport.baseball       0.85      0.85      0.85       397
-        rec.sport.hockey       0.94      0.88      0.91       399
-               sci.crypt       0.87      0.83      0.85       396
-         sci.electronics       0.61      0.68      0.64       393
-                 sci.med       0.78      0.76      0.77       396
-               sci.space       0.86      0.84      0.85       394
-  soc.religion.christian       0.79      0.79      0.79       398
-      talk.politics.guns       0.68      0.79      0.73       364
-   talk.politics.mideast       0.93      0.76      0.84       376
-      talk.politics.misc       0.49      0.58      0.53       310
-      talk.religion.misc       0.44      0.39      0.41       251
+             alt.atheism       0.00      0.00      0.00         0
+           comp.graphics       0.00      0.00      0.00         0
+ comp.os.ms-windows.misc       0.00      0.00      0.00         0
+comp.sys.ibm.pc.hardware       0.00      0.00      0.00         0
+   comp.sys.mac.hardware       0.00      0.00      0.00         0
+          comp.windows.x       0.00      0.00      0.00         0
+            misc.forsale       0.00      0.00      0.00         0
+               rec.autos       0.00      0.00      0.00         0
+         rec.motorcycles       0.00      0.00      0.00         0
+      rec.sport.baseball       0.00      0.00      0.00         0
+        rec.sport.hockey       0.00      0.00      0.00         0
+               sci.crypt       0.00      0.00      0.00         0
+         sci.electronics       0.00      0.00      0.00         0
+                 sci.med       0.00      0.00      0.00         0
+               sci.space       0.00      0.00      0.00         0
+  soc.religion.christian       0.00      0.00      0.00         0
+      talk.politics.guns       0.00      0.00      0.00         0
+   talk.politics.mideast       0.00      0.00      0.00         0
+      talk.politics.misc       0.00      0.00      0.00         0
+      talk.religion.misc       0.00      0.00      0.00         0
 
-                accuracy                           0.74      7532
-               macro avg       0.74      0.74      0.74      7532
-            weighted avg       0.75      0.74      0.75      7532
+               micro avg       0.00      0.00      0.00         0
+               macro avg       0.00      0.00      0.00         0
+            weighted avg       0.00      0.00      0.00         0
 
 
 ```

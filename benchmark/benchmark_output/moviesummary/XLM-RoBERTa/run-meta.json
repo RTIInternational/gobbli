@@ -1,0 +1,1 @@
+{"name": "XLM-RoBERTa", "model_name": "Transformer", "param_grid": {"transformer_weights": ["xlm-roberta-base"], "transformer_model": ["XLMRoberta"]}, "preprocess_func": "bert_preprocess", "run_kwargs": {}}
