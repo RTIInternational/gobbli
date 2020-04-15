@@ -299,8 +299,6 @@ class SKLearnClassifier(BaseModel, TrainMixin, PredictMixin):
         # Input must be a numpy array for OneVsRestClassifier case
         X = np.array(predict_input.X)
         pred_proba_df = pd.DataFrame(self.estimator.predict_proba(X))
-        # if predict_input.multilabel:
-        # The model will have been trained to generate binarized classes as output --
 
         if self.estimator.classes_ is None:
             raise ValueError(
