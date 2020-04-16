@@ -3,12 +3,25 @@ import tempfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterator, List, Optional, Tuple, TypeVar, Union, cast
 
 import numpy as np
 import pandas as pd
 
-from gobbli.util import TokenizeMethod, detokenize, pred_prob_to_pred_label, tokenize
+from gobbli.util import (
+    TokenizeMethod,
+    as_multiclass,
+    as_multilabel,
+    collect_labels,
+    detokenize,
+    is_multilabel,
+    multiclass_to_multilabel_target,
+    pred_prob_to_pred_label,
+    pred_prob_to_pred_multilabel,
+    tokenize,
+)
+
+T = TypeVar("T")
 
 
 def _check_string_list(obj: Any):
@@ -21,6 +34,24 @@ def _check_string_list(obj: Any):
         raise TypeError(f"obj must contain strings, got '{type(obj[0])}'")
 
 
+def _check_multilabel_list(obj: Any):
+    """
+    Verify a given object is a list containing lists of strings (labels).
+    """
+    if not isinstance(obj, list):
+        raise TypeError(f"obj must be a list, got '{type(obj)}'")
+
+    if len(obj) > 0:
+        if not isinstance(obj[0], list):
+            raise TypeError(f"obj must contain lists, got '{type(obj[0])}'")
+
+        if len(obj[0]) > 0:
+            if not isinstance(obj[0][0], str):
+                raise TypeError(
+                    f"obj must contain lists of strings, got lists of '{type(obj[0][0])}'"
+                )
+
+
 def validate_X(X: List[str]):
     """
     Confirm a given array matches the expected type for input.
@@ -31,15 +62,19 @@ def validate_X(X: List[str]):
     _check_string_list(X)
 
 
-def validate_y(y: List[str]):
+def validate_multilabel_y(y: Union[List[str], List[List[str]]], multilabel: bool):
     """
-    Confirm a given array matches the expected type and length for model output
-    (expected or predicted).
+    Confirm an array is typed appropriately for the value of ``multilabel``.
 
     Args:
-      y: Something that should be valid model output.
+      y: Something that should be valid multiclass or multilabel output.
+      multilabel: True if y should be formatted for a multilabel problem
+        and False otherwise (for a multiclass problem).
     """
-    _check_string_list(y)
+    if multilabel:
+        _check_multilabel_list(y)
+    else:
+        _check_string_list(y)
 
 
 def validate_X_y(X: List[str], y: List[Any]):
@@ -79,6 +114,10 @@ class TrainInput(TaskIO):
     """
     Input for training a model.  See :meth:`gobbli.model.mixin.TrainMixin.train`.
 
+    For usage specific to a multiclass or multilabel paradigm, consider using the
+    more specifically checked and typed properties: ``y_{train,valid}_{multiclass,multilabel}``
+    as opposed to the more generically typed ``y_{train,valid}`` attributes.
+
     Args:
       X_train: Documents used for training.
       y_train: Labels for training documents.
@@ -93,13 +132,35 @@ class TrainInput(TaskIO):
     """
 
     X_train: List[str]
-    y_train: List[str]
+    y_train: Union[List[str], List[List[str]]]
     X_valid: List[str]
-    y_valid: List[str]
+    y_valid: Union[List[str], List[List[str]]]
     train_batch_size: int = 32
     valid_batch_size: int = 8
     num_train_epochs: int = 3
     checkpoint: Optional[Path] = None
+
+    @property
+    def y_train_multiclass(self) -> List[str]:
+        return as_multiclass(self.y_train, self.multilabel)
+
+    @property
+    def y_train_multilabel(self) -> List[List[str]]:
+        return as_multilabel(self.y_train, self.multilabel)
+
+    @property
+    def y_valid_multiclass(self) -> List[str]:
+        if self.multilabel:
+            raise ValueError(
+                "Multilabel training input can't be converted to multiclass."
+            )
+        return cast(List[str], self.y_valid)
+
+    @property
+    def y_valid_multilabel(self) -> List[List[str]]:
+        if self.multilabel:
+            return cast(List[List[str]], self.y_valid)
+        return multiclass_to_multilabel_target(cast(List[str], self.y_valid))
 
     def labels(self) -> List[str]:
         """
@@ -107,14 +168,18 @@ class TrainInput(TaskIO):
           The set of unique labels in the data.
           Sort and return a list for consistent ordering, in case that matters.
         """
-        return sorted(list(set(self.y_train) | set(self.y_valid)))
+        # We verify these types are compatible during initialization, so ignore
+        # mypy warning about a possible mismatch due to the Union
+        return collect_labels(self.y_train + self.y_valid)  # type: ignore
 
     def __post_init__(self):
+        self.multilabel = is_multilabel(self.y_train)
+
         for X in (self.X_train, self.X_valid):
             validate_X(X)
 
         for y in self.y_train, self.y_valid:
-            validate_y(y)
+            validate_multilabel_y(y, self.multilabel)
 
         for X, y in ((self.X_train, self.y_train), (self.X_valid, self.y_valid)):
             validate_X_y(X, y)
@@ -128,6 +193,7 @@ class TrainInput(TaskIO):
             "len_y_train": len(self.y_train),
             "len_X_valid": len(self.X_valid),
             "len_y_valid": len(self.y_valid),
+            "multilabel": self.multilabel,
             "checkpoint": self.checkpoint,
         }
 
@@ -143,6 +209,8 @@ class TrainOutput(TaskIO):
       train_loss:  Loss on the training dataset.
       labels: List of labels present in the training data.
         Used to initialize the model for prediction.
+      multilabel: True if the model was trained in a multilabel context,
+        otherwise False (indicating a multiclass context).
       checkpoint: Path to the best checkpoint from training.
         This may not be a literal filepath in the case of ex. TensorFlow,
         but it should give the user everything they need to run prediction
@@ -154,6 +222,7 @@ class TrainOutput(TaskIO):
     valid_accuracy: float
     train_loss: float
     labels: List[str]
+    multilabel: bool
     checkpoint: Optional[Path] = None
     _console_output: str = ""
 
@@ -162,6 +231,7 @@ class TrainOutput(TaskIO):
             "valid_loss": float(self.valid_loss),
             "valid_accuracy": float(self.valid_accuracy),
             "train_loss": float(self.train_loss),
+            "multilabel": self.multilabel,
             "labels": self.labels,
             "checkpoint": str(self.checkpoint),
         }
@@ -175,6 +245,8 @@ class PredictInput(TaskIO):
     Args:
       X: Documents to have labels predicted for.
       labels: See :paramref:`TrainOutput.params.labels`.
+      multilabel: True if the model was trained in a multilabel context,
+        otherwise False (indicating a multiclass context).
       predict_batch_size: Number of documents to predict in each batch.
       checkpoint: Checkpoint containing trained weights for the model.
         See :paramref:`TrainOutput.params.checkpoint`.
@@ -182,6 +254,7 @@ class PredictInput(TaskIO):
 
     X: List[str]
     labels: List[str]
+    multilabel: bool = False
     predict_batch_size: int = 32
     checkpoint: Optional[Path] = None
 
@@ -193,6 +266,7 @@ class PredictInput(TaskIO):
             "predict_batch_size": self.predict_batch_size,
             "labels": self.labels,
             "checkpoint": str(self.checkpoint),
+            "multilabel": self.multilabel,
             "len_X": len(self.X),
         }
 
@@ -215,12 +289,20 @@ class PredictOutput(TaskIO):
     def y_pred(self) -> List[str]:
         """
         Returns:
-          The predicted class for each observation.
+          The most likely predicted label for each observation.
         """
         return pred_prob_to_pred_label(self.y_pred_proba)
 
+    def y_pred_multilabel(self, threshold: float = 0.5) -> pd.DataFrame:
+        """
+        Returns:
+          Indicator matrix representing the predicted labels for each observation
+          using the given (optional) threshold.
+        """
+        return pred_prob_to_pred_multilabel(self.y_pred_proba, threshold)
+
     def __post_init__(self):
-        validate_y(self.y_pred)
+        validate_multilabel_y(self.y_pred, False)
 
     def metadata(self) -> Dict[str, Any]:
         return {"len_y_pred": self.y_pred_proba.shape[0]}
@@ -311,11 +393,11 @@ def _chunk_tokens(tokens: List[str], window_len: int) -> Iterator[List[str]]:
 def make_document_windows(
     X: List[str],
     window_len: int,
-    y: Optional[List[str]] = None,
+    y: Optional[List[T]] = None,
     tokenize_method: TokenizeMethod = TokenizeMethod.SPLIT,
     model_path: Optional[Path] = None,
     vocab_size: Optional[int] = None,
-) -> Tuple[List[str], List[int], Optional[List[str]]]:
+) -> Tuple[List[str], List[int], Optional[List[T]]]:
     """
     This is a helper for when you have a dataset with long documents which is going to be
     passed through a model with a fixed max sequence length.  If you don't have enough
@@ -332,8 +414,9 @@ def make_document_windows(
       X: List of texts to make windows out of.
       window_len: The maximum length of each window.  This should roughly correspond to
         the ``max_seq_len`` of your model.
-      y: Optional list of labels.  If passed, a list of labels for each window (the label
-        associated with the window's document) will be returned.
+      y: Optional list of classes (or list of list of labels).  If passed, a corresponding
+        list of targets for each window (the target(s) associated with the window's document)
+        will be returned.
       tokenize_method: :class:`gobbli.util.TokenizeMethod` corresponding to the tokenization
         method to use for determining windows.
       model_path: This argument is used if the tokenization method requires
@@ -347,16 +430,16 @@ def make_document_windows(
     Returns:
       A 3-tuple containing a new list of texts split into windows, a corresponding list
       containing the index of each original document for each window, and (optionally)
-      a list containing a label per window.  The index should
+      a list containing a target per window.  The index should
       be used to pool the output from the windowed text (see :func:`pool_document_windows`).
     """
-    X_windowed = []  # type: List[str]
-    X_windowed_indices = []  # type: List[int]
-    y_windowed = []  # type: List[str]
+    X_windowed: List[str] = []
+    X_windowed_indices: List[int] = []
+    y_windowed: List[T] = []
 
     # Create a temp dir in case it's needed
     with tempfile.TemporaryDirectory() as tmpdir:
-        tokenize_kwargs = {}  # type: Dict[str, Any]
+        tokenize_kwargs: Dict[str, Any] = {}
 
         if model_path is None:
             model_path = Path(tmpdir) / "tokenizer"

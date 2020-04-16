@@ -7,7 +7,7 @@ from typing import Any, List, Optional, Tuple
 from sklearn.model_selection import train_test_split
 
 import gobbli.io
-from gobbli.util import format_duration, gobbli_dir, shuffle_together
+from gobbli.util import collect_labels, format_duration, gobbli_dir, shuffle_together
 
 LOGGER = logging.getLogger(__name__)
 
@@ -155,8 +155,8 @@ class BaseDataset(ABC):
         if limit is not None:
             X_test = X_test[:limit]
 
+        labels = collect_labels(y_train_valid)
+
         return gobbli.io.PredictInput(
-            X=X_test,
-            predict_batch_size=predict_batch_size,
-            labels=sorted(list(set(y_train_valid))),
+            X=X_test, predict_batch_size=predict_batch_size, labels=labels
         )

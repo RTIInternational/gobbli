@@ -37,11 +37,11 @@ setup(
         "humanize >= 1.1.0",
     ],
     extras_require={
-        "augment": ["nltk>=3.4.4", "gensim>=3.8.0", "spacy>=2.1.4"],
+        "augment": ["nltk>=3.4.4", "gensim>=3.8.2", "spacy>=2.1.4"],
         "tokenize": ["sentencepiece >= v0.1.83"],
         "interactive": [
             "streamlit >= 0.56.0",
-            "gensim >= 3.8.0",
+            "gensim >= 3.8.2",
             "umap-learn >= 0.3.10",
             "eli5 >= 0.10.1",
             "hdbscan >= 0.8.24",

@@ -168,7 +168,7 @@ PREPROCESS_FUNCS: Dict[Optional[str], Callable[[List[str]], List[str]]] = {
 def run_benchmark_experiment(
     name: str,
     X: List[str],
-    y: List[str],
+    y: Union[List[str], List[List[str]]],
     model_cls: Any,
     param_grid: Dict[str, List[Any]],
     ray_log_level: Union[int, str] = logging.ERROR,
@@ -182,7 +182,8 @@ def run_benchmark_experiment(
     Args:
       name: Name of the experiment
       X: List of texts to predict
-      y: List of labels
+      y: List of labels for multiclass classification or list of lists of labels
+        for multilabel classification
       model_cls: Class for the model to be instantiated
       param_grid: Model parameters to search for the experiment
       ray_log_level: Log level for local logging (ray cluster)

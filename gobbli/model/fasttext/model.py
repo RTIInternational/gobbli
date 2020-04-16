@@ -19,7 +19,9 @@ from gobbli.util import (
     assert_type,
     download_archive,
     escape_line_delimited_text,
+    multilabel_to_indicator_df,
     pred_prob_to_pred_label,
+    pred_prob_to_pred_multilabel,
 )
 
 FASTTEXT_VECTOR_ARCHIVES = {
@@ -107,6 +109,8 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
     _EMBEDDING_OUTPUT_FILE = "embeddings.txt"
 
     _CHECKPOINT_BASE = "model"
+
+    _LABEL_SPACE_ESCAPE = "$gobbli_space$"
 
     @property
     def image_tag(self) -> str:
@@ -221,6 +225,33 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         )
 
     @staticmethod
+    def _escape_label(label: str) -> str:
+        """
+        Escape a label for use in fastText's label format.  Spaces
+        must be replaced, or the label will be interpreted as part of the text.
+
+        Args:
+          label: Label to escape
+
+        Returns:
+          The escaped label
+        """
+        return label.replace(" ", FastText._LABEL_SPACE_ESCAPE)
+
+    @staticmethod
+    def _unescape_label(label: str) -> str:
+        """
+        Reverse escaping for a label read from fastText's output format.
+
+        Args:
+          label: Label to unescape
+
+        Returns:
+          The unescaped label
+        """
+        return label.replace(FastText._LABEL_SPACE_ESCAPE, " ")
+
+    @staticmethod
     def _locate_checkpoint(weights_dir: Path) -> FastTextCheckpoint:
         """
         Locate a fastText checkpoint under the given directory,
@@ -285,26 +316,22 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             return host_checkpoint, container_checkpoint
 
     def _write_input(
-        self, X: List[str], y: Optional[List[str]], input_path: Path
-    ) -> List[str]:
+        self, X: List[str], y: Optional[List[List[str]]], input_path: Path
+    ):
         """
         Write the given input and labels (if any) into the format expected by fastText.
         Make sure the given directory exists first.
-
-        Returns:
-          A sorted list of unique labels found in the dataset.
         """
-        label_set = set()
         with open(input_path, "w") as f:
             if y is not None:
-                for text, label in zip(X, y):
-                    f.write(f"__label__{label} {_fasttext_preprocess(text)}\n")
-                    label_set.add(label)
+                for text, labels in zip(X, y):
+                    label_str = " ".join(
+                        f"__label__{FastText._escape_label(label)}" for label in labels
+                    )
+                    f.write(f"{label_str} {_fasttext_preprocess(text)}\n")
             elif y is None:
                 for text in X:
                     f.write(f"{_fasttext_preprocess(text)}\n")
-
-        return list(sorted(label_set))
 
     def _run_supervised(
         self,
@@ -449,10 +476,14 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
         with open(host_output_path, "r") as f:
             for line in f:
                 tokens = line.split()
-                row_data = {}
+                # Seems that fastText doesn't always return a probability for
+                # every label, so start out with default = 0.0 so the shape of
+                # the returned DataFrame will be consistent with the number
+                # of labels
+                row_data = {label: 0.0 for label in labels}
                 for raw_label, prob in zip(tokens[0::2], tokens[1::2]):
-                    # Strip the "__label__" prefix
-                    label = raw_label[9:]
+                    # Strip the "__label__" prefix and undo escaping
+                    label = FastText._unescape_label(raw_label[9:])
                     row_data[label] = float(prob)
                 pred_prob_data.append(row_data)
 
@@ -461,14 +492,14 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
     def _train(
         self, train_input: gobbli.io.TrainInput, context: ContainerTaskContext
     ) -> gobbli.io.TrainOutput:
-        labels = self._write_input(
+        self._write_input(
             train_input.X_train,
-            train_input.y_train,
+            train_input.y_train_multilabel,
             context.host_input_dir / FastText._TRAIN_INPUT_FILE,
         )
         self._write_input(
             train_input.X_valid,
-            train_input.y_valid,
+            train_input.y_valid_multilabel,
             context.host_input_dir / FastText._VALID_INPUT_FILE,
         )
 
@@ -486,16 +517,27 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
 
         host_checkpoint_path = context.host_output_dir / f"{FastText._CHECKPOINT_BASE}"
 
+        labels = train_input.labels()
+
         # Calculate validation accuracy on our own, since the CLI only provides
         # precision/recall
         predict_logs, pred_prob_df = self._run_predict_prob(
             host_checkpoint_path, labels, container_validation_input_path, context
         )
-        pred_labels = pred_prob_to_pred_label(pred_prob_df)
+
+        if train_input.multilabel:
+            pred_labels = pred_prob_to_pred_multilabel(pred_prob_df)
+            gold_labels = multilabel_to_indicator_df(
+                train_input.y_valid_multilabel, labels
+            )
+        else:
+            pred_labels = pred_prob_to_pred_label(pred_prob_df)
+            gold_labels = train_input.y_valid_multiclass
+
+        valid_accuracy = accuracy_score(gold_labels, pred_labels)
 
         # Not ideal, but fastText doesn't provide a way to get validation loss;
         # Negate the validation accuracy instead
-        valid_accuracy = accuracy_score(train_input.y_valid, pred_labels)
         valid_loss = -valid_accuracy
 
         return gobbli.io.TrainOutput(
@@ -503,6 +545,7 @@ class FastText(BaseModel, TrainMixin, PredictMixin, EmbedMixin):
             valid_loss=valid_loss,
             valid_accuracy=valid_accuracy,
             labels=labels,
+            multilabel=train_input.multilabel,
             checkpoint=host_checkpoint_path,
             _console_output="\n".join((train_logs, predict_logs)),
         )

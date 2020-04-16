@@ -1,4 +1,5 @@
-from typing import Any, Dict
+import itertools
+from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
@@ -7,6 +8,7 @@ import gobbli.io
 from gobbli.model.base import BaseModel
 from gobbli.model.context import ContainerTaskContext
 from gobbli.model.mixin import PredictMixin, TrainMixin
+from gobbli.util import multilabel_to_indicator_df, pred_prob_to_pred_label
 
 
 class MajorityClassifier(BaseModel, TrainMixin, PredictMixin):
@@ -25,27 +27,63 @@ class MajorityClassifier(BaseModel, TrainMixin, PredictMixin):
         No build step required for this model.
         """
 
+    def _make_pred_df(self, labels: List[str], size: int) -> pd.DataFrame:
+        return pd.DataFrame(
+            {label: 1 if label == self.majority_class else 0 for label in labels},
+            index=range(size),
+        )
+
     def _train(
         self, train_input: gobbli.io.TrainInput, context: ContainerTaskContext
     ) -> gobbli.io.TrainOutput:
         """
         Determine the majority class.
         """
-        unique_values, value_counts = np.unique(train_input.y_train, return_counts=True)
+        if train_input.multilabel:
+            train_labels: List[str] = list(
+                itertools.chain.from_iterable(train_input.y_train_multilabel)
+            )
+        else:
+            train_labels = train_input.y_train_multiclass
+
+        unique_values, value_counts = np.unique(train_labels, return_counts=True)
         self.majority_class = unique_values[value_counts.argmax(axis=0)]
 
-        y_train_pred = np.full_like(train_input.y_train, self.majority_class)
-        train_loss = np.sum(y_train_pred != train_input.y_train)
+        labels = train_input.labels()
+        y_train_pred_proba = self._make_pred_df(labels, len(train_input.y_train))
+        y_valid_pred_proba = self._make_pred_df(labels, len(train_input.y_valid))
 
-        y_valid_pred = np.full_like(train_input.y_valid, self.majority_class)
-        valid_loss = np.sum(y_valid_pred != train_input.y_valid)
-        valid_accuracy = valid_loss / y_valid_pred.shape[0]
+        if train_input.multilabel:
+            y_train_indicator = multilabel_to_indicator_df(
+                train_input.y_train_multilabel, labels
+            )
+            train_loss = (
+                (y_train_pred_proba.subtract(y_train_indicator)).abs().to_numpy().sum()
+            )
+
+            y_valid_indicator = multilabel_to_indicator_df(
+                train_input.y_valid_multilabel, labels
+            )
+            valid_loss = (
+                (y_valid_pred_proba.subtract(y_valid_indicator)).abs().to_numpy().sum()
+            )
+            valid_accuracy = valid_loss / (
+                y_valid_pred_proba.shape[0] * y_valid_pred_proba.shape[1]
+            )
+        else:
+            y_train_pred = pred_prob_to_pred_label(y_train_pred_proba)
+            train_loss = np.sum(y_train_pred != train_input.y_train_multiclass)
+
+            y_valid_pred = pred_prob_to_pred_label(y_valid_pred_proba)
+            valid_loss = np.sum(y_valid_pred != train_input.y_valid_multiclass)
+            valid_accuracy = valid_loss / len(y_valid_pred)
 
         return gobbli.io.TrainOutput(
             valid_loss=valid_loss,
             valid_accuracy=valid_accuracy,
             train_loss=train_loss,
             labels=train_input.labels(),
+            multilabel=train_input.multilabel,
         )
 
     def _predict(
@@ -54,12 +92,6 @@ class MajorityClassifier(BaseModel, TrainMixin, PredictMixin):
         """
         Predict based on our learned majority class.
         """
-        pred_proba_df = pd.DataFrame(
-            {
-                label: 1 if label == self.majority_class else 0
-                for label in predict_input.labels
-            },
-            index=range(len(predict_input.X)),
-        )
+        pred_proba_df = self._make_pred_df(predict_input.labels, len(predict_input.X))
 
         return gobbli.io.PredictOutput(y_pred_proba=pred_proba_df)

@@ -1,5 +1,6 @@
 import pytest
 
+from gobbli.dataset.cmu_movie_summary import MovieSummaryDataset
 from gobbli.dataset.newsgroups import NewsgroupsDataset
 from gobbli.dataset.trivial import TrivialDataset
 from gobbli.model.bert import BERT
@@ -29,8 +30,10 @@ def check_predict_output(train_output, predict_input, predict_output):
     [
         (MajorityClassifier, TrivialDataset, {}, {}, {}),
         (MajorityClassifier, NewsgroupsDataset, {}, {}, {}),
+        (MajorityClassifier, MovieSummaryDataset, {}, {}, {}),
         (SKLearnClassifier, TrivialDataset, {}, {}, {}),
         (SKLearnClassifier, NewsgroupsDataset, {}, {}, {}),
+        (SKLearnClassifier, MovieSummaryDataset, {}, {}, {}),
         (
             BERT,
             TrivialDataset,
@@ -41,6 +44,13 @@ def check_predict_output(train_output, predict_input, predict_output):
         (
             BERT,
             NewsgroupsDataset,
+            {},
+            {"num_train_epochs": 1, "train_batch_size": 32, "valid_batch_size": 8},
+            {"predict_batch_size": 32},
+        ),
+        (
+            BERT,
+            MovieSummaryDataset,
             {},
             {"num_train_epochs": 1, "train_batch_size": 32, "valid_batch_size": 8},
             {"predict_batch_size": 32},
@@ -60,16 +70,30 @@ def check_predict_output(train_output, predict_input, predict_output):
             {"predict_batch_size": 32},
         ),
         (
+            MTDNN,
+            MovieSummaryDataset,
+            {},
+            {"num_train_epochs": 1, "train_batch_size": 32, "valid_batch_size": 32},
+            {"predict_batch_size": 32},
+        ),
+        (
             FastText,
             TrivialDataset,
-            {"autotune_duration": 10, "word_ngrams": 1},
+            {"autotune_duration": 10, "word_ngrams": 1, "dim": 50, "ws": 5},
             {"num_train_epochs": 1, "train_batch_size": 1, "valid_batch_size": 1},
             {"predict_batch_size": 1},
         ),
         (
             FastText,
             NewsgroupsDataset,
-            {"autotune_duration": 10, "word_ngrams": 1},
+            {"autotune_duration": 10, "word_ngrams": 1, "dim": 50, "ws": 5},
+            {"num_train_epochs": 1, "train_batch_size": 32, "valid_batch_size": 32},
+            {"predict_batch_size": 32},
+        ),
+        (
+            FastText,
+            MovieSummaryDataset,
+            {"autotune_duration": 10, "word_ngrams": 1, "dim": 50, "ws": 5},
             {"num_train_epochs": 1, "train_batch_size": 32, "valid_batch_size": 32},
             {"predict_batch_size": 32},
         ),
@@ -88,6 +112,13 @@ def check_predict_output(train_output, predict_input, predict_output):
             {"predict_batch_size": 32},
         ),
         (
+            Transformer,
+            MovieSummaryDataset,
+            {"max_seq_length": 128},
+            {"num_train_epochs": 1, "train_batch_size": 16, "valid_batch_size": 32},
+            {"predict_batch_size": 32},
+        ),
+        (
             SpaCyModel,
             TrivialDataset,
             {"model": "en_core_web_sm", "architecture": "bow"},
@@ -97,6 +128,13 @@ def check_predict_output(train_output, predict_input, predict_output):
         (
             SpaCyModel,
             NewsgroupsDataset,
+            {"model": "en_core_web_sm", "architecture": "bow"},
+            {"num_train_epochs": 1, "train_batch_size": 32},
+            {},
+        ),
+        (
+            SpaCyModel,
+            MovieSummaryDataset,
             {"model": "en_core_web_sm", "architecture": "bow"},
             {"num_train_epochs": 1, "train_batch_size": 32},
             {},
@@ -117,7 +155,10 @@ def test_classifier(
     Ensure classifiers train and predict appropriately across a few example datasets.
     """
     # These combinations of model and dataset require a lot of memory
-    if model_cls in (BERT, MTDNN, Transformer) and dataset_cls in (NewsgroupsDataset,):
+    if model_cls in (BERT, MTDNN, Transformer) and dataset_cls in (
+        NewsgroupsDataset,
+        MovieSummaryDataset,
+    ):
         skip_if_low_resource(request.config)
 
     model = model_cls(
@@ -130,8 +171,14 @@ def test_classifier(
     model.build()
     ds = dataset_cls.load()
 
+    train_input = ds.train_input(limit=50, **train_kwargs)
+    if train_input.multilabel and model_cls in (BERT, MTDNN):
+        pytest.xfail(
+            f"model {model_cls.__name__} doesn't support multilabel classification"
+        )
+
     # Verify training runs, results are sensible
-    train_output = model.train(ds.train_input(limit=50, **train_kwargs))
+    train_output = model.train(train_input)
     assert train_output.valid_loss is not None
     assert train_output.train_loss is not None
     assert 0 <= train_output.valid_accuracy <= 1

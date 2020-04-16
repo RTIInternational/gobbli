@@ -1,4 +1,5 @@
 import argparse
+import ast
 import json
 import random
 from pathlib import Path
@@ -26,7 +27,7 @@ def read_unique_labels(labels_path):
     """
     Read the list of unique labels from the given path.
     """
-    return labels_path.read_text().split("\n")
+    return labels_path.read_text(encoding="utf-8").split("\n")
 
 
 def read_data(file_path, has_labels):
@@ -38,13 +39,15 @@ def read_data(file_path, has_labels):
     X = df["Text"].tolist()
     y = None
     if has_labels:
-        y = df["Label"].tolist()
+        # Since spaCy defaults to multilabel paradigm, read in all data in that
+        # format -- assume labels are a list
+        y = df["Label"].apply(lambda labels: set(ast.literal_eval(labels))).tolist()
     return X, y
 
 
 def spacy_format_labels(ys, labels):
     """Convert a list of labels to the format spaCy expects for model training."""
-    return [{l: int(y == l) for l in labels} for y in ys]
+    return [{l: int(l in y) for l in labels} for y in ys]
 
 
 def evaluate(tokenizer, nlp, valid_data, labels):
@@ -65,24 +68,19 @@ def evaluate(tokenizer, nlp, valid_data, labels):
     num_correct = 0
     for i, doc in enumerate(nlp.pipe(texts)):
         gold_cats = cats[i]["cats"]
-        gold_prediction = max(gold_cats, key=lambda label: gold_cats[label])
-        doc_prediction = None
-        max_score = -1
         for j, (label, score) in enumerate(doc.cats.items()):
             if label not in gold_cats:
                 raise ValueError(f"Prediction for unexpected label: {label}")
-            if score > max_score:
-                max_score = score
-                doc_prediction = label
 
             scores[i, j] = score
 
-        if doc_prediction == gold_prediction:
-            num_correct += 1
+            doc_prediction = score > 0.5
+            if doc_prediction == bool(gold_cats[label]):
+                num_correct += 1
 
         golds.append(GoldParse(doc, cats=gold_cats))
 
-    accuracy = num_correct / (len(texts) + 1e-8)
+    accuracy = num_correct / ((len(texts) * len(labels)) + 1e-8)
     loss, _ = textcat.get_loss(texts, golds, scores)
 
     return accuracy, loss
@@ -99,6 +97,7 @@ def train(
     labels,
     dropout,
     disabled_components,
+    multilabel,
 ):
     """
     Train the TextCategorizer component of the passed pipeline on the given data.
@@ -112,7 +111,7 @@ def train(
             textcat_pipe_name,
             config={
                 "architecture": "softmax_last_hidden",
-                "exclusive_classes": True,
+                "exclusive_classes": not multilabel,
                 # We get an error about token_vector_width being unset if it isn't set
                 # explicitly here.  We can't set it to an arbitrary value, either.  It must
                 # be set based on the model
@@ -123,7 +122,7 @@ def train(
         textcat_pipe_name = "textcat"
         textcat = nlp.create_pipe(
             textcat_pipe_name,
-            config={"exclusive_classes": True, "architecture": architecture},
+            config={"exclusive_classes": not multilabel, "architecture": architecture},
         )
     nlp.add_pipe(textcat, last=True)
 
@@ -269,6 +268,12 @@ if __name__ == "__main__":
         help="Architecture for the spaCy TextCategorizer.",
     )
     parser.add_argument(
+        "--multilabel",
+        action="store_true",
+        help="If True, model will train in a multilabel context (i.e. it's allowed to make multiple "
+        "class predictions for each observation).",
+    )
+    parser.add_argument(
         "--full-pipeline",
         action="store_true",
         help="If passed, use the full spaCy language pipeline (including tagging, "
@@ -378,6 +383,7 @@ if __name__ == "__main__":
             num_train_epochs=args.num_train_epochs,
             dropout=args.dropout,
             disabled_components=disabled_components,
+            multilabel=args.multilabel,
         )
 
     elif args.mode == "predict":

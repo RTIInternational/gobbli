@@ -7,7 +7,7 @@ import os
 import random
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, TypeVar
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, TypeVar, Union
 
 import pandas as pd
 import streamlit as st
@@ -19,22 +19,31 @@ from gobbli.io import PredictInput, TaskIO
 from gobbli.model.base import BaseModel
 from gobbli.model.context import ContainerTaskContext
 from gobbli.model.mixin import TrainMixin
-from gobbli.util import read_metadata, truncate_text
+from gobbli.util import is_multilabel, read_metadata, truncate_text
 
 DEFAULT_PREDICT_BATCH_SIZE = PredictInput.predict_batch_size
 
 
 @st.cache
-def get_label_indices(labels: List[str]) -> Dict[str, List[int]]:
+def get_label_indices(y: Union[List[str], List[List[str]]]) -> Dict[str, List[int]]:
     label_indices = defaultdict(list)
-    for i, label in enumerate(labels):
-        label_indices[label].append(i)
+    if is_multilabel(y):
+        for i, labels in enumerate(y):
+            for label in labels:
+                label_indices[label].append(i)
+    else:
+        for i, cls in enumerate(y):
+            label_indices[cls].append(i)
     return label_indices
 
 
 def _read_delimited(
-    data_file: Path, delimiter: str, n_rows: Optional[int] = None
-) -> Tuple[List[str], Optional[List[str]]]:
+    data_file: Path,
+    delimiter: str,
+    n_rows: Optional[int] = None,
+    multilabel: bool = False,
+    multilabel_sep: str = ",",
+) -> Tuple[List[str], Optional[Union[List[str], List[List[str]]]]]:
     """
     Read up to n_rows lines from the given delimited text file and return lists
     of the texts and labels.  Texts must be stored in a column named "text", and
@@ -44,6 +53,8 @@ def _read_delimited(
       data_file: Data file containing one text per line.
       delimiter: Field delimiter for the data file.
       n_rows: The maximum number of rows to read.
+      multilabel: If True, read multiple labels for each line.
+      multilabel_sep: The separator splitting multiple labels in each line.
 
     Returns:
       2-tuple: list of read texts and corresponding list of read labels.
@@ -64,7 +75,15 @@ def _read_delimited(
     for row in rows:
         texts.append(row["text"])
         if has_labels:
-            labels.append(row["label"])
+            label_str = row["label"]
+            if multilabel:
+                if len(row["label"]) == 0:
+                    row_labels = []
+                else:
+                    row_labels = label_str.split(multilabel_sep)
+                labels.append(row_labels)
+            else:
+                labels.append(label_str)
 
     return texts, labels if has_labels else None
 
@@ -85,13 +104,18 @@ def _read_lines(data_file: Path, n_rows: Optional[int] = None) -> List[str]:
 
 
 def read_data_file(
-    data_file: Path, n_rows: Optional[int] = None
-) -> Tuple[List[str], Optional[List[str]]]:
+    data_file: Path,
+    multilabel: bool,
+    multilabel_sep: str = ",",
+    n_rows: Optional[int] = None,
+) -> Tuple[List[str], Optional[Union[List[str], List[List[str]]]]]:
     """
     Read data to explore from a file.  Rows may be sampled using the n_rows argument.
 
     Args:
       data_file: Path to a data file to read.
+      multilabel: If True, read multiple labels for each line.
+      multilabel_sep: Separator for multiple labels on the same line.
       n_rows: The maximum number of rows to read.
 
     Returns:
@@ -99,9 +123,21 @@ def read_data_file(
     """
     extension = data_file.suffix
     if extension == ".tsv":
-        texts, labels = _read_delimited(data_file, "\t", n_rows=n_rows)
+        texts, labels = _read_delimited(
+            data_file,
+            "\t",
+            n_rows=n_rows,
+            multilabel=multilabel,
+            multilabel_sep=multilabel_sep,
+        )
     elif extension == ".csv":
-        texts, labels = _read_delimited(data_file, ",", n_rows=n_rows)
+        texts, labels = _read_delimited(
+            data_file,
+            ",",
+            n_rows=n_rows,
+            multilabel=multilabel,
+            multilabel_sep=multilabel_sep,
+        )
     elif extension == ".txt":
         labels = None
         texts = _read_lines(data_file, n_rows=n_rows)
@@ -156,32 +192,44 @@ def read_data_file_cached(
     # Streamlit errors sometimes when hashing Path objects, so use a string.
     # https://github.com/streamlit/streamlit/issues/857
     data_file: str,
+    multilabel: bool,
     n_rows: Optional[int] = None,
+    multilabel_sep: str = ",",
 ) -> Tuple[List[str], Optional[List[str]]]:
     """
     Streamlit-cached wrapper around :func:`read_data_file` for performance.
     """
-    return read_data_file(Path(data_file), n_rows=n_rows)
+    return read_data_file(
+        Path(data_file),
+        n_rows=n_rows,
+        multilabel=multilabel,
+        multilabel_sep=multilabel_sep,
+    )
 
 
 def load_data(
-    data: str, n_rows: Optional[int]
+    data: str, multilabel: bool, n_rows: Optional[int], multilabel_sep: str = ","
 ) -> Tuple[List[str], Optional[List[str]]]:
     """
     Load data according to the given 'data' string and row limit.
 
     Args:
       data: Could be either the name of a gobbli dataset class or a path
-      to a data file in a supported format.
+        to a data file in a supported format.
       n_rows: Optional limit on number of rows read from the data.
+      multilabel: If the dataset is a file and the file has labels, this determines
+        whether the labels are interpreted as multiclass (one label per row) or multilabel
+        (multiple labels per row).
+      multilabel_sep: Determines how the labels in the label column are separated for
+        a multilabel dataset read from a file.
 
     Returns:
-      2-tuple: List of texts and list of labels.
+      2-tuple: List of texts and optional list of targets.
     """
     if os.path.exists(data):
         data_path = Path(data)
         texts, labels = read_data_file_cached(
-            str(data_path), n_rows=None if n_rows == -1 else n_rows
+            str(data_path), multilabel, n_rows=None if n_rows == -1 else n_rows
         )
     elif data in gobbli.dataset.__all__:
         dataset = getattr(gobbli.dataset, data).load()

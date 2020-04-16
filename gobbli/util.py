@@ -14,12 +14,24 @@ import warnings
 import zipfile
 from distutils.util import strtobool
 from pathlib import Path
-from typing import Any, Container, Dict, Iterator, List, Optional, TypeVar
+from typing import (
+    Any,
+    Container,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    TypeVar,
+    Union,
+    cast,
+)
 
 import humanize
 import pandas as pd
 import pkg_resources
 import requests
+from sklearn.preprocessing import MultiLabelBinarizer
 
 LOGGER = logging.getLogger(__name__)
 
@@ -102,12 +114,14 @@ def cleanup(force: bool = False, full: bool = False):
     if full:
         shutil.rmtree(gobbli_dir())
     else:
-        for model_dir in (gobbli_dir() / "model").iterdir():
-            for instance_dir in model_dir.iterdir():
-                # Special directories containing cached weights or models
-                # which are reusable -- don't delete them here
-                if instance_dir.name not in ("cache", "weights"):
-                    shutil.rmtree(instance_dir)
+        base_model_dir = gobbli_dir() / "model"
+        if base_model_dir.exists():
+            for model_dir in (gobbli_dir() / "model").iterdir():
+                for instance_dir in model_dir.iterdir():
+                    # Special directories containing cached weights or models
+                    # which are reusable -- don't delete them here
+                    if instance_dir.name not in ("cache", "weights"):
+                        shutil.rmtree(instance_dir)
 
 
 def pred_prob_to_pred_label(y_pred_proba: pd.DataFrame) -> List[str]:
@@ -115,7 +129,103 @@ def pred_prob_to_pred_label(y_pred_proba: pd.DataFrame) -> List[str]:
     Convert a dataframe of predicted probabilities (shape (n_samples, n_classes)) to
     a list of predicted classes.
     """
+    if len(y_pred_proba) == 0:
+        return []
+
     return y_pred_proba.idxmax(axis=1).tolist()
+
+
+def pred_prob_to_pred_multilabel(
+    y_pred_proba: pd.DataFrame, threshold: float = 0.5
+) -> pd.DataFrame:
+    """
+    Convert a dataframe of predicted probabilities (shape (n_samples, n_classes)) to
+    a dataframe of predicted label indicators (shape (n_samples, n_classes)).
+    """
+    return y_pred_proba > threshold
+
+
+def is_multilabel(y: Union[List[str], List[List[str]]]) -> bool:
+    """
+    Returns:
+      True if the passed dataset is formatted as a multilabel problem, otherwise false
+      (it's multiclass).
+    """
+    return len(y) > 0 and isinstance(y[0], list)
+
+
+def as_multilabel(
+    y: Union[List[str], List[List[str]]], is_multilabel: bool
+) -> List[List[str]]:
+    """
+    Returns:
+      Labels in multilabel format, validated against
+      possible mismatch between the multilabel attribute and data format.
+    """
+    if is_multilabel:
+        return cast(List[List[str]], y)
+    return multiclass_to_multilabel_target(cast(List[str], y))
+
+
+def as_multiclass(
+    y: Union[List[str], List[List[str]]], is_multilabel: bool
+) -> List[str]:
+    """
+    Returns:
+      Labels in multiclass format, validated against
+      possible mismatch between the multilabel attribute and data format.
+    """
+    if is_multilabel:
+        raise ValueError("Multilabel training input can't be converted to multiclass.")
+    return cast(List[str], y)
+
+
+def multiclass_to_multilabel_target(y: List[str]) -> List[List[str]]:
+    """
+    Args:
+      y: Multiclass-formatted target variable
+
+    Returns:
+      The multiclass-formatted variable generalized to a multilabel context
+    """
+    return [[l] for l in y]
+
+
+def multilabel_to_indicator_df(y: List[List[str]], labels: List[str]) -> pd.DataFrame:
+    """
+    Convert a list of label lists to a 0/1 indicator dataframe.
+
+    Args:
+      y: List of label lists
+      labels: List of all unique labels found in y
+
+    Returns:
+      The dataframe will have a column for each label and a row for each observation,
+      with a 1 if the observation has that label or a 0 if not.
+    """
+    mlb = MultiLabelBinarizer(classes=labels)
+    return pd.DataFrame(mlb.fit_transform(y), columns=mlb.classes_)
+
+
+def collect_labels(y: Any) -> List[str]:
+    """
+    Collect the unique labels in the given target variable, which could be in
+    multiclass or multilabel format.
+
+    Args:
+      y: Target variable
+
+    Returns:
+      An ordered list of all labels in y.
+    """
+    if is_multilabel(y):
+        label_set: Set[str] = set()
+        for labels in y:
+            label_set.update(labels)
+    else:
+        label_set = set(y)
+
+    return list(sorted(label_set))
 
 
 def truncate_text(text: str, length: int) -> str:

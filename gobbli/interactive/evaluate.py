@@ -53,7 +53,9 @@ def _show_example_predictions(
         pred_prob_order = row.sort_values(ascending=False)[:top_k]
         data = {"Document": truncate_text(texts[ndx], truncate_len)}
         if labels is not None:
-            data["True Label"] = labels[ndx]
+            y_true = labels[ndx]
+            column_header = "True Labels" if isinstance(y_true, list) else "True Label"
+            data[column_header] = y_true
 
         for i, (label, pred_prob) in enumerate(pred_prob_order.items()):
             data[f"Predicted Label {i+1}"] = f"{label} ({pred_prob:.3f})"
@@ -79,8 +81,15 @@ def _show_example_predictions(
             match = re.match(PRED_PROB_LABEL_RE, p)
             if match is None:
                 raise ValueError(f"Failed to parse predicted probability cell: {p}")
-            if match.group(1) == labels[ndx]:
-                # The cell corresponds to the true label
+
+            y_true = labels[ndx]
+            if isinstance(y_true, list):
+                is_match = match.group(1) in y_true
+            else:
+                is_match = match.group(1) == y_true
+
+            if is_match:
+                # The cell corresponds to a correct label
                 cell_style = true_label_style
             else:
                 cell_style = ""
@@ -119,13 +128,16 @@ def show_errors(errors: List[ClassificationError], truncate_len: int = 500):
     for e in errors:
         pred_class = max(e.y_pred_proba, key=e.y_pred_proba.get)
         pred_class_prob = e.y_pred_proba[pred_class]
+        true_column_header = (
+            "True Labels" if isinstance(e.y_true, list) else "True Label"
+        )
         df_data.append(
             # Use OrderedDict to preserve column order
             OrderedDict(
                 {
                     "Document": truncate_text(e.X, truncate_len),
-                    "True Label": e.y_true,
-                    "Predicted Label": f"{pred_class} ({pred_class_prob:.4f})",
+                    true_column_header: e.y_true,
+                    "Top Predicted Label": f"{pred_class} ({pred_class_prob:.4f})",
                 }
             )
         )
@@ -149,6 +161,20 @@ def show_errors(errors: List[ClassificationError], truncate_len: int = 500):
     help="Which device to run the model on. Defaults to CPU.",
 )
 @click.option(
+    "--multilabel/--multiclass",
+    default=False,
+    help="Only applies when reading user data from a file.  If --multilabel, each "
+    "observation may have multiple associated labels.  If --multiclass, only one label "
+    "is allowed per observation.  Defaults to --multiclass.",
+)
+@click.option(
+    "--multilabel-sep",
+    default=",",
+    help="Determines how the labels in the label column are separated for a multilabel "
+    "dataset read from a file.",
+    show_default=True,
+)
+@click.option(
     "--nvidia-visible-devices",
     default="all",
     help="Which GPUs to make available to the container; ignored if running on CPU. "
@@ -160,6 +186,8 @@ def run(
     data: str,
     n_rows: int,
     use_gpu: bool,
+    multilabel: bool,
+    multilabel_sep: str,
     nvidia_visible_devices: str,
 ):
     st.sidebar.header("Model")
@@ -172,7 +200,12 @@ def run(
     model = model_cls(**model_kwargs)
     st_model_metadata(model)
 
-    texts, labels = load_data(data, n_rows=None if n_rows == -1 else n_rows)
+    texts, labels = load_data(
+        data,
+        multilabel,
+        n_rows=None if n_rows == -1 else n_rows,
+        multilabel_sep=multilabel_sep,
+    )
     if labels is not None:
         label_indices = get_label_indices(labels)
 
@@ -181,12 +214,12 @@ def run(
 
     if labels is not None:
         dataset_labels = set(label_indices.keys())
-        if dataset_labels != set(checkpoint_labels):
-            st.error(
-                f"Labels for the dataset ({dataset_labels}) are different from the model checkpoint "
-                f"labels ({checkpoint_labels}).  They must match to evaluate the model."
+        if dataset_labels > set(checkpoint_labels):
+            st.warning(
+                "The dataset contains some labels that the model was not trained on.  No "
+                "predictions will be made for these labels: "
+                f"{dataset_labels - set(checkpoint_labels)}"
             )
-            return
 
     sampled_texts, sampled_labels = st_sample_data(texts, labels)
 
@@ -195,7 +228,7 @@ def run(
         "Batch Size",
         min_value=1,
         max_value=len(sampled_texts),
-        value=DEFAULT_PREDICT_BATCH_SIZE,
+        value=min(len(sampled_texts), DEFAULT_PREDICT_BATCH_SIZE),
     )
 
     y_pred_proba = get_predictions(
@@ -244,19 +277,12 @@ def run(
     )
 
     if labels is not None and evaluation is not None:
-        num_errors = int(
-            (pd.Series(evaluation.y_pred) != pd.Series(sampled_labels)).sum()
-        )
-
         st.sidebar.header("Errors")
         errors_label = st.sidebar.selectbox(
             "Label to Show Errors For", options=checkpoint_labels
         )
         errors_num_docs = st.sidebar.number_input(
-            "Number of Error Documents to Show",
-            min_value=1,
-            max_value=num_errors,
-            value=min(5, num_errors),
+            "Number of Error Documents to Show", min_value=1, max_value=None, value=5
         )
         errors_truncate_len = st.sidebar.number_input(
             "Error Document Truncate Length", min_value=1, max_value=None, value=500
@@ -265,6 +291,7 @@ def run(
         false_positives, false_negatives = evaluation.errors_for_label(
             errors_label, k=errors_num_docs
         )
+
         st.header(f"Top Model Errors: {errors_label}")
 
         st.subheader("False Positives")

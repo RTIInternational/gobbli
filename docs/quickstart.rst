@@ -11,13 +11,13 @@ Since deep learning models can take a long time to train, gobbli provides trivia
 
 We recommend scaffolding your code using one of these techniques before switching to a real model.  Here are the currently implemented models:
 
-- `Google's BERT <https://github.com/google-research/bert>`__: (:class:`gobbli.model.bert.BERT`) Supports training, prediction, and embedding generation.
-- `Microsoft's MT-DNN <https://github.com/namisan/mt-dnn>`__: (:class:`gobbli.model.mtdnn.MTDNN`) Supports training and prediction.
+- `Google's BERT <https://github.com/google-research/bert>`__: (:class:`gobbli.model.bert.BERT`) Supports training/prediction (multiclass) and embedding generation.
+- `Microsoft's MT-DNN <https://github.com/namisan/mt-dnn>`__: (:class:`gobbli.model.mtdnn.MTDNN`) Supports training/prediction (multiclass).
 - `Universal Sentence Encoder (USE) <https://tfhub.dev/google/universal-sentence-encoder/2>`__: (:class:`gobbli.model.use.USE`) Supports embedding generation.
-- `Facebook's fastText <https://github.com/facebookresearch/fastText>`__: (:class:`gobbli.model.fasttext.FastText`) Supports training, prediction, and embedding generation.
-- `transformer models <https://github.com/huggingface/transformers>`__: (:class:`gobbli.model.transformer.Transformer`) Models with a ``<model>ForSequenceClassification`` version implemented can be used for training, prediction, and embedding generation (ex. ``Bert``).  All other models can only be used for embedding generation.
-- `scikit-learn models <https://scikit-learn.org/stable/>`__: (:class:`gobbli.model.sklearn.SKLearnClassifier`) Any scikit-learn pipeline which accepts text input and outputs a predicted probability can be used as a gobbli model.  A simple default is implemented composing TF-IDF vectorization and logistic regression.  Baseline "embeddings" are also provided via a TF-IDF vectorizer (:class:`gobbli.model.sklearn.TfidfEmbedder`).
-- `spaCy models <https://spacy.io/>`__: (:class:`gobbli.model.spacy.SpaCyModel`) The text categorizer component of any spaCy language model (or spacy-transformers model) can be trained and used for prediction.  The spaCy model vectors can also be retrieved as static embeddings (pre-training not supported).
+- `Facebook's fastText <https://github.com/facebookresearch/fastText>`__: (:class:`gobbli.model.fasttext.FastText`) Supports training/prediction (multiclass and multilabel) and embedding generation.
+- `transformer models <https://github.com/huggingface/transformers>`__: (:class:`gobbli.model.transformer.Transformer`) Models with a ``<model>ForSequenceClassification`` version implemented can be used for training/prediction (multiclass and multilabel) and embedding generation (ex. ``Bert``).  All other models can only be used for embedding generation.
+- `scikit-learn models <https://scikit-learn.org/stable/>`__: (:class:`gobbli.model.sklearn.SKLearnClassifier`) Any scikit-learn pipeline which accepts text input and outputs a predicted probability can be used as a gobbli model.  A simple default is implemented composing TF-IDF vectorization and logistic regression.  Baseline "embeddings" are also provided via a TF-IDF vectorizer (:class:`gobbli.model.sklearn.TfidfEmbedder`).  Multilabel classification is supported by wrapping the passed classifier in a :class:`sklearn.multiclass.OneVsRestClassifier`.
+- `spaCy models <https://spacy.io/>`__: (:class:`gobbli.model.spacy.SpaCyModel`) The text categorizer component of any spaCy language model (or spacy-transformers model) can be trained and used for prediction (multiclass and multilabel).  The spaCy model vectors can also be retrieved as static embeddings (pre-training not supported).
 
 Most models can accept model-specific parameters during initialization.  See the documentation for each model's :meth:`init` method for information on model-specific parameters.
 
@@ -41,7 +41,7 @@ A high-level overview of each type of experiment follows.  For an overview of mo
 Classification Experiment
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This type of experiment is useful when you have a classification problem, or a set of documents with associated labels.  A :class:`gobbli.experiment.classification.ClassificationExperiment` requires a model and dataset.  The dataset can be either a :class:`gobbli.dataset.base.BaseDataset` derived class instance or an (X, y) tuple, where X is a list of strings, and y is a corresponding list of labels.  The dataset will be split into train, validation, and test sets.  Training will be run on the train set, evaluated on the validation set, and results on the test set will be reporting.
+This type of experiment is useful when you have a classification problem, or a set of documents with associated labels.  A :class:`gobbli.experiment.classification.ClassificationExperiment` requires a model and dataset.  The dataset can be either a :class:`gobbli.dataset.base.BaseDataset` derived class instance or an (X, y) tuple, where X is a list of strings, and y is a corresponding list of labels (or, for multilabel classification, a list of lists of labels).  The dataset will be split into train, validation, and test sets.  Training will be run on the train set, evaluated on the validation set, and results on the test set will be reporting.
 
 To run an experiment: ::
 
@@ -70,6 +70,18 @@ To run an experiment: ::
       "Bad",
   ]
 
+  # Example multilabel format
+  y_multilabel = [
+      ["Fancy", "Cool"],
+      ["Scary"],
+      [],
+      ["Boring"],
+      [],
+      ["Cool"],
+      ["Fancy"],
+      ["Scary", "Cool"],
+  ]
+
   exp = ClassificationExperiment(
     model_cls=MajorityClassifier,
     dataset=(X, y)
@@ -91,7 +103,7 @@ Training
 
 Deep learning models can generally be fine-tuned on a user's specific problem after having been pretrained on a large, general dataset.  Training enables the model to develop an internal representation more suited to the nuances of a given problem.  We generally train models in a classification paradigm, encouraging them to learn to predict a set of labels.
 
-Most gobbli models can be trained. First, create your training input. ::
+Most gobbli models can be trained. First, create your training input. Multilabel classification is also transparently supported; just pass a list of lists of labels instead of a list containing a single label for each document. ::
 
   from gobbli.io import TrainInput
 
@@ -101,6 +113,8 @@ Most gobbli models can be trained. First, create your training input. ::
                "This is another training document."],
       # y_train: The true class for each string in X_train
       y_train=["0", "1"],
+      # Use the below data format for multilabel classification
+      # y_train=[["0"], ["0", "1"]]
       # And likewise for validation
       X_valid=["This is a validation sentence.",
                "This is another validation sentence."],
@@ -131,7 +145,7 @@ Training is generally used to enhance performance on other tasks, such as classi
 Predicting
 ^^^^^^^^^^^
 
-Classification models predict whether the input falls into one of several predetermined classes.
+Classification models predict whether the input falls into one of several predetermined classes (or, for a multilabel model, which of several labels apply).
 
 With a trained model, we can make predictions. ::
 
@@ -140,10 +154,11 @@ With a trained model, we can make predictions. ::
   predict_input = PredictInput(
       # X: A list of strings to predict the trained classes for
       X=["Which class is this document?"],
-      # Pass the set of labels and the trained checkpoint
-      # from the training output
+      # Pass the set of labels, trained checkpoint, and
+      # whether the model was multilabel from the training output
       labels=train_output.labels,
       checkpoint=train_output.checkpoint,
+      multilabel=train_output.multilabel,
       # Number of documents to predict at once
       predict_batch_size=1
   )

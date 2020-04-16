@@ -15,6 +15,7 @@ Here are some general things to know about the gobbli interactive apps:
  - Since the entire app re-runs with every input widget change, the apps default to taking a small sample of data so you can tweak parameters without locking up your browser on long-running tasks. You can increase the sample size when you have everything set the way you want.
  - All the normal gobbli output goes to the terminal window running Streamlit. Check the terminal to see status of long-running tasks that involve use of a model (embedding generation, prediction, etc).
  - We attempt to cache long-running task results as much as possible, but re-running costly tasks is required in many cases when parameters change.
+ - Use ``gobbli <app_name> -- --help`` to see information on allowed arguments for each app, including enabling GPU usage and multilabel classification support.
 
 explore
 -------
@@ -27,6 +28,8 @@ The explore app requires a dataset. The dataset can be one of a few formats (not
  - A text file with one document per line
  - A ``.csv`` file with a "text" column and optional "label" column
  - A ``.tsv`` file with a "text" column and optional "label" column
+
+Labels can be multiclass (single label per row) or multilabel (multiple labels per row).  Use the ``--multilabel`` and ``--multilabel-sep`` arguments to the apps to let gobbli know if and how you're giving it a multilabel dataset from a file.
 
 Some functionality won't appear for datasets without labels. If you don't have your own dataset handy, the following invocation will work out of the box:
 

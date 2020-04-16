@@ -9,13 +9,12 @@ from gobbli.io import (
     WindowPooling,
     make_document_windows,
     pool_document_windows,
+    validate_multilabel_y,
     validate_X,
     validate_X_y,
-    validate_y,
 )
 
 
-@pytest.mark.parametrize("val_func", [validate_X, validate_y])
 @pytest.mark.parametrize(
     "obj,err_class",
     [
@@ -33,12 +32,57 @@ from gobbli.io import (
         ([], None),
     ],
 )
-def test_validate_input(obj, err_class, val_func):
+def test_validate_X(obj, err_class):
     if err_class is None:
-        val_func(obj)
+        validate_X(obj)
     else:
         with pytest.raises(err_class):
-            val_func(obj)
+            validate_X(obj)
+
+
+@pytest.mark.parametrize(
+    "multilabel,obj,err_class",
+    [
+        # Wrong collection type (series)
+        (False, pd.Series(["a"]), TypeError),
+        # Wrong collection type (numpy array)
+        (False, np.array([["a"]]), TypeError),
+        # Wrong type (list of str)
+        (False, [["a"]], TypeError),
+        # Wrong type (float)
+        (False, [1.0], TypeError),
+        # Wrong type (list of float)
+        (False, [[1.0]], TypeError),
+        # Wrong type (empty list)
+        (False, [[]], TypeError),
+        # Correct type (str)
+        (False, ["1"], None),
+        # Empty
+        (False, [], None),
+        # Wrong collection type (series)
+        (True, pd.Series(["a"]), TypeError),
+        # Wrong collection type (numpy array)
+        (True, np.array([["a"]]), TypeError),
+        # Wrong type (float)
+        (True, [1.0], TypeError),
+        # Wrong type (str)
+        (True, ["1"], TypeError),
+        # Wrong type (list of float)
+        (True, [[1.0]], TypeError),
+        # Correct type (list of str)
+        (True, [["a"]], None),
+        # Empty label
+        (True, [[]], None),
+        # Empty
+        (True, [], None),
+    ],
+)
+def test_validate_multilabel_y(multilabel, obj, err_class):
+    if err_class is None:
+        validate_multilabel_y(obj, multilabel)
+    else:
+        with pytest.raises(err_class):
+            validate_multilabel_y(obj, multilabel)
 
 
 @pytest.mark.parametrize(
@@ -171,7 +215,7 @@ def test_pool_document_windows_validation():
 
     # Train output is unsupported
     train_output = TrainOutput(
-        valid_loss=0.0, valid_accuracy=0.0, train_loss=0.0, labels=[]
+        valid_loss=0.0, valid_accuracy=0.0, train_loss=0.0, labels=[], multilabel=False
     )
     with pytest.raises(TypeError):
         pool_document_windows(train_output, [])

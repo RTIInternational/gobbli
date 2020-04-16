@@ -179,14 +179,19 @@ class MTDNN(BaseModel, TrainMixin, PredictMixin):
     def _train(
         self, train_input: gobbli.io.TrainInput, context: ContainerTaskContext
     ) -> gobbli.io.TrainOutput:
+        if train_input.multilabel:
+            raise ValueError(
+                "gobbli MT-DNN model doesn't support multilabel classification."
+            )
+
         self._write_input(
             train_input.X_train,
-            train_input.y_train,
+            train_input.y_train_multiclass,
             context.host_input_dir / MTDNN._TRAIN_INPUT_FILE,
         )
         self._write_input(
             train_input.X_valid,
-            train_input.y_valid,
+            train_input.y_valid_multiclass,
             context.host_input_dir / MTDNN._VALID_INPUT_FILE,
         )
 
@@ -253,6 +258,7 @@ class MTDNN(BaseModel, TrainMixin, PredictMixin):
             valid_accuracy=eval_results["valid_metrics"]["accuracy"] / 100,
             train_loss=eval_results["train_metrics"]["loss"],
             labels=labels,
+            multilabel=False,
             checkpoint=context.host_output_dir / f"model_{final_epoch}.pt",
             _console_output=container_logs,
         )
