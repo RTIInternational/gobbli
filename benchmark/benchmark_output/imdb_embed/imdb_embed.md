@@ -96,3 +96,10 @@
 
 ![Results](USE/plot.png)
 ---
+# Results: ELECTRA
+```
+
+```
+
+![Results](ELECTRA/plot.png)
+---
