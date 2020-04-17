@@ -256,6 +256,9 @@ def safe_sample(l: Sequence[T], n: int, seed: Optional[int] = None) -> List[T]:
     return list(random.sample(l, min(n, len(l))))
 
 
+DEFAULT_SAMPLE_SIZE = 100
+
+
 def st_sample_data(
     texts: List[str], labels: Optional[List[str]]
 ) -> Tuple[List[str], Optional[List[str]]]:
@@ -269,6 +272,9 @@ def st_sample_data(
     Returns:
       2-tuple: the list of sampled texts and list of sampled labels.
     """
+    if len(texts) <= DEFAULT_SAMPLE_SIZE:
+        return texts[:], labels[:]
+
     st.sidebar.header("Sample")
 
     if st.sidebar.button("Randomize Seed"):
@@ -278,7 +284,10 @@ def st_sample_data(
     sample_seed = st.sidebar.number_input("Sample Seed", value=default_seed)
 
     sample_size = st.sidebar.slider(
-        "Sample Size", min_value=1, max_value=len(texts), value=min(100, len(texts))
+        "Sample Size",
+        min_value=1,
+        max_value=len(texts),
+        value=min(DEFAULT_SAMPLE_SIZE, len(texts)),
     )
 
     sample_indices = safe_sample(range(len(texts)), sample_size, seed=sample_seed)
