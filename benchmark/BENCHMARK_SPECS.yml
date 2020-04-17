@@ -172,6 +172,12 @@
       model_name: "USE"
       model_params:
         use_model: "universal-sentence-encoder"
+    - name: "ELECTRA"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "google/electra-base-discriminator"
+        transformer_model: "Electra"
+      preprocess_func: "bert_preprocess"
 
 
 - scenario: "imdb"
@@ -416,6 +422,12 @@
       model_name: "USE"
       model_params:
         use_model: "universal-sentence-encoder"
+    - name: "ELECTRA"
+      model_name: "Transformer"
+      model_params:
+        transformer_weights: "google/electra-base-discriminator"
+        transformer_model: "Electra"
+      preprocess_func: "bert_preprocess"
 
 - scenario: "class_imbalance"
   params:
