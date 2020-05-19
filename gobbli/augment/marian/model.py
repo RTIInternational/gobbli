@@ -23,63 +23,125 @@ class MarianMT(BaseModel, BaseAugment):
 
     _CONTAINER_CACHE_DIR = Path("/cache")
 
-    MARIAN_MODEL = "Helsinki-NLP/opus-mt-en-ROMANCE"
-    MARIAN_INVERSE_MODEL = "Helsinki-NLP/opus-mt-ROMANCE-en"
-
-    # Hardcoded list based on the languages available in the en-ROMANCE model
-    # https://huggingface.co/Helsinki-NLP/opus-mt-en-ROMANCE
-    ALL_TARGET_LANGUAGES = set(
-        (
-            "fr",
-            "fr_BE",
-            "fr_CA",
-            "fr_FR",
-            "wa",
-            "frp",
-            "oc",
-            "ca",
-            "rm",
-            "lld",
-            "fur",
-            "lij",
-            "lmo",
-            "es",
-            "es_AR",
-            "es_CL",
-            "es_CO",
-            "es_CR",
-            "es_DO",
-            "es_EC",
-            "es_ES",
-            "es_GT",
-            "es_HN",
-            "es_MX",
-            "es_NI",
-            "es_PA",
-            "es_PE",
-            "es_PR",
-            "es_SV",
-            "es_UY",
-            "es_VE",
-            "pt",
-            "pt_br",
-            "pt_BR",
-            "pt_PT",
-            "gl",
-            "lad",
-            "an",
-            "mwl",
-            "it",
-            "it_IT",
-            "co",
-            "nap",
-            "scn",
-            "vec",
-            "sc",
-            "ro",
-            "la",
-        )
-    )
+    # Hardcoded list based on the languages available in various models
+    # Ignore models that translate multiple languages because they have
+    # a different API (texts require a >>lang_code<< prelude describing
+    # which language to translate to)
+    # https://huggingface.co/models?search=opus-mt-en&sort=alphabetical
+    # The below mapping was reconstructed manually using various resources
+    # including ISO language codes, Google Translate auto-detect,
+    # and the JWS docs from Opus: http://opus.nlpl.eu/JW300.php (see languages.json)
+    LANGUAGE_CODE_MAPPING = {
+        "afrikaans": "af",
+        "central-bikol": "bcl",
+        "bemba": "bem",
+        "berber": "ber",
+        "bulgarian": "bg",
+        "bislama": "bi",
+        # BZS stands for Brazilian Sign Language, but the text
+        # looks like Portugese, and there's no other model for Portugese
+        "portugese": "bzs",
+        "catalan": "ca",
+        "cebuano": "ceb",
+        "chuukese": "chk",
+        "seychelles-creole": "crs",
+        "czech": "cs",
+        "welsh": "cy",
+        "danish": "da",
+        "german": "de",
+        "ewe": "ee",
+        "efik": "efi",
+        "greek": "el",
+        "esperanto": "eo",
+        "estonian": "et",
+        "basque": "eu",
+        "finnish": "fi",
+        "fijian": "fj",
+        "french": "fr",
+        "irish": "ga",
+        "ga": "gaa",
+        "gilbertese": "gil",
+        "galician": "gl",
+        "gun": "guw",
+        "manx": "gv",
+        "hausa": "ha",
+        "hebrew": "he",
+        "hiligaynon": "hil",
+        "hiri-motu": "ho",
+        "haitian": "ht",
+        "hungarian": "hu",
+        "indonesian": "id",
+        "igbo": "ig",
+        "iloko": "ilo",
+        "icelandic": "is",
+        "isoko": "iso",
+        "italian": "it",
+        "japanese": "jap",
+        "kongo": "kg",
+        "kuanyama": "kj",
+        "kikaonde": "kqn",
+        "kwangali": "kwn",
+        "kikongo": "kwy",
+        "luganda": "lg",
+        "lingala": "ln",
+        "silozi": "loz",
+        "kiluba": "lu",
+        "tshiluba": "lua",
+        "luvale": "lue",
+        "lunda": "lun",
+        "luo": "luo",
+        "mizo": "lus",
+        "mauritian-creole": "mfe",
+        "malagasy": "mg",
+        "marshallese": "mh",
+        "macedonian": "mk",
+        "malayalam": "ml",
+        "moore": "mos",
+        "marathi": "mr",
+        "maltese": "mt",
+        "ndonga": "ng",
+        "niuean": "niu",
+        "dutch": "nl",
+        "sepedi": "nso",
+        "chichewa": "ny",
+        "nyaneka": "nyk",
+        "oromo": "om",
+        "pangasinan": "pag",
+        "papiamento": "pap",
+        "solomon-islands-pidgin": "pis",
+        "ponapean": "pon",
+        "uruund": "rnd",
+        "romanian": "ro",
+        "russian": "ru",
+        "kirundi": "run",
+        "kinyarwanda": "rw",
+        "sango": "sg",
+        "slovak": "sk",
+        "samoan": "sm",
+        "shona": "sn",
+        "albanian": "sq",
+        "swati": "ss",
+        "sesotho-lesotho": "st",
+        "swedish": "sv",
+        "swahili": "sw",
+        "swahili-congo": "swc",
+        "tetun-dili": "tdt",
+        "tigrinya": "ti",
+        "tiv": "tiv",
+        "tagalog": "tl",
+        "otetela": "tll",
+        "setswana": "tn",
+        "tongan": "to",
+        "chitonga": "toi",
+        "tok-pisin": "tpi",
+        "tsonga": "ts",
+        "tuvaluan": "tvl",
+        "twi": "tw",
+        "tahitian": "ty",
+        "ukrainian": "uk",
+        "umbundu": "umb",
+        "xhosa": "xh",
+    }
 
     def init(self, params: Dict[str, Any]):
         """
@@ -96,7 +158,10 @@ class MarianMT(BaseModel, BaseAugment):
           for documentation about the abbreviations.
         """
         self.batch_size = 32
-        self.target_languages = ["es", "fr", "it", "pt", "ro"]
+        # Current default - top 5 lanugages in Wikipedia which are also available
+        # in the list of target languages
+        # https://en.wikipedia.org/wiki/List_of_Wikipedias#List
+        self.target_languages = ["french", "german", "japanese", "russian", "italian"]
 
         for name, value in params.items():
             if name == "batch_size":
@@ -107,10 +172,10 @@ class MarianMT(BaseModel, BaseAugment):
             elif name == "target_languages":
                 assert_type(name, value, list)
                 for target in value:
-                    if target not in self.ALL_TARGET_LANGUAGES:
+                    if target not in MarianMT.LANGUAGE_CODE_MAPPING:
                         raise ValueError(
-                            f"invalid target language '{value}'. Valid values are "
-                            f"{self.ALL_TARGET_LANGUAGES}"
+                            f"invalid target language '{target}'. Valid values are "
+                            f"{list(MarianMT.LANGUAGE_CODE_MAPPING.keys())}"
                         )
                 self.target_languages = value
             else:
@@ -124,6 +189,24 @@ class MarianMT(BaseModel, BaseAugment):
         """
         return f"gobbli-marian-nmt"
 
+    @classmethod
+    def marian_model(cls, language: str) -> str:
+        """
+        Returns:
+          Name of the Marian MT model to use to translate English
+          to the passed language.
+        """
+        return f"Helsinki-NLP/opus-mt-en-{cls.LANGUAGE_CODE_MAPPING[language]}"
+
+    @classmethod
+    def marian_inverse_model(cls, language: str) -> str:
+        """
+        Returns:
+          Name of the Marian MT model to use to translate the passed language
+          back to English.
+        """
+        return f"Helsinki-NLP/opus-mt-{cls.LANGUAGE_CODE_MAPPING[language]}-en"
+
     def _build(self):
         self.docker_client.images.build(
             path=str(MarianMT._BUILD_PATH),
@@ -136,12 +219,7 @@ class MarianMT(BaseModel, BaseAugment):
         Write the user input to a file for the container to read.
         """
         input_path = context.host_input_dir / MarianMT._INPUT_FILE
-        expanded_texts = []
-        for language in self.target_languages:
-            for text in X:
-                expanded_texts.append(f">>{language}<< {text}")
-
-        input_path.write_text(escape_line_delimited_texts(expanded_texts))
+        input_path.write_text(escape_line_delimited_texts(X))
 
     def _read_output(self, context: ContainerTaskContext) -> List[str]:
         """
@@ -186,25 +264,31 @@ class MarianMT(BaseModel, BaseAugment):
                 device_num = self.nvidia_visible_devices.split(",")[0]
                 device = f"cuda:{device_num}"
 
-        cmd = (
-            "python3 backtranslate_text.py"
-            f" {context.container_input_dir / MarianMT._INPUT_FILE}"
-            f" {context.container_output_dir / MarianMT._OUTPUT_FILE}"
-            f" --batch-size {self.batch_size}"
-            f" --cache-dir {MarianMT._CONTAINER_CACHE_DIR}"
-            f" --device {device}"
-            f" --marian-model {MarianMT.MARIAN_MODEL}"
-            f" --marian-inverse-model {MarianMT.MARIAN_INVERSE_MODEL}"
-        )
+        augmented_texts = []
+        for language in self.target_languages:
+            cmd = (
+                "python3 backtranslate_text.py"
+                f" {context.container_input_dir / MarianMT._INPUT_FILE}"
+                f" {context.container_output_dir / MarianMT._OUTPUT_FILE}"
+                f" --batch-size {self.batch_size}"
+                f" --cache-dir {MarianMT._CONTAINER_CACHE_DIR}"
+                f" --device {device}"
+                f" --marian-model {MarianMT.marian_model(language)}"
+                f" --marian-inverse-model {MarianMT.marian_inverse_model(language)}"
+            )
 
-        run_kwargs = self._base_docker_run_kwargs(context)
+            run_kwargs = self._base_docker_run_kwargs(context)
 
-        maybe_mount(
-            run_kwargs["volumes"], self.host_cache_dir, MarianMT._CONTAINER_CACHE_DIR
-        )
+            maybe_mount(
+                run_kwargs["volumes"],
+                self.host_cache_dir,
+                MarianMT._CONTAINER_CACHE_DIR,
+            )
 
-        run_container(
-            self.docker_client, self.image_tag, cmd, self.logger, **run_kwargs
-        )
+            run_container(
+                self.docker_client, self.image_tag, cmd, self.logger, **run_kwargs
+            )
 
-        return self._read_output(context)
+            augmented_texts.extend(self._read_output(context))
+
+        return augmented_texts
