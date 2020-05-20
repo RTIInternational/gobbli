@@ -1,6 +1,6 @@
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from gobbli.augment.base import BaseAugment
 from gobbli.docker import maybe_mount, run_container
@@ -51,7 +51,6 @@ class MarianMT(BaseModel, BaseAugment):
         "german": "de",
         "ewe": "ee",
         "efik": "efi",
-        "greek": "el",
         "esperanto": "eo",
         "estonian": "et",
         "basque": "eu",
@@ -65,7 +64,6 @@ class MarianMT(BaseModel, BaseAugment):
         "gun": "guw",
         "manx": "gv",
         "hausa": "ha",
-        "hebrew": "he",
         "hiligaynon": "hil",
         "hiri-motu": "ho",
         "haitian": "ht",
@@ -111,7 +109,6 @@ class MarianMT(BaseModel, BaseAugment):
         "solomon-islands-pidgin": "pis",
         "ponapean": "pon",
         "uruund": "rnd",
-        "romanian": "ro",
         "russian": "ru",
         "kirundi": "run",
         "kinyarwanda": "rw",
@@ -123,9 +120,7 @@ class MarianMT(BaseModel, BaseAugment):
         "swati": "ss",
         "sesotho-lesotho": "st",
         "swedish": "sv",
-        "swahili": "sw",
         "swahili-congo": "swc",
-        "tetun-dili": "tdt",
         "tigrinya": "ti",
         "tiv": "tiv",
         "tagalog": "tl",
@@ -136,8 +131,6 @@ class MarianMT(BaseModel, BaseAugment):
         "tok-pisin": "tpi",
         "tsonga": "ts",
         "tuvaluan": "tvl",
-        "twi": "tw",
-        "tahitian": "ty",
         "ukrainian": "uk",
         "umbundu": "umb",
         "xhosa": "xh",
@@ -151,11 +144,10 @@ class MarianMT(BaseModel, BaseAugment):
 
         - ``batch_size``: Number of documents to run through the Marian model at once.
         - ``target_languages``: List of target languages to translate texts to and back.
-          One copy of each text will be generated for each target language.
-          See :attr:`MarianMT.ALL_TARGET_LANGUAGES` for a full list of possible values.  See
-          https://github.com/Helsinki-NLP/OPUS-MT-train/blame/198c779e91555594d76484109aaccee344b85aec/NOTES.md
-          and https://github.com/Helsinki-NLP/OPUS-MT-train/blob/37a83a9eba4fdb73d0311356eadd9e0610139970/backtranslate/Makefile#L647
-          for documentation about the abbreviations.
+          See :attr:`MarianMT.ALL_TARGET_LANGUAGES` for a full list of possible values. You may
+          only augment texts up to the number of languages specified, since each language
+          will be used at most once.  So if you want to augment 5 times, you need to specify
+          at least 5 languages when initializing the model.
         """
         self.batch_size = 32
         # Current default - top 5 lanugages in Wikipedia which are also available
@@ -179,7 +171,7 @@ class MarianMT(BaseModel, BaseAugment):
                         )
                 self.target_languages = value
             else:
-                raise ValueError(f"Unknown praam '{name}'")
+                raise ValueError(f"Unknown param '{name}'")
 
     @property
     def image_tag(self) -> str:
@@ -239,11 +231,17 @@ class MarianMT(BaseModel, BaseAugment):
         cache_dir.mkdir(exist_ok=True, parents=True)
         return cache_dir
 
-    def augment(self, X: List[str], times: int = None, p: float = None) -> List[str]:
-        if times is not None:
-            warnings.warn(
-                "MarianMT generates a number of times based on the target_languages parameter, "
-                "so the 'times' parameter will be ignored."
+    def augment(
+        self, X: List[str], times: Optional[int] = None, p: float = None
+    ) -> List[str]:
+        if times is None:
+            times = len(self.target_languages)
+
+        if times > len(self.target_languages):
+            raise ValueError(
+                "MarianMT was asked to augment {len(times)} times but was only initialized with "
+                "{len(self.target_languages)} target languages.  You must specify at least as "
+                "many target languages as the number of times you'd like to augment."
             )
         if p is not None:
             warnings.warn(
@@ -265,7 +263,8 @@ class MarianMT(BaseModel, BaseAugment):
                 device = f"cuda:{device_num}"
 
         augmented_texts = []
-        for language in self.target_languages:
+        for i in range(times):
+            language = self.target_languages[i]
             cmd = (
                 "python3 backtranslate_text.py"
                 f" {context.container_input_dir / MarianMT._INPUT_FILE}"

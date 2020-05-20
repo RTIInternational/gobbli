@@ -43,5 +43,11 @@ def test_marianmt_augment(model_gpu_config, gobbli_dir):
     )
     model.build()
 
-    new_texts = model.augment(["This is a test."])
-    assert len(new_texts) == len(target_languages)
+    # Can't augment more times than target languages
+    invalid_num_times = len(target_languages) + 1
+    with pytest.raises(ValueError):
+        model.augment(["This is a test."], times=invalid_num_times)
+
+    valid_num_times = len(target_languages)
+    new_texts = model.augment(["This is a test."], times=valid_num_times)
+    assert len(new_texts) == valid_num_times

@@ -90,15 +90,21 @@ if __name__ == "__main__":
         with open(args.output_file, "w", encoding="utf-8") as f_out:
             batches = list(batch_list(f_in.readlines(), args.batch_size))
             for batch_id, batch in enumerate(batches):
+                # Explicit max length needed to make the tokenizer cut off at the max length
+                # Otherwise we get potential index errors running the texts through the models
                 translated = model.generate(
-                    **tokenizer.prepare_translation_batch(batch)
+                    **tokenizer.prepare_translation_batch(
+                        batch, max_length=tokenizer.model_max_length
+                    ).to(args.device)
                 )
                 translated_texts = [
                     tokenizer.decode(t, skip_special_tokens=True) for t in translated
                 ]
 
                 backtranslated = inv_model.generate(
-                    **inv_tokenizer.prepare_translation_batch(translated_texts)
+                    **inv_tokenizer.prepare_translation_batch(
+                        translated_texts, max_length=inv_tokenizer.model_max_length
+                    ).to(args.device)
                 )
                 backtranslated_texts = [
                     inv_tokenizer.decode(t, skip_special_tokens=True)
