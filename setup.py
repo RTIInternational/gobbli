@@ -31,7 +31,7 @@ setup(
         "numpy >= 1.16.0",
         "pandas >= 0.24.0",
         "scikit-learn >= 0.22.0",
-        "ray >= 0.7.3",
+        "ray >= 0.8.4",
         "altair >= 3.2.0",
         "click >= 7.0",
         "humanize >= 1.1.0",
