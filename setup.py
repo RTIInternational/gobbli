@@ -38,7 +38,7 @@ setup(
     ],
     extras_require={
         "augment": ["nltk>=3.4.4", "gensim>=3.8.2", "spacy>=2.1.4"],
-        "tokenize": ["sentencepiece >= v0.1.83"],
+        "tokenize": ["sentencepiece >= 0.1.83, < 0.1.90"],
         "interactive": [
             "streamlit >= 0.56.0",
             "gensim >= 3.8.2",
