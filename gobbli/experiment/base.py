@@ -67,17 +67,8 @@ def get_worker_ip() -> str:
     Returns:
       A string containing the IP address.
     """
-    global_worker = ray.worker.get_global_worker()
+    global_worker = ray.worker.global_worker
     return getattr(global_worker, "node_ip_address", "127.0.0.1")
-
-
-def is_ray_local_mode() -> bool:
-    """
-    Determine whether the current global ray worker is running in local mode.
-    Returns:
-      True if we're running in local mode.
-    """
-    return ray.worker.get_global_worker().mode == ray.worker.LOCAL_MODE
 
 
 class BaseExperiment(ABC):
@@ -206,6 +197,8 @@ class BaseExperiment(ABC):
         _ray_kwargs = ray_kwargs
         if _ray_kwargs is None:
             _ray_kwargs = {}
+
+        self.is_ray_local_mode = _ray_kwargs.get("local_mode", False)
 
         # We may have an existing ray connection active -- throw an error or
         # clear it out to ensure it's re-initialized with the passed params

@@ -119,7 +119,13 @@ def test_classification_run_validation(bad_value):
         (
             FastText,
             NewsgroupsDataset,
-            {"lr": [0.1, 0.01], "autotune_duration": [5]},
+            {
+                "lr": [0.1, 0.01],
+                "ws": [5],
+                "dim": [50],
+                "word_ngrams": [1],
+                "autotune_duration": [5],
+            },
             200,
             False,
         ),
@@ -127,7 +133,13 @@ def test_classification_run_validation(bad_value):
         (
             FastText,
             MovieSummaryDataset,
-            {"lr": [0.1, 0.01], "autotune_duration": [5]},
+            {
+                "lr": [0.1, 0.01],
+                "ws": [5],
+                "dim": [50],
+                "word_ngrams": [1],
+                "autotune_duration": [5],
+            },
             200,
             False,
         ),
@@ -156,7 +168,7 @@ def test_classification_run(
         worker_log_level=request.config.getoption("worker_log_level"),
         limit=limit,
         ignore_ray_initialized_error=True,
-        ray_kwargs={"local_mode": ray_local_mode},
+        ray_kwargs={"local_mode": ray_local_mode, "include_webui": False},
     )
 
     results = exp.run()
