@@ -35,5 +35,6 @@ rsync -raz \
 
 ssh "$ssh_string" "cd $remote_repo_dir/ci-gpu \
     && export NVIDIA_VISIBLE_DEVICES=$visible_gpus \
+    && export PYTHON_VERSION=3.7 \
     && docker-compose build gobbli-ci-gpu \
     && docker-compose run --rm gobbli-ci-gpu"

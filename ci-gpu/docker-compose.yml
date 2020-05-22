@@ -4,7 +4,10 @@ services:
   gobbli-ci-gpu:
     runtime: nvidia
     ipc: host
-    build: ../
+    build:
+      context: ../
+      args:
+        PYTHON_VERSION: "${PYTHON_VERSION:?Must specify Python version.}"
     image: gobbli-ci:latest
     environment:
       NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}

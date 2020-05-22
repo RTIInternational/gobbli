@@ -2,7 +2,10 @@ version: "3.3"
 
 services:
   gobbli-ci:
-    build: ../
+    build:
+      context: ../
+      args:
+        PYTHON_VERSION: "${PYTHON_VERSION:?Must specify Python version.}"
     image: gobbli-ci:latest
     # Travis only gives us ~7.5GB of memory, so we need to run tests in
     # low resource mode
