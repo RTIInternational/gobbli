@@ -1,7 +1,7 @@
 flake8==3.7.7
 mypy==0.720
 pytest==4.5.0
-ray[debug]==0.7.3
+ray[debug]==0.8.5
 aiohttp==3.5.4
 importmagic==0.1.7
 epc==0.0.5

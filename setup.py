@@ -31,14 +31,14 @@ setup(
         "numpy >= 1.16.0",
         "pandas >= 0.24.0",
         "scikit-learn >= 0.22.0",
-        "ray >= 0.7.3",
+        "ray >= 0.8.4",
         "altair >= 3.2.0",
         "click >= 7.0",
         "humanize >= 1.1.0",
     ],
     extras_require={
         "augment": ["nltk>=3.4.4", "gensim>=3.8.2", "spacy>=2.1.4"],
-        "tokenize": ["sentencepiece >= v0.1.83"],
+        "tokenize": ["sentencepiece >= 0.1.83, < 0.1.90"],
         "interactive": [
             "streamlit >= 0.56.0",
             "gensim >= 3.8.2",
@@ -57,6 +57,7 @@ setup(
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Topic :: Scientific/Engineering",
     ],
 )
