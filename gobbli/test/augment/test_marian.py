@@ -18,9 +18,9 @@ from gobbli.test.util import model_test_dir
         # Bad value (target_languages)
         ({"target_languages": ["not a language"]}, ValueError),
         # Bad value, one OK value (target_languages)
-        ({"target_languages": ["spanish", "not a language"]}, ValueError),
+        ({"target_languages": ["french", "not a language"]}, ValueError),
         # OK values
-        ({"batch_size": 16, "target_languages": ["spanish", "french"]}, None),
+        ({"batch_size": 16, "target_languages": ["russian", "french"]}, None),
     ],
 )
 def test_init(params, exception):
