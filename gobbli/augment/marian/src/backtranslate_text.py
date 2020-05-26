@@ -27,7 +27,9 @@ if __name__ == "__main__":
         help="Marian model to use. "
         "Can be one of the pretrained names supported by transformers, in which case "
         "the pretrained weights will be downloaded. "
-        "Anything else supported by transformers should work as well.",
+        "Anything else supported by transformers should work as well. "
+        "Note an inverse model is required, so a custom model will need a corresponding "
+        "inverse to translate in the other direction.",
         required=True,
     )
     parser.add_argument(
@@ -40,7 +42,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--batch-size",
-        help="Number of documents to run through the BERT model at once.",
+        help="Number of documents to run through the model at once.",
         type=int,
         default=32,
     )
