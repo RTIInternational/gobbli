@@ -644,6 +644,13 @@
       params: {}
     - augment_name: "BERTMaskedLM"
       params: {}
+    - augment_name: "MarianMT"
+      params:
+        # Need as many languages as the largest multiplier used above
+        # Top x available in MarianMT by descending popularity on Wikipedia as a
+        # rough proxy for best-supported languages
+        # https://en.wikipedia.org/wiki/List_of_Wikipedias
+        target_languages: ["french", "german", "japanese", "russian", "italian", "portugese", "dutch", "indonesian", "ukrainian", "swedish"]
 
 - scenario: "document_windowing"
   params:
