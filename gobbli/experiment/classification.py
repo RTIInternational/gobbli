@@ -18,7 +18,6 @@ from gobbli.experiment.base import (
     get_worker_ip,
     init_gpu_config,
     init_worker_env,
-    is_ray_local_mode,
 )
 from gobbli.inspect.evaluate import ClassificationError, ClassificationEvaluation
 from gobbli.model.mixin import PredictMixin, TrainMixin
@@ -296,13 +295,7 @@ class ClassificationExperiment(BaseExperiment):
         if len(grid) == 0:
             raise ValueError("empty parameter grid")
 
-        # Transfer datasets to the Ray distributed object store
-        # if not running in local mode
-        # In local mode, this causes problems: https://github.com/ray-project/ray/issues/5379
-        if is_ray_local_mode():
-            dataset_ids = [X_train, y_train, X_valid, y_valid]
-        else:
-            dataset_ids = [ray.put(d) for d in (X_train, y_train, X_valid, y_valid)]
+        dataset_ids = [ray.put(d) for d in (X_train, y_train, X_valid, y_valid)]
 
         # Return the checkpoint blob separately from the train result so it doesn't
         # have to be copied to the object store again when used by the predict function
@@ -317,17 +310,16 @@ class ClassificationExperiment(BaseExperiment):
             num_train_epochs: int,
             model_cls: Any,
             model_params: Dict[str, Any],
-            master_ip: str,
             gobbli_dir: Optional[Path] = None,
             log_level: Union[int, str] = logging.WARNING,
+            local_mode: bool = False,
             distributed: bool = False,
         ) -> RemoteTrainResult:
 
             logger = init_worker_env(gobbli_dir=gobbli_dir, log_level=log_level)
             use_gpu, nvidia_visible_devices = init_gpu_config()
 
-            worker_ip = get_worker_ip()
-            if not distributed and worker_ip != master_ip:
+            if not distributed and len(ray.nodes()) > 1:
                 raise RuntimeError(
                     "Experiments must be started with distributed = True to run "
                     "tasks on remote workers."
@@ -362,8 +354,11 @@ class ClassificationExperiment(BaseExperiment):
                     dir_to_blob(checkpoint.parent) if checkpoint is not None else None
                 )
 
-            if not is_ray_local_mode():
+            # Ray throws an error here if we try to put this checkpoint in local mode
+            if not local_mode:
                 checkpoint = ray.put(checkpoint)
+
+            worker_ip = get_worker_ip()
 
             return RemoteTrainResult(
                 metadata=train_output.metadata(),
@@ -383,7 +378,6 @@ class ClassificationExperiment(BaseExperiment):
             labels: List[str],
             checkpoint: Union[bytes, Path],
             checkpoint_name: Optional[str],
-            master_ip: str,
             gobbli_dir: Optional[Path] = None,
             log_level: Union[int, str] = logging.WARNING,
             distributed: bool = False,
@@ -392,8 +386,7 @@ class ClassificationExperiment(BaseExperiment):
             logger = init_worker_env(gobbli_dir=gobbli_dir, log_level=log_level)
             use_gpu, nvidia_visible_devices = init_gpu_config()
 
-            worker_ip = get_worker_ip()
-            if not distributed and worker_ip != master_ip:
+            if not distributed and len(ray.nodes()) > 1:
                 raise RuntimeError(
                     "Experiments must be started with distributed = True to run "
                     "tasks on remote workers."
@@ -440,11 +433,6 @@ class ClassificationExperiment(BaseExperiment):
 
             return predict_output.y_pred_proba
 
-        # Record the IP address of the master node so workers can detect
-        # whether they're remote and not running in distributed mode, at which
-        # point they should raise an error
-        master_ip = get_worker_ip()
-
         # Run training in parallel using the Ray cluster
         raw_results = ray.get(
             [
@@ -455,9 +443,9 @@ class ClassificationExperiment(BaseExperiment):
                     num_train_epochs,
                     self.model_cls,
                     params,
-                    master_ip,
                     self.worker_gobbli_dir,
                     self.worker_log_level,
+                    self.is_ray_local_mode,
                     self.distributed,
                 )
                 for params in grid
@@ -488,10 +476,11 @@ class ClassificationExperiment(BaseExperiment):
             )
 
         # Evaluate the best model on the test set
-        if is_ray_local_mode():
-            X_test_id = X_test
-        else:
-            X_test_id = ray.put(X_test)
+        # TODO is this no longer necessary?
+        # if is_ray_local_mode():
+        #     X_test_id = X_test
+        # else:
+        X_test_id = ray.put(X_test)
         y_pred_proba = ray.get(
             predict.remote(
                 X_test_id,
@@ -501,7 +490,6 @@ class ClassificationExperiment(BaseExperiment):
                 best_result.labels,
                 best_checkpoint_id,
                 best_result.checkpoint_name,
-                master_ip,
                 self.worker_gobbli_dir,
                 self.worker_log_level,
                 self.distributed,
@@ -509,7 +497,9 @@ class ClassificationExperiment(BaseExperiment):
         )
 
         best_checkpoint = best_checkpoint_id
-        if not is_ray_local_mode():
+        # We will have stored the checkpoint in the object store if not
+        # running in local mode
+        if not self.is_ray_local_mode:
             best_checkpoint = ray.get(best_checkpoint_id)
 
         return ClassificationExperimentResults(

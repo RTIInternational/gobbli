@@ -7,6 +7,7 @@ services:
       args:
         PYTHON_VERSION: "${PYTHON_VERSION:?Must specify Python version.}"
     image: gobbli-ci:latest
+    ipc: host
     # Travis only gives us ~7.5GB of memory, so we need to run tests in
     # low resource mode
     # The test environment won't be shared across runs, but we'd like to reuse
