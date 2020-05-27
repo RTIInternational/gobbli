@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -6,6 +7,7 @@ import click
 import yaml
 
 import gobbli
+from benchmark_util import BENCHMARK_DATA_DIR
 from scenario import (
     ClassImbalanceScenario,
     DataAugmentationScenario,
@@ -104,6 +106,10 @@ def run(
     debug: bool,
     raise_exceptions: bool,
 ):
+    # Make sure all models run outside of experiments create their data under the
+    # assigned benchmark directory
+    os.environ["GOBBLI_DIR"] = str(BENCHMARK_DATA_DIR)
+
     logging.basicConfig(
         level=log_level, format="[%(asctime)s] %(levelname)s - %(name)s: %(message)s"
     )

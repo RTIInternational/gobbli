@@ -19,6 +19,7 @@ from umap import UMAP
 
 import gobbli.model
 from benchmark_util import (
+    BENCHMARK_DATA_DIR,
     PREPROCESS_FUNCS,
     StdoutCatcher,
     assert_param_required,
@@ -41,9 +42,25 @@ from gobbli.io import (
     make_document_windows,
     pool_document_windows,
 )
+from gobbli.model.base import BaseModel
 from gobbli.util import TokenizeMethod, assert_in, assert_type, pred_prob_to_pred_label
 
 LOGGER = logging.getLogger(__name__)
+
+
+def get_model_run_params() -> Dict[str, Any]:
+    """
+    See also :func:`run_benchmark_experiment`, since there's some duplication between there
+    and here (that function initializes its own models indirectly via
+    :class:`gobbli.experiment.ClassificationExperiment`
+
+    Returns:
+      Parameters that should be passed to any gobbli model used as part of benchmarks.
+    """
+    return {
+        "use_gpu": os.getenv("GOBBLI_USE_GPU") is not None,
+        "nvidia_visible_devices": os.getenv("NVIDIA_VISIBLE_DEVICES", ""),
+    }
 
 
 class BaseRun(ABC):
@@ -426,13 +443,10 @@ class DatasetEmbeddingScenario(ModelEmbeddingScenario):  # type: ignore
         stdout_catcher = StdoutCatcher()
         with stdout_catcher:
             # Construct the dict of kwargs up-front so each run can override the "use_gpu"
-            # option if necessary -- ex. for models like spaCy which have trouble controlling
-            # memory usage on the GPU and don't gain much benefit from it
-            model_kwargs = {
-                "use_gpu": os.getenv("GOBBLI_USE_GPU") is not None,
-                "nvidia_visible_devices": os.getenv("NVIDIA_VISIBLE_DEVICES", ""),
-                **run.model_params,
-            }
+            # option if necessary using its model params -- ex. for models like spaCy
+            # which have trouble controlling memory usage on the GPU and don't gain
+            # much benefit from it
+            model_kwargs = {**get_model_run_params(), **run.model_params}
             model = model_cls(**model_kwargs)
             model.build()
 
@@ -778,7 +792,20 @@ class DataAugmentationScenario(AugmentScenario):
 
         assert_valid_augment(run.augment_name)
         augment_cls = getattr(gobbli.augment, run.augment_name)
-        augment_obj = augment_cls(**run.params)
+
+        model_run_params: Dict[str, Any] = {}
+        if issubclass(augment_cls, BaseModel):
+            # If the augment method is also a gobbli model (and will be mounting files back-
+            # and-forth with Docker), we need to make sure it has the proper params
+            # applied ex. to store data in the correct place and use GPU(s)
+            model_run_params = get_model_run_params()
+
+        augment_obj = augment_cls(**run.params, **model_run_params)
+
+        # Some augmentation methods are also models, which need to be built
+        # beforehand
+        if isinstance(augment_obj, BaseModel):
+            augment_obj.build()
 
         all_results = []
 
