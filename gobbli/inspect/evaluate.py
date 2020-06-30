@@ -174,7 +174,7 @@ class ClassificationEvaluation:
             y_true: Union[pd.DataFrame, List[str]] = self.y_true_multilabel
             y_pred: Union[pd.DataFrame, List[str]] = self.y_pred_multilabel
             # Since these are indicator dataframes, the "labels" are indices
-            labels = list(range(len(self.labels)))
+            labels: Union[List[str], List[int]] = list(range(len(self.labels)))
         else:
             y_true = self.y_true_multiclass
             y_pred = self.y_pred_multiclass
