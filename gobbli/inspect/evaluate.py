@@ -173,18 +173,21 @@ class ClassificationEvaluation:
         if self.multilabel:
             y_true: Union[pd.DataFrame, List[str]] = self.y_true_multilabel
             y_pred: Union[pd.DataFrame, List[str]] = self.y_pred_multilabel
+            # Since these are indicator dataframes, the "labels" are indices
+            labels = list(range(len(self.labels)))
         else:
             y_true = self.y_true_multiclass
             y_pred = self.y_pred_multiclass
+            # Since these are lists of labels, the "labels" are the strings themselves
+            labels = self.labels
 
-        label_indices = list(range(len(self.labels)))
         return (
             "Metrics:\n"
             "--------\n"
             f"{metric_string}\n\n"
             "Classification Report:\n"
             "----------------------\n"
-            f"{classification_report(y_true, y_pred, labels=label_indices, target_names=self.labels)}\n"
+            f"{classification_report(y_true, y_pred, labels=labels, target_names=self.labels)}\n"
         )
 
     def plot(self, sample_size: Optional[int] = None) -> alt.Chart:
