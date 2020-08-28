@@ -325,7 +325,13 @@ def format_task(task_dir: Path) -> str:
       String-formatted, human-readable task metadata.
     """
     task_id = task_dir.name
-    task_creation_time = dt.datetime.fromtimestamp(task_dir.stat().st_birthtime)
+    try:
+        # Should work on OS X, Linux
+        task_creation_ts = task_dir.stat().st_birthtime
+    except AttributeError:
+        # Should work on Windows
+        task_creation_ts = task_dir.stat().st_ctime
+    task_creation_time = dt.datetime.fromtimestamp(task_creation_ts)
     return f"{task_id[:5]} - Created {task_creation_time.strftime('%Y-%m-%d %H:%M:%S')}"
 
 
