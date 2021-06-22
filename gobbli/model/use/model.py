@@ -19,7 +19,7 @@ def _read_embeddings(output_file: Path) -> np.ndarray:
     with open(output_file, "r") as f:
         for line in f:
             embeddings.append(json.loads(line))
-    return np.vstack(embeddings)
+    return embeddings
 
 
 USE_MODEL_ARCHIVES = {
