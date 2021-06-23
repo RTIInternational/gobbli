@@ -2,7 +2,7 @@ import json
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import numpy as np
 
@@ -14,12 +14,12 @@ from gobbli.model.mixin import EmbedMixin
 from gobbli.util import assert_in, download_archive, escape_line_delimited_texts
 
 
-def _read_embeddings(output_file: Path) -> np.ndarray:
-    embeddings = []
+def _read_embeddings(output_file: Path) -> List[np.ndarray]:
+    embeddings = []  # type: List[np.ndarray]
     with open(output_file, "r") as f:
         for line in f:
-            embeddings.append(json.loads(line))
-    return np.vstack(embeddings)
+            embeddings.append(np.array(json.loads(line)))
+    return embeddings
 
 
 USE_MODEL_ARCHIVES = {
