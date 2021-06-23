@@ -24,6 +24,10 @@ services:
     build:
       context: ./gobbli/augment/bert
 
+  marian:
+    build:
+      context: ./gobbli/augment/marian
+
   transformer:
     build:
       context: ./gobbli/model/transformer
