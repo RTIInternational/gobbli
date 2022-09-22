@@ -1,4 +1,0 @@
-# These are additional requirements needed on top of the pytorch image
-pandas==0.25.0
-transformers==2.8.0
-sentencepiece==0.1.86
