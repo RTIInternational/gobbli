@@ -1,1 +1,0 @@
-{"name": "spaCy", "model_name": "SpaCyModel", "model_params": {"model": "en_core_web_lg", "use_gpu": false}, "preprocess_func": null, "batch_size": 32}

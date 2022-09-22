@@ -1,1 +1,0 @@
-{"name": "XLM", "model_name": "Transformer", "model_params": {"transformer_weights": "xlm-clm-ende-1024", "transformer_model": "XLM"}, "preprocess_func": "bert_preprocess", "batch_size": 16}

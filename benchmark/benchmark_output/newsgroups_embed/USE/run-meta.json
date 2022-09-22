@@ -1,1 +1,0 @@
-{"name": "USE", "model_name": "USE", "model_params": {"use_model": "universal-sentence-encoder"}, "preprocess_func": null, "batch_size": 32}

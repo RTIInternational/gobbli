@@ -1,1 +1,0 @@
-{"name": "XLNet", "model_name": "Transformer", "param_grid": {"transformer_weights": ["xlnet-base-cased"], "transformer_model": ["XLNet"]}, "preprocess_func": "bert_preprocess", "run_kwargs": {"train_batch_size": 16}}

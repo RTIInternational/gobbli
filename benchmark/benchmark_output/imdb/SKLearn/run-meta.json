@@ -1,1 +1,0 @@
-{"name": "SKLearn", "model_name": "SKLearnClassifier", "param_grid": {}, "preprocess_func": "fasttext_preprocess", "run_kwargs": {}}

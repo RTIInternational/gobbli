@@ -1,1 +1,0 @@
-{"imbalance_proportions": [0.01, 0.05, 0.1, 0.25, 0.33, 0.5], "name": "XLM", "model_name": "Transformer", "param_grid": {"transformer_weights": ["xlm-mlm-tlm-xnli15-1024", "xlm-clm-ende-1024"], "transformer_model": ["XLM"]}, "preprocess_func": "bert_preprocess", "run_kwargs": {"train_batch_size": 16}}

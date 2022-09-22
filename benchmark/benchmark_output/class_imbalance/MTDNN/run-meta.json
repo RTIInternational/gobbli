@@ -1,1 +1,0 @@
-{"imbalance_proportions": [0.01, 0.05, 0.1, 0.25, 0.33, 0.5], "name": "MTDNN", "model_name": "MTDNN", "param_grid": {"mtdnn_model": ["mt-dnn-base"], "max_seq_length": [128]}, "preprocess_func": "bert_preprocess", "run_kwargs": {"train_batch_size": 16}}

@@ -1,1 +1,0 @@
-{"imbalance_proportions": [0.01, 0.05, 0.1, 0.25, 0.33, 0.5], "name": "BERT", "model_name": "BERT", "param_grid": {"bert_model": ["bert-base-uncased", "bert-base-cased", "scibert-uncased"], "max_seq_length": [128]}, "preprocess_func": "bert_preprocess", "run_kwargs": {}}

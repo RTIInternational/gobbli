@@ -1,1 +1,0 @@
-{"name": "T5Model", "model_name": "Transformer", "model_params": {"transformer_weights": "t5-base", "transformer_model": "T5"}, "preprocess_func": "bert_preprocess", "batch_size": 16}
